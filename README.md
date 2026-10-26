@@ -17,7 +17,10 @@ served from any static host (GitHub Pages, S3, Netlify, nginx) by copying the re
 | News | `/news/` | News items, newest first, and who to email for media enquiries |
 | Careers | `/careers/` | Open positions, how to apply, and the companies to work for |
 | Contact | `/contact/` | Call, email, visit and opening hours, and the companies' own websites |
-| Not found | `/404.html` | |
+| Not found | `/404.html` | A way back to the home page in each language |
+
+Every page is in English and Arabic: English at the addresses above, Arabic under `/ar/`
+(`/ar/`, `/ar/contact/`, ...). See **Languages** below.
 
 On the home page each sector opens its card on Our Sectors, and each company logo opens its
 card on Almail Group World; the card arrived at is outlined in lavender. Every inner page ends
@@ -27,12 +30,13 @@ with a "Talk to us" band with call and email buttons.
 
 ```
 .
-├── index.html, contact/index.html, news/index.html, ...   # generated pages
+├── index.html, contact/index.html, news/index.html, ...   # generated pages, English
+├── ar/                   # the same pages in Arabic
 ├── 404.html
 ├── assets/
 │   ├── css/style.css     # all styling: tokens, sections, responsive rules
 │   ├── js/main.js        # sticky header, mobile menu, scroll reveal, quote slider
-│   ├── fonts/            # Inter and Montserrat, served from the site (see its README)
+│   ├── fonts/            # Inter, Montserrat, Cairo and Tajawal, served from the site (see its README)
 │   └── img/
 │       ├── logos/        # Almail Group and group-company logos (white)
 │       ├── partners/     # partner logos (white)
@@ -45,6 +49,34 @@ with a "Talk to us" band with call and email buttons.
 ├── robots.txt
 └── sitemap.xml
 ```
+
+## Languages
+
+The site is in English and Arabic, built from one set of templates in `tools/build.py`. Every
+visible string there is a pair, `("English", "Arabic")`, so the two versions cannot drift
+apart; a string that is the same in both, a brand name or a phone number, is written once.
+Adding content means giving both halves: a news item's title and paragraphs, a job, a
+company's description.
+
+- **Addresses**: English at the root (`/contact/`), Arabic under `/ar/` (`/ar/contact/`).
+  Each page tells search engines about its twin (`hreflang`), and both are in `sitemap.xml`.
+- **Switching**: the top bar and the phone menu carry a link to the same page in the other
+  language, named in that language ("العربية" on an English page, "English" on an Arabic one).
+- **Right to left**: Arabic pages are `dir="rtl"`. The layout mirrors by itself because the
+  stylesheet uses logical sides (start and end rather than left and right); the "right to
+  left" block in `assets/css/style.css` handles what direction alone does not: the menu
+  sliding in from the left, arrows, the hero's shading, letter spacing (none in Arabic) and
+  taller line heights. Phone numbers and emails are kept left to right inside Arabic text.
+- **Type**: Arabic is set in Cairo (headings) and Tajawal (text), the pair the AZSCO site
+  uses, served from `assets/fonts/`. They cover only Arabic letters, so Latin words on an
+  Arabic page stay in Montserrat and Inter, and English pages never download them.
+- **Names**: the Arabic names are the ones the companies use themselves: مجموعة الميل,
+  أزسكو للأمن, أنظمة أزسكو الأمنية, بيزاري and نت‑لت. Shiplee, Gemellry and Mailarti keep their
+  Latin names until they have Arabic ones. The Arabic address is the one AZSCO's site gives
+  for the same building.
+
+The Arabic text was written for this site; have a native speaker read it before relying on
+it for anything formal.
 
 ## Running locally
 

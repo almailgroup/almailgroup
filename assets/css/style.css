@@ -47,6 +47,32 @@
   line-gap-override: 0%;
 }
 
+/* Arabic (the /ar/ pages): Cairo for headings and Tajawal for text, the
+   pair AZSCO's site uses. Each covers only Arabic letters (unicode-range), so
+   a Latin word on an Arabic page, a brand or an email, stays in Montserrat or
+   Inter, and the English pages never download them. */
+@font-face {
+  font-family: "Cairo";
+  src: url(/assets/fonts/cairo-arabic.woff2) format("woff2");
+  font-weight: 200 1000;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FEFC;
+}
+@font-face {
+  font-family: "Tajawal";
+  src: url(/assets/fonts/tajawal-arabic-400.woff2) format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FEFC;
+}
+@font-face {
+  font-family: "Tajawal";
+  src: url(/assets/fonts/tajawal-arabic-700.woff2) format("woff2");
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FEFC;
+}
+
 /* ---------------------------------------------------------------- tokens */
 :root {
   --black: #000;
@@ -69,6 +95,11 @@
   --gutter: clamp(20px, 5vw, 64px);
   --section: clamp(88px, 12vw, 150px);
   --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+html[lang="ar"] {
+  --font-head: "Cairo", "Montserrat", "Montserrat Fallback", Tahoma, "Geeza Pro", sans-serif;
+  --font-body: "Tajawal", "Inter", "Inter Fallback", Tahoma, "Geeza Pro", sans-serif;
 }
 
 /* ---------------------------------------------------------------- base */
@@ -129,7 +160,7 @@ address { font-style: normal; }
 
 .skip-link {
   position: absolute;
-  left: 16px;
+  inset-inline-start: 16px;
   top: -60px;
   z-index: 100;
   padding: 10px 16px;
@@ -194,6 +225,24 @@ address { font-style: normal; }
 }
 .topbar-social svg { width: 15px; height: 15px; }
 
+/* the same page in the other language, in the top bar and the menu */
+.topbar-end { display: flex; align-items: center; gap: 18px; }
+.lang-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  font: 600 14px/1 var(--font-nav);
+  color: rgba(255, 255, 255, .85);
+  text-decoration: none;
+  transition: color .25s var(--ease);
+}
+.lang-link svg { width: 16px; height: 16px; }
+/* the Arabic word on an English page is set in the Arabic text face */
+.lang-link[lang="ar"],
+.m-lang[lang="ar"],
+.not-found-ar { font-family: "Tajawal", Tahoma, "Geeza Pro", sans-serif; }
+
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-block: 26px; }
 
 /* Once the page has scrolled past the header, it comes back as a compact
@@ -245,7 +294,7 @@ address { font-style: normal; }
 
 /* phones and tablets: a call button beside the menu button, in reach from
    anywhere on the page once the header is fixed to the top */
-.header-actions { display: none; align-items: center; gap: 10px; margin-right: -6px; }
+.header-actions { display: none; align-items: center; gap: 10px; margin-inline-end: -6px; }
 
 .call-btn {
   display: inline-flex;
@@ -300,7 +349,7 @@ address { font-style: normal; }
 .mobile-nav {
   position: fixed;
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
   z-index: 50;
   display: flex;
@@ -340,6 +389,19 @@ address { font-style: normal; }
 }
 .m-link[aria-current="page"],
 .m-link:active { color: var(--lavender); }
+
+.m-lang {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+  font: 600 18px/1.3 var(--font-nav);
+  color: var(--soft);
+  text-decoration: none;
+}
+.m-lang svg { width: 18px; height: 18px; color: var(--lavender); }
+.m-lang:active { color: var(--lavender); }
 
 /* the menu ends with the ways to get in touch */
 .m-contact { margin-top: auto; padding-top: 36px; }
@@ -583,12 +645,12 @@ address { font-style: normal; }
   max-width: 1160px;
   margin-top: clamp(48px, 6vw, 72px);
   border-top: 1px solid rgba(255, 255, 255, .12);
-  border-left: 1px solid rgba(255, 255, 255, .12);
+  border-inline-start: 1px solid rgba(255, 255, 255, .12);
 }
 .logo-grid--partners li {
   height: 160px;
   padding: 28px;
-  border-right: 1px solid rgba(255, 255, 255, .12);
+  border-inline-end: 1px solid rgba(255, 255, 255, .12);
   border-bottom: 1px solid rgba(255, 255, 255, .12);
   transition: background .3s var(--ease);
 }
@@ -684,7 +746,7 @@ address { font-style: normal; }
 
 .footer-grid a { color: var(--white); text-decoration: none; }
 
-.social { display: flex; gap: 8px; margin-left: -10px; }
+.social { display: flex; gap: 8px; margin-inline-start: -10px; }
 .social a { display: inline-flex; width: 44px; height: 44px; padding: 10px; color: var(--white); transition: color .25s var(--ease); }
 .social svg { width: 24px; height: 24px; }
 
@@ -872,7 +934,8 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
    and keeps it until the next tap elsewhere, so Back would return to a sector
    still lit or a tile still raised. Touch gets the :active states above. */
 @media (hover: hover) {
-  .topbar-contact a:hover { color: var(--white); }
+  .topbar-contact a:hover,
+  .lang-link:hover { color: var(--white); }
   .topbar-social a:hover { color: var(--lavender); border-color: rgba(201, 184, 255, .45); }
   .nav-link:hover::after { transform: scaleX(1); }
   .btn-primary:hover { background: var(--lavender); }
@@ -892,6 +955,44 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .contact-card p a:hover,
   .side-note a:hover,
   .steps p a:hover { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+/* ---------------------------------------------------------------- right to left */
+/* The layout mirrors by itself (flex, grid and logical sides follow the
+   page's direction); this is what direction alone does not turn round. */
+
+/* tracking pulls joined Arabic letters apart */
+[dir="rtl"] * { letter-spacing: 0 !important; }
+[dir="rtl"] [dir="ltr"],
+[dir="rtl"] [dir="ltr"] * { letter-spacing: normal !important; }
+
+/* Arabic letters reach higher and lower than Latin ones */
+[dir="rtl"] h1,
+[dir="rtl"] h2 { line-height: 1.35; }
+[dir="rtl"] h3 { line-height: 1.45; }
+[dir="rtl"] .quote blockquote p { line-height: 1.45; }
+
+[dir="rtl"] .nav-link::after { transform-origin: right; }
+
+/* the menu slides in from the left */
+[dir="rtl"] .mobile-nav { transform: translateX(-100%); }
+[dir="rtl"] .mobile-nav.is-open { transform: none; }
+
+/* arrows point the way the page reads */
+[dir="rtl"] .sector-arrow { transform: translateX(10px); }
+[dir="rtl"] .sector-arrow svg,
+[dir="rtl"] .company-link svg,
+[dir="rtl"] .online-url svg { transform: scaleX(-1); }
+[dir="rtl"] .sector-link:focus-visible .sector-name { transform: translateX(-6px); }
+@media (hover: hover) {
+  [dir="rtl"] .sector-link:hover .sector-name { transform: translateX(-6px); }
+}
+
+/* the hero is darker behind the words, which are on the right */
+@media (min-width: 901px) {
+  [dir="rtl"] .hero::before {
+    background: linear-gradient(270deg, rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .58) 42%, rgba(0, 0, 0, .28) 100%);
+  }
 }
 
 /* ---------------------------------------------------------------- scroll reveal */
@@ -963,7 +1064,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .why .bg img { object-position: 22% center; }   /* a phone's narrow crop: keep the left tower in frame */
   .why-areas li { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; font-size: 15px; }
   .why-icon { width: 38px; height: 38px; }
-  .sectors-head { text-align: left; }   /* six lines of centred text are hard to read on a phone */
+  .sectors-head { text-align: start; }   /* six lines of centred text are hard to read on a phone */
   .sector-link { gap: 16px; padding: 18px 2px; }
   .sector-arrow svg { width: 22px; height: 22px; }
   .sub-logos { --cols: 2; --gx: 12px; }
@@ -993,6 +1094,12 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .sector-arrow { display: none; }
 }
 
+@media (max-width: 400px) {
+  /* room for the phone number and the language: the social links are in the
+     menu and the footer too */
+  .topbar-social { display: none; }
+}
+
 @media (max-width: 359px) {
   .logo-grid--clients { --cols: 2; }
 }
@@ -1000,6 +1107,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
 /* touch screens: small links keep their look but take a 44px tap */
 @media (pointer: coarse) {
   .topbar-contact a { padding-block: 10px; }
+  .lang-link { min-height: 44px; }
   .topbar-social { gap: 12px; }
   .topbar-social a { position: relative; }
   .topbar-social a::after { content: ""; position: absolute; inset: -6px; }

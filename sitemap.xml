@@ -1,27 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.almailgroup.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/"/>
     <lastmod>2026-10-26</lastmod>
   </url>
   <url>
     <loc>https://www.almailgroup.com/almail-group-world/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/almail-group-world/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/almail-group-world/"/>
     <lastmod>2026-10-26</lastmod>
   </url>
   <url>
     <loc>https://www.almailgroup.com/our-sectors/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/our-sectors/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/our-sectors/"/>
     <lastmod>2026-10-26</lastmod>
   </url>
   <url>
     <loc>https://www.almailgroup.com/news/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/news/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/news/"/>
     <lastmod>2026-10-26</lastmod>
   </url>
   <url>
     <loc>https://www.almailgroup.com/careers/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/careers/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/careers/"/>
     <lastmod>2026-10-26</lastmod>
   </url>
   <url>
     <loc>https://www.almailgroup.com/contact/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/contact/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/contact/"/>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://www.almailgroup.com/ar/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/"/>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://www.almailgroup.com/ar/almail-group-world/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/almail-group-world/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/almail-group-world/"/>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://www.almailgroup.com/ar/our-sectors/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/our-sectors/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/our-sectors/"/>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://www.almailgroup.com/ar/news/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/news/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/news/"/>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://www.almailgroup.com/ar/careers/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/careers/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/careers/"/>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://www.almailgroup.com/ar/contact/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.almailgroup.com/contact/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.almailgroup.com/ar/contact/"/>
     <lastmod>2026-10-26</lastmod>
   </url>
 </urlset>

@@ -7,6 +7,12 @@ directory (contact/index.html, news/index.html, ...) so addresses are clean:
 
     python3 tools/build.py
 
+The site is in English and Arabic. English is at the root (/contact/) and
+Arabic under /ar/ (/ar/contact/), right to left. Both come from the same
+templates: every visible string below is an ("English", "Arabic") pair, so
+the two can't drift apart, and a string that is the same in both (a brand
+name, a number) is written once.
+
 The lighter image copies (AVIF photos, WebP logos, phone crops) come from
 tools/images.py, which needs Pillow; run it first after changing an image.
 """
@@ -22,22 +28,38 @@ from urllib.parse import quote as urlquote, urlparse
 OUT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 SITE_URL = "https://www.almailgroup.com"
-SITE_NAME = "Almail Group"
+
+LANGS = ("en", "ar")
+
+
+def t(value, lang):
+    """The text for one language: a pair gives its English or Arabic half,
+    anything else is the same in both."""
+    if isinstance(value, tuple):
+        return value[0] if lang == "en" else value[1]
+    return value
+
+
+SITE_NAME = ("Almail Group", "مجموعة الميل")
 
 # ---------------------------------------------------------------- contact
 PHONE = "+965 - 1808606"
 PHONE_HREF = "+9651808606"
 EMAIL = "Info@Almailgroup.com"
 EMAIL_HREF = "info@almailgroup.com"
-ADDRESS = ["Kuwait Building Tower, Floor 27,", "Fahad Alsalem Street,", "Qibla City - Kuwait."]
+ADDRESS = (["Kuwait Building Tower, Floor 27,", "Fahad Alsalem Street,", "Qibla City - Kuwait."],
+           ["برج مبنى الكويت، الدور 27،", "شارع فهد السالم،", "القبلة - الكويت."])
 # The top bar's one-line address, and the shorter form it falls back to on a
 # medium screen. The address opens Google Maps; paste the office's own share
 # link here (Maps -> Share -> Copy link) to land on the pin exactly.
-ADDRESS_LINE = "Floor 27, Kuwait Building Tower, Fahad Alsalem St., Qibla, Kuwait"
-ADDRESS_SHORT = "Kuwait Building Tower, Qibla"
+ADDRESS_LINE = ("Floor 27, Kuwait Building Tower, Fahad Alsalem St., Qibla, Kuwait",
+                "الدور 27، برج مبنى الكويت، شارع فهد السالم، القبلة، الكويت")
+ADDRESS_SHORT = ("Kuwait Building Tower, Qibla", "برج مبنى الكويت، القبلة")
 MAPS_URL = ("https://www.google.com/maps/search/?api=1&query="
             "Kuwait+Building+Tower%2C+Fahad+Al+Salem+Street%2C+Qibla%2C+Kuwait")
-HOURS = [("Sunday - Thursday", "8am - 5pm"), ("Friday", "Closed"), ("Saturday", "Closed")]
+HOURS = [(("Sunday - Thursday", "الأحد - الخميس"), ("8am - 5pm", "8 صباحاً - 5 مساءً")),
+         (("Friday", "الجمعة"), ("Closed", "مغلق")),
+         (("Saturday", "السبت"), ("Closed", "مغلق"))]
 
 # Paste the profile URLs here and rebuild. Left empty, the icons still show
 # but link nowhere ("#").
@@ -46,7 +68,7 @@ X_URL = ""
 
 # ---------------------------------------------------------------- routes
 # Every page lives in its own directory so the address bar never shows
-# ".html"; the home page is the bare site root.
+# ".html"; the home page is the bare site root, and /ar/ for Arabic.
 ROUTES = {
     "index.html": "",
     "almail-group-world.html": "almail-group-world",
@@ -57,35 +79,37 @@ ROUTES = {
 }
 
 NAV = [
-    ("Home", "index.html"),
-    ("Almail Group World", "almail-group-world.html"),
-    ("Our Sectors", "our-sectors.html"),
-    ("News", "news.html"),
-    ("Careers", "careers.html"),
-    ("Contact", "contact.html"),
+    (("Home", "الرئيسية"), "index.html"),
+    (("Almail Group World", "عالم مجموعة الميل"), "almail-group-world.html"),
+    (("Our Sectors", "قطاعاتنا"), "our-sectors.html"),
+    (("News", "الأخبار"), "news.html"),
+    (("Careers", "الوظائف"), "careers.html"),
+    (("Contact", "اتصل بنا"), "contact.html"),
 ]
 
 
-def path_for(fname):
-    """Root-relative clean URL for a page: '/', '/contact/'."""
+def path_for(lang, fname):
+    """Root-relative clean URL for a page: '/', '/contact/', '/ar/contact/'."""
     if fname == "404.html":
         return "/404.html"
     slug = ROUTES[fname]
-    return "/" if slug == "" else f"/{slug}/"
+    prefix = "" if lang == "en" else f"/{lang}"
+    return f"{prefix}/" if slug == "" else f"{prefix}/{slug}/"
 
 
-def out_file_for(fname):
+def out_file_for(lang, fname):
     """File the page is physically written to, relative to OUT."""
     if fname == "404.html":
         return "404.html"
     slug = ROUTES[fname]
-    return "index.html" if slug == "" else f"{slug}/index.html"
+    rel = "index.html" if slug == "" else f"{slug}/index.html"
+    return rel if lang == "en" else f"{lang}/{rel}"
 
 
-def link(spec):
-    """'contact.html' or 'our-sectors.html#security' -> clean URL."""
+def link(lang, spec):
+    """'contact.html' or 'our-sectors.html#security' -> clean URL in that language."""
     fname, _, anchor = spec.partition("#")
-    return path_for(fname) + (f"#{anchor}" if anchor else "")
+    return path_for(lang, fname) + (f"#{anchor}" if anchor else "")
 
 
 def e(text):
@@ -328,69 +352,143 @@ I = {
     "arrow": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
     "down": '<svg viewBox="0 0 24 48" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v42"/><path d="m4 36 8 8 8-8"/></svg>',
 }
+I["globe"] = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+              'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/>'
+              '<path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/></svg>')
 
 # ============================================================ content
+# Every visible string is an ("English", "Arabic") pair.
+
 HOME = {
-    "title": "Almail Group | Security",
+    "title": ("Almail Group | Security", "مجموعة الميل | الأمن"),
     "desc": ("Almail Group is a Kuwait holding group: real estate, construction and maintenance, "
-             "low voltage technology, security, e-commerce, jewelry, smart homes and delivery."),
-    "h1": "Almail Group",
+             "low voltage technology, security, e-commerce, jewelry, smart homes and delivery.",
+             "مجموعة الميل مجموعة قابضة في الكويت تعمل في العقارات والإنشاءات والصيانة وتقنيات "
+             "التيار المنخفض والأمن والتجارة الإلكترونية والمجوهرات والمنازل الذكية والتوصيل."),
+    "h1": SITE_NAME,
     "lead": ("A holding group company that provides a diverse array of products and services, "
              "including real estate services, construction and maintenance, low voltage technologies, "
              "jewelry design, e-commerce, security systems, security guard services, smart home "
-             "solutions, and delivery."),
+             "solutions, and delivery.",
+             "شركة قابضة تقدّم باقة متنوعة من المنتجات والخدمات، تشمل الخدمات العقارية، والإنشاءات "
+             "والصيانة، وتقنيات التيار المنخفض، وتصميم المجوهرات، والتجارة الإلكترونية، والأنظمة "
+             "الأمنية، وخدمات الحراسة الأمنية، وحلول المنازل الذكية، والتوصيل."),
     # (label, page) -- the first is the filled button
-    "actions": [("Explore our sectors", "our-sectors.html"), ("Contact us", "contact.html")],
+    "actions": [(("Explore our sectors", "تعرّف على قطاعاتنا"), "our-sectors.html"),
+                (("Contact us", "تواصل معنا"), "contact.html")],
 }
 
 WHY = {
-    "title": "Why Choose Almail Group?",
-    "sub": "Diverse Service Portfolio",
+    "title": ("Why Choose Almail Group?", "لماذا تختار مجموعة الميل؟"),
+    "sub": ("Diverse Service Portfolio", "محفظة خدمات متنوعة"),
     "text": ("Almail Group offers a diverse range of services including real estate, construction, "
              "technology, e-commerce, security, and smart home solutions. We are committed to "
-             "delivering excellence in each domain."),
+             "delivering excellence in each domain.",
+             "تقدّم مجموعة الميل طيفاً متنوعاً من الخدمات يشمل العقارات، والإنشاءات، والتكنولوجيا، "
+             "والتجارة الإلكترونية، والأمن، وحلول المنازل الذكية. ونلتزم بتقديم التميّز في كل مجال."),
     # the six areas the paragraph names, drawn beside it
-    "areas": [("Real estate", "building"), ("Construction", "helmet"), ("Technology", "chip"),
-              ("E-commerce", "cart"), ("Security", "shield"), ("Smart home", "smarthome")],
+    "areas": [(("Real estate", "العقارات"), "building"), (("Construction", "الإنشاءات"), "helmet"),
+              (("Technology", "التكنولوجيا"), "chip"), (("E-commerce", "التجارة الإلكترونية"), "cart"),
+              (("Security", "الأمن"), "shield"), (("Smart home", "المنازل الذكية"), "smarthome")],
 }
 
 ABOUT = {
-    "title": "About Almail Group",
-    "sub": "Empowering Through Innovation",
+    "title": ("About Almail Group", "عن مجموعة الميل"),
+    "sub": ("Empowering Through Innovation", "التمكين من خلال الابتكار"),
     "text": ("Almail Group is dedicated to empowering individuals and businesses through innovative "
              "solutions. We are committed to delivering top-notch services and creating a positive "
-             "impact in every industry we serve."),
+             "impact in every industry we serve.",
+             "تكرّس مجموعة الميل جهودها لتمكين الأفراد والشركات من خلال حلول مبتكرة. ونلتزم بتقديم "
+             "خدمات على أعلى مستوى، وبإحداث أثر إيجابي في كل قطاع نخدمه."),
 }
+
+# The group's sectors, in order. The English name is also the sector's anchor
+# on the Our Sectors page (/our-sectors/#delivery-services), in both languages.
+SECTORS = [("Security", "الأمن"), ("Real Estate", "العقارات"), ("Maintenance", "الصيانة"),
+           ("Smart Solutions", "الحلول الذكية"), ("E-Commerce", "التجارة الإلكترونية"),
+           ("Delivery Services", "خدمات التوصيل"), ("Jewelry", "المجوهرات"),
+           ("Fin-tech", "التكنولوجيا المالية")]
+SECTOR = {s[0]: s for s in SECTORS}
+
+SECTORS_INTRO = ("At Almail Group, we bring unparalleled expertise to every project we undertake. "
+                 "Our team is proficient in various domains, ensuring exceptional outcomes for our clients.",
+                 "في مجموعة الميل، نقدّم خبرة لا مثيل لها في كل مشروع نتولّاه. ويتمتع فريقنا بالكفاءة "
+                 "في مجالات متعددة، بما يضمن نتائج استثنائية لعملائنا.")
+
+# Our Sectors page: an icon and a description for each sector, keyed by its
+# English name. The companies listed under a sector come from COMPANIES.
+SECTOR_INFO = {
+    "Security": ("shield", (
+        "Guarding for buildings and facilities, VIP protection and rapid intervention, security patrols "
+        "and a central operations room, alongside the supply and installation of security systems.",
+        "حراسة المباني والمنشآت، وحماية الشخصيات والتدخّل السريع، والدوريات الأمنية وغرفة عمليات "
+        "مركزية، إلى جانب توريد الأنظمة الأمنية وتركيبها.")),
+    "Real Estate": ("building", (
+        "Real estate services, including Bizarri Chalet on the lagoon in Al Khiran.",
+        "خدمات عقارية، منها شاليه بيزاري على البحيرة في الخيران.")),
+    "Maintenance": ("helmet", ("Construction and maintenance services.", "خدمات الإنشاءات والصيانة.")),
+    "Smart Solutions": ("smarthome", (
+        "Low voltage technology and smart home solutions: video surveillance, access control, intrusion "
+        "and fire detection, and the networks that connect them.",
+        "تقنيات التيار المنخفض وحلول المنازل الذكية: المراقبة بالفيديو، والتحكم بالدخول، وكشف التسلل "
+        "والحريق، والشبكات التي تربط بينها.")),
+    "E-Commerce": ("cart", (
+        "NetLet, an online marketplace that brings Kuwait's stores together in one cart.",
+        "نت‑لت، سوق إلكتروني يجمع متاجر الكويت في سلة واحدة.")),
+    "Delivery Services": ("truck", (
+        "Delivery, with Shiplee getting orders to customers' doors.",
+        "التوصيل، مع Shiplee التي توصل الطلبات إلى أبواب العملاء.")),
+    "Jewelry": ("gem", ("Jewelry design, through Gemellry.", "تصميم المجوهرات من خلال Gemellry.")),
+    "Fin-tech": ("card", ("Technology for financial services.", "تقنيات للخدمات المالية.")),
+}
+
+
+def slug(text):
+    """'Delivery Services' -> 'delivery-services', the anchor for that sector."""
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
 
 # The group's companies, in the order the Almail Group World page shows them.
 # `id` is the company's anchor on that page (/almail-group-world/#bizarri),
-# `sectors` the Our Sectors entries it is listed under, `url` its own website
-# ("" when it has none to link to). A company with no `text` yet shows
-# "More about ... soon"; fill it in when the description is ready.
+# `sectors` the (English) names of the sectors it is listed under, `url` its
+# own website ("" when it has none to link to). A company with no `text` yet
+# shows "More about ... soon"; fill it in when the description is ready.
+# Arabic names are the ones the companies use themselves; a brand without one
+# keeps its Latin name.
 COMPANIES = [
-    {"id": "azsco-security", "name": "AZSCO Security", "logo": "logos/logo-azsco-security.png",
-     "field": "Security services", "url": "https://azsco.com", "sectors": ["Security"],
+    {"id": "azsco-security", "name": ("AZSCO Security", "أزسكو للأمن"), "logo": "logos/logo-azsco-security.png",
+     "field": ("Security services", "خدمات أمنية"), "url": "https://azsco.com", "sectors": ["Security"],
      "text": ("A Kuwait-based security company: facility guarding, VIP protection and rapid "
               "intervention, security patrols and a central operations room, together with "
-              "security systems.")},
-    {"id": "azsco-systems", "name": "AZSCO Systems", "logo": "logos/logo-azsco-systems.png",
-     "field": "Security systems", "url": "https://azsco.systems", "sectors": ["Security", "Smart Solutions"],
+              "security systems.",
+              "شركة أمن كويتية تقدّم حراسة المنشآت، وحماية الشخصيات والتدخّل السريع، والدوريات "
+              "الأمنية، وغرفة عمليات مركزية، إلى جانب الأنظمة الأمنية.")},
+    {"id": "azsco-systems", "name": ("AZSCO Systems", "أنظمة أزسكو الأمنية"), "logo": "logos/logo-azsco-systems.png",
+     "field": ("Security systems", "أنظمة أمنية"), "url": "https://azsco.systems",
+     "sectors": ["Security", "Smart Solutions"],
      "text": ("Supplies and installs security systems in Kuwait: video surveillance, intrusion and "
-              "fire detection, access control, and the radio and network hardware behind them.")},
-    {"id": "bizarri", "name": "Bizarri", "logo": "logos/logo-bizarri.png",
-     "field": "Real estate", "url": "https://bizarri.com", "sectors": ["Real Estate"],
+              "fire detection, access control, and the radio and network hardware behind them.",
+              "تورّد الأنظمة الأمنية وتركّبها في الكويت: المراقبة بالفيديو، وكشف التسلل والحريق، "
+              "والتحكم بالدخول، وأجهزة الاتصال اللاسلكي والشبكات التي تعمل بها.")},
+    {"id": "bizarri", "name": ("Bizarri", "بيزاري"), "logo": "logos/logo-bizarri.png",
+     "field": ("Real estate", "عقارات"), "url": "https://bizarri.com", "sectors": ["Real Estate"],
      "text": ("Bizarri Chalet, a chalet to book in Al Khiran: seven bedrooms for 14 guests, a heated "
-              "pool, seating on the lagoon and a children's play area.")},
-    {"id": "netlet", "name": "NetLet", "logo": "logos/logo-netlet.png",
-     "field": "E-commerce", "url": "https://netlet.net", "sectors": ["E-Commerce"],
+              "pool, seating on the lagoon and a children's play area.",
+              "شاليه بيزاري، شاليه للحجز في الخيران: سبع غرف نوم تتسع لـ14 ضيفاً، ومسبح مُدفّأ، "
+              "وجلسات على البحيرة، ومنطقة ألعاب للأطفال.")},
+    {"id": "netlet", "name": ("NetLet", "نت‑لت"), "logo": "logos/logo-netlet.png",
+     "field": ("E-commerce", "تجارة إلكترونية"), "url": "https://netlet.net", "sectors": ["E-Commerce"],
      "text": ("An online marketplace for Kuwait: products from many stores in one cart, delivered to "
-              "every governorate, with cash on delivery.")},
+              "every governorate, with cash on delivery.",
+              "سوق إلكتروني للكويت: منتجات من متاجر عديدة في سلة واحدة، مع التوصيل إلى جميع "
+              "المحافظات والدفع عند الاستلام.")},
     {"id": "shiplee", "name": "Shiplee", "logo": "logos/logo-shiplee.png",
-     "field": "Delivery", "url": "", "sectors": ["Delivery Services"],
-     "text": "The group's delivery company, getting orders to customers' doors."},
+     "field": ("Delivery", "توصيل"), "url": "", "sectors": ["Delivery Services"],
+     "text": ("The group's delivery company, getting orders to customers' doors.",
+              "شركة التوصيل في المجموعة، توصل الطلبات إلى أبواب العملاء.")},
     {"id": "gemellry", "name": "Gemellry", "logo": "logos/logo-gemellry.png",
-     "field": "Jewelry", "url": "", "sectors": ["Jewelry"],
-     "text": "The group's jewelry design business."},
+     "field": ("Jewelry", "مجوهرات"), "url": "", "sectors": ["Jewelry"],
+     "text": ("The group's jewelry design business.", "ذراع المجموعة لتصميم المجوهرات.")},
     {"id": "mailarti", "name": "Mailarti", "logo": "logos/logo-mailarti.png",
      "field": "", "url": "", "sectors": [], "text": ""},
 ]
@@ -400,33 +498,8 @@ COMPANY = {c["id"]: c for c in COMPANIES}
 SUBSIDIARIES = [COMPANY[i] for i in ("azsco-systems", "bizarri", "azsco-security", "mailarti",
                                      "netlet", "gemellry", "shiplee")]
 
-SECTORS_INTRO = ("At Almail Group, we bring unparalleled expertise to every project we undertake. "
-                 "Our team is proficient in various domains, ensuring exceptional outcomes for our clients.")
-
-SECTORS = ["Security", "Real Estate", "Maintenance", "Smart Solutions",
-           "E-Commerce", "Delivery Services", "Jewelry", "Fin-tech"]
-
-# Our Sectors page: an icon and a description for each sector. The companies
-# listed under a sector come from each company's `sectors` in COMPANIES.
-SECTOR_INFO = {
-    "Security": ("shield", "Guarding for buildings and facilities, VIP protection and rapid intervention, "
-                 "security patrols and a central operations room, alongside the supply and installation "
-                 "of security systems."),
-    "Real Estate": ("building", "Real estate services, including Bizarri Chalet on the lagoon in Al Khiran."),
-    "Maintenance": ("helmet", "Construction and maintenance services."),
-    "Smart Solutions": ("smarthome", "Low voltage technology and smart home solutions: video surveillance, "
-                        "access control, intrusion and fire detection, and the networks that connect them."),
-    "E-Commerce": ("cart", "NetLet, an online marketplace that brings Kuwait's stores together in one cart."),
-    "Delivery Services": ("truck", "Delivery, with Shiplee getting orders to customers' doors."),
-    "Jewelry": ("gem", "Jewelry design, through Gemellry."),
-    "Fin-tech": ("card", "Technology for financial services."),
-}
-
-
-def slug(text):
-    """'Delivery Services' -> 'delivery-services', the anchor for that sector."""
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
-
+# Partner and client logos: (name, image). The name is the logo's alt text
+# and stays as the brand writes it.
 PARTNERS = [
     ("Motorola", "partners/logo-motorola.png"),
     ("Ajax", "partners/logo-ajax.png"),
@@ -440,8 +513,10 @@ PARTNERS = [
 
 # Add a dict here to add a slide; the dots and rotation appear on their own.
 QUOTES = [
-    {"quote": "Our Client Commitment is Beyond Success & Profit.",
-     "name": "Dr. Abdulaziz Almail", "role": "Group CEO"},
+    {"quote": ("Our Client Commitment is Beyond Success & Profit.",
+               "التزامنا تجاه عملائنا يتجاوز النجاح والربح."),
+     "name": ("Dr. Abdulaziz Almail", "د. عبدالعزيز الميل"),
+     "role": ("Group CEO", "الرئيس التنفيذي للمجموعة")},
 ]
 
 CLIENTS = [
@@ -469,20 +544,25 @@ CLIENTS = [
 ]
 
 # News, newest first. Add a dict to publish an item: the date (YYYY-MM-DD), a
-# title and the text, one paragraph per string.
+# title and the text, one paragraph per string, in each language.
 NEWS = [
-    {"date": "2026-10-26", "title": "Almail Group launches its new website",
-     "text": ["Almail Group's new website brings the group together in one place: its companies, the "
-              "sectors they work in, its partners and clients, and every way to reach us.",
-              "It is built to be quick and easy to use on a phone, and every page carries our phone "
-              "number, email and address."]},
+    {"date": "2026-10-26",
+     "title": ("Almail Group launches its new website", "مجموعة الميل تطلق موقعها الإلكتروني الجديد"),
+     "text": (["Almail Group's new website brings the group together in one place: its companies, the "
+               "sectors they work in, its partners and clients, and every way to reach us.",
+               "It is in English and Arabic, quick and easy to use on a phone, and every page carries "
+               "our phone number, email and address."],
+              ["يجمع الموقع الإلكتروني الجديد لمجموعة الميل المجموعةَ في مكان واحد: شركاتها، والقطاعات "
+               "التي تعمل فيها، وشركاءها وعملاءها، وكل وسائل التواصل معنا.",
+               "والموقع متاح باللغتين العربية والإنجليزية، سريع وسهل الاستخدام على الهاتف، وتحمل كل صفحة "
+               "فيه رقم هاتفنا وبريدنا الإلكتروني وعنواننا."])},
 ]
 
 # Open positions on the Careers page. With none listed, the page says so and
 # invites a CV. To list one, add for example:
-#   {"title": "Security Systems Technician", "company": "AZSCO Systems",
-#    "location": "Kuwait City", "type": "Full time",
-#    "text": "What the role involves and who it suits."},
+#   {"title": ("Security Systems Technician", "فني أنظمة أمنية"), "company": "azsco-systems",
+#    "location": ("Kuwait City", "مدينة الكويت"), "type": ("Full time", "دوام كامل"),
+#    "text": ("What the role involves and who it suits.", "طبيعة الوظيفة ومن تناسب.")},
 JOBS = []
 
 # Where applications go (the subject line is filled in for the applicant).
@@ -492,32 +572,134 @@ CAREERS_EMAIL = EMAIL_HREF
 # description and the photo behind its heading.
 INNER = {
     "almail-group-world.html": {
-        "title": "Almail Group World", "photo": "about-curved-facade.jpg",
-        "lead": "The companies of Almail Group, from security and real estate to e-commerce, delivery and jewelry.",
+        "title": ("Almail Group World", "عالم مجموعة الميل"), "photo": "about-curved-facade.jpg",
+        "lead": ("The companies of Almail Group, from security and real estate to e-commerce, delivery and jewelry.",
+                 "شركات مجموعة الميل، من الأمن والعقارات إلى التجارة الإلكترونية والتوصيل والمجوهرات."),
         "desc": ("The companies of Almail Group: AZSCO Security, AZSCO Systems, Bizarri, NetLet, Shiplee, "
-                 "Gemellry and Mailarti.")},
+                 "Gemellry and Mailarti.",
+                 "شركات مجموعة الميل: أزسكو للأمن، وأنظمة أزسكو الأمنية، وبيزاري، ونت‑لت، وShiplee، "
+                 "وGemellry، وMailarti.")},
     "our-sectors.html": {
-        "title": "Our Sectors", "photo": "sectors-glass-facade.jpg",
-        "lead": "Eight sectors, from security and smart solutions to e-commerce, delivery and fin-tech.",
+        "title": ("Our Sectors", "قطاعاتنا"), "photo": "sectors-glass-facade.jpg",
+        "lead": ("Eight sectors, from security and smart solutions to e-commerce, delivery and fin-tech.",
+                 "ثمانية قطاعات، من الأمن والحلول الذكية إلى التجارة الإلكترونية والتوصيل والتكنولوجيا المالية."),
         "desc": ("Almail Group's sectors: security, real estate, maintenance, smart solutions, e-commerce, "
-                 "delivery services, jewelry and fin-tech.")},
+                 "delivery services, jewelry and fin-tech.",
+                 "قطاعات مجموعة الميل: الأمن، والعقارات، والصيانة، والحلول الذكية، والتجارة الإلكترونية، "
+                 "وخدمات التوصيل، والمجوهرات، والتكنولوجيا المالية.")},
     "news.html": {
-        "title": "News", "photo": "why-choose-towers.jpg",
-        "lead": "News and announcements from Almail Group and its companies.",
-        "desc": "News and announcements from Almail Group, a holding group in Kuwait."},
+        "title": ("News", "الأخبار"), "photo": "why-choose-towers.jpg",
+        "lead": ("News and announcements from Almail Group and its companies.",
+                 "أخبار وإعلانات مجموعة الميل وشركاتها."),
+        "desc": ("News and announcements from Almail Group, a holding group in Kuwait.",
+                 "أخبار وإعلانات مجموعة الميل، المجموعة القابضة في الكويت.")},
     "careers.html": {
-        "title": "Careers", "photo": "footer-skyscrapers-bw.jpg",
-        "lead": "Build your career with Almail Group and its companies.",
-        "desc": "Careers at Almail Group and its companies in Kuwait: open positions and how to apply."},
+        "title": ("Careers", "الوظائف"), "photo": "footer-skyscrapers-bw.jpg",
+        "lead": ("Build your career with Almail Group and its companies.",
+                 "ابنِ مسيرتك المهنية مع مجموعة الميل وشركاتها."),
+        "desc": ("Careers at Almail Group and its companies in Kuwait: open positions and how to apply.",
+                 "الوظائف في مجموعة الميل وشركاتها في الكويت: الشواغر المتاحة وطريقة التقديم.")},
     "contact.html": {
-        "title": "Contact", "photo": "hero-glass-towers.jpg",
-        "lead": "Call, email or visit us. We're open Sunday to Thursday, 8am to 5pm.",
-        "desc": (f"Contact {SITE_NAME}: {PHONE}, {EMAIL}. "
-                 "Kuwait Building Tower, Floor 27, Fahad Alsalem Street, Qibla City, Kuwait.")},
+        "title": ("Contact", "اتصل بنا"), "photo": "hero-glass-towers.jpg",
+        "lead": ("Call, email or visit us. We're open Sunday to Thursday, 8am to 5pm.",
+                 "اتصل بنا أو راسلنا أو زُرنا. نستقبلكم من الأحد إلى الخميس، من 8 صباحاً حتى 5 مساءً."),
+        "desc": (f"Contact Almail Group: {PHONE}, {EMAIL}. "
+                 "Kuwait Building Tower, Floor 27, Fahad Alsalem Street, Qibla City, Kuwait.",
+                 f"تواصل مع مجموعة الميل: {PHONE}، {EMAIL}. "
+                 "برج مبنى الكويت، الدور 27، شارع فهد السالم، القبلة، الكويت.")},
 }
 
+# Words the templates use, in both languages.
+UI = {
+    "skip": ("Skip to content", "تخطَّ إلى المحتوى"),
+    "main_nav": ("Main", "القائمة الرئيسية"),
+    "open_menu": ("Open menu", "فتح القائمة"),
+    "close_menu": ("Close menu", "إغلاق القائمة"),
+    "home": ("Almail Group, home", "مجموعة الميل، الصفحة الرئيسية"),
+    "call_label": ("Call Almail Group on", "اتصل بمجموعة الميل على"),
+    "call": ("Call", "اتصل على"),
+    "instagram": ("Almail Group on Instagram", "مجموعة الميل على إنستغرام"),
+    "x": ("Almail Group on X", "مجموعة الميل على إكس"),
+    "contact": ("Contact", "تواصل"),
+    "address": ("Address", "العنوان"),
+    "hours": ("Opening Hours", "ساعات العمل"),
+    "social": ("Social", "تابعنا"),
+    "rights": ("All rights reserved.", "جميع الحقوق محفوظة."),
+    "scroll": ("Scroll to the next section", "الانتقال إلى القسم التالي"),
+    "areas": ("Areas we work in", "مجالات عملنا"),
+    "companies": ("Almail Group companies", "شركات مجموعة الميل"),
+    "sectors": ("Sectors", "القطاعات"),
+    "partners": ("Our Partners", "شركاؤنا"),
+    "clients": ("Our Clients", "عملاؤنا"),
+    "quotes": ("Leadership quotes", "كلمات القيادة"),
+    "slide": ("slide", "شريحة"),
+    "carousel": ("carousel", "عرض متتابع"),
+    "of": ("of", "من"),
+    "choose_quote": ("Choose a quote", "اختر اقتباساً"),
+    "show_quote": ("Show quote", "عرض الاقتباس"),
+    "talk": ("Talk to us", "تحدّث إلينا"),
+    "talk_text": ("Questions about Almail Group or one of our companies? Call or email us.",
+                  "لديك سؤال عن مجموعة الميل أو إحدى شركاتنا؟ اتصل بنا أو راسلنا."),
+    "email_us": ("Email us", "راسلنا"),
+    "visit": ("Visit", "زيارة"),
+    "more_soon": ("More about {name} soon.", "المزيد عن {name} قريباً."),
+    "our_companies": ("Our companies", "شركاتنا"),
+    "group_companies": ("Group companies", "شركات المجموعة"),
+    "no_news": ("There is no news yet. Check back soon.", "لا توجد أخبار بعد. تابعنا قريباً."),
+    "media": ("Media enquiries", "الاستفسارات الإعلامية"),
+    "media_text": ("For press and media enquiries, email", "للاستفسارات الصحفية والإعلامية، راسلنا على"),
+    "follow": ("Follow us for the latest news.", "تابعنا لمعرفة آخر الأخبار."),
+    "open_positions": ("Open positions", "الوظائف الشاغرة"),
+    "careers_intro": ("Almail Group brings together companies in security, real estate, e-commerce, "
+                      "delivery and jewelry. Open roles across the group are listed here.",
+                      "تضمّ مجموعة الميل شركات في الأمن والعقارات والتجارة الإلكترونية والتوصيل "
+                      "والمجوهرات، ونعرض هنا الوظائف الشاغرة في المجموعة."),
+    "no_jobs": ("There are no open positions listed right now. You are still welcome to send us your CV: "
+                "tell us the company or the field you would like to work in.",
+                "لا توجد وظائف شاغرة معروضة حالياً، ويسعدنا مع ذلك أن تُرسل إلينا سيرتك الذاتية مع ذكر "
+                "الشركة أو المجال الذي تودّ العمل فيه."),
+    "apply_by_email": ("Apply by email", "قدّم عبر البريد الإلكتروني"),
+    "application": ("Application", "طلب توظيف"),
+    "job_application": ("Job application", "طلب توظيف"),
+    "how_to_apply": ("How to apply", "طريقة التقديم"),
+    "step1": ("Choose a field", "اختر مجالاً"),
+    "step1_text": ("Find where your experience fits among our sectors.",
+                   "حدّد أين تناسب خبرتك بين قطاعاتنا."),
+    "step2": ("Prepare your CV", "جهّز سيرتك الذاتية"),
+    "step2_text": ("Include your experience, your qualifications, and a phone number and email we can "
+                   "reach you on.",
+                   "اذكر خبراتك ومؤهلاتك، ورقم هاتف وبريداً إلكترونياً يمكننا التواصل معك من خلالهما."),
+    "step3": ("Email it to us", "أرسلها إلينا"),
+    "step3_text": ("Send it to {email} with the role or the field in the subject line.",
+                   "أرسلها إلى {email} مع ذكر الوظيفة أو المجال في عنوان الرسالة."),
+    "email_cv": ("Email your CV", "أرسل سيرتك الذاتية"),
+    "where": ("Where you could work", "أين يمكنك أن تعمل"),
+    "where_text": ("The companies of Almail Group. Choose one to read what it does.",
+                   "شركات مجموعة الميل. اختر إحداها لتتعرّف على عملها."),
+    "call_us": ("Call us", "اتصل بنا"),
+    "call_now": ("Call now", "اتصل الآن"),
+    "send_email": ("Send an email", "أرسل رسالة"),
+    "visit_us": ("Visit us", "زُرنا"),
+    "directions": ("Get directions", "الاتجاهات"),
+    "online": ("Our companies online", "شركاتنا على الإنترنت"),
+    "online_text": ("Reach one of our companies directly through its own website.",
+                    "تواصل مع أيٍّ من شركاتنا مباشرة عبر موقعها الإلكتروني."),
+}
+
+# The language switch names the other language in that language.
+LANG_NAME = {"en": "English", "ar": "العربية"}
+
+# Arabic quotes in guillemets, typed opening-first like the text around them
+QUOTE_MARKS = {"en": ("&ldquo;", "&rdquo;"), "ar": ("&laquo;", "&raquo;")}
+
+MONTHS_AR = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+             "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+
 # ============================================================ templates
-FONT_FILES = ["assets/fonts/inter-latin.woff2", "assets/fonts/montserrat-latin.woff2"]
+FONT_FILES = {
+    "en": ["assets/fonts/inter-latin.woff2", "assets/fonts/montserrat-latin.woff2"],
+    "ar": ["assets/fonts/tajawal-arabic-400.woff2", "assets/fonts/cairo-arabic.woff2"],
+}
 
 _CSS = None
 
@@ -536,13 +718,32 @@ def inline_css():
     return _CSS
 
 
-def head(fname, title, desc, noindex=False, preload=""):
-    url = SITE_URL + path_for(fname)
+def ltr(text, lang):
+    """A phone number or an email address: always read left to right, so on an
+    Arabic page it is isolated or its '+' and '-' would move about."""
+    return e(text) if lang == "en" else f'<bdi dir="ltr">{e(text)}</bdi>'
+
+
+def other(lang):
+    return "ar" if lang == "en" else "en"
+
+
+def head(lang, fname, title, desc, noindex=False, preload=""):
+    url = SITE_URL + path_for(lang, fname)
     fonts = "\n".join(f'<link rel="preload" href="{asset_url(f)}" as="font" type="font/woff2" crossorigin>'
-                      for f in FONT_FILES)
+                      for f in FONT_FILES[lang])
     robots = '<meta name="robots" content="noindex">\n' if noindex else ""
+    # each page names its twin in the other language, so search engines show
+    # people the one in their language
+    alternates = ""
+    if fname != "404.html":
+        twins = [(code, path_for(code, fname)) for code in LANGS] + [("x-default", path_for("en", fname))]
+        alternates = "".join(f'<link rel="alternate" hreflang="{code}" href="{SITE_URL + href}">\n'
+                             for code, href in twins)
+    locale, alt_locale = ("en_US", "ar_KW") if lang == "en" else ("ar_KW", "en_US")
+    direction = ' dir="rtl"' if lang == "ar" else ""
     return f'''<!DOCTYPE html>
-<html lang="en">
+<html lang="{lang}"{direction}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -550,8 +751,10 @@ def head(fname, title, desc, noindex=False, preload=""):
 <meta name="description" content="{e(desc)}">
 <meta name="theme-color" content="#000000">
 {robots}<link rel="canonical" href="{url}">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="{SITE_NAME}">
+{alternates}<meta property="og:type" content="website">
+<meta property="og:site_name" content="{e(t(SITE_NAME, lang))}">
+<meta property="og:locale" content="{locale}">
+<meta property="og:locale:alternate" content="{alt_locale}">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{url}">
@@ -569,74 +772,24 @@ def head(fname, title, desc, noindex=False, preload=""):
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
+<a class="skip-link" href="#main">{e(t(UI["skip"], lang))}</a>
 '''
 
 
-def nav_items(current, cls):
+def nav_items(lang, current, cls):
     out = []
     for label, fname in NAV:
         here = ' aria-current="page"' if fname == current else ""
-        out.append(f'<li><a class="{cls}" href="{link(fname)}"{here}>{e(label)}</a></li>')
+        out.append(f'<li><a class="{cls}" href="{link(lang, fname)}"{here}>{e(t(label, lang))}</a></li>')
     return "\n        ".join(out)
 
 
-def header(current):
-    logo = picture("logos/logo-almail-group-white.png", "Almail Group", "brand-logo", lazy=False)
-    logo_first = picture("logos/logo-almail-group-white.png", "Almail Group", "brand-logo", priority=True)
-    day, time = HOURS[0]
-    return f'''
-<header class="site-header">
-  <div class="topbar">
-    <div class="wrap topbar-inner">
-      <ul class="topbar-contact">
-        <li class="tb-address">{I["pin"]}<a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer"><span class="tb-long">{e(ADDRESS_LINE)}</span><span class="tb-short">{e(ADDRESS_SHORT)}</span></a></li>
-        <li>{I["phone"]}<a href="tel:{PHONE_HREF}">{e(PHONE)}</a></li>
-        <li class="tb-email">{I["mail"]}<a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
-      </ul>
-      <ul class="topbar-social">
-        {social_link(INSTAGRAM_URL, "Almail Group on Instagram", "instagram")}
-        {social_link(X_URL, "Almail Group on X", "x")}
-      </ul>
-    </div>
-  </div>
-  <div class="wrap header-inner">
-    <a class="brand" href="/">{logo_first}</a>
-    <nav class="nav" aria-label="Main">
-      <ul>
-        {nav_items(current, "nav-link")}
-      </ul>
-    </nav>
-    <div class="header-actions">
-      <a class="call-btn" href="tel:{PHONE_HREF}" aria-label="Call Almail Group on {e(PHONE)}">{I["phone"]}</a>
-      <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span></button>
-    </div>
-  </div>
-</header>
-
-<div class="backdrop" aria-hidden="true"></div>
-<nav class="mobile-nav" id="mobile-nav" aria-label="Main">
-  <div class="mobile-nav-head">
-    <a class="brand" href="/">{logo}</a>
-    <button class="close" type="button" aria-label="Close menu">{I["close"]}</button>
-  </div>
-  <ul>
-        {nav_items(current, "m-link")}
-  </ul>
-  <div class="m-contact">
-    <a class="btn btn-primary m-call" href="tel:{PHONE_HREF}">{I["phone"]}<span>Call {e(PHONE)}</span></a>
-    <ul class="m-details">
-      <li>{I["mail"]}<a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
-      <li>{I["pin"]}<a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{e(ADDRESS_SHORT)}</a></li>
-      <li>{I["clock"]}<span>{e(day)}: {e(time)}</span></li>
-    </ul>
-    <ul class="social m-social">
-      {social_link(INSTAGRAM_URL, "Almail Group on Instagram", "instagram")}
-      {social_link(X_URL, "Almail Group on X", "x")}
-    </ul>
-  </div>
-</nav>
-'''
+def lang_switch(lang, fname, cls):
+    """The same page in the other language, named in that language."""
+    to = other(lang)
+    target = path_for(to, "index.html" if fname == "404.html" else fname)
+    return (f'<a class="{cls}" href="{target}" hreflang="{to}" lang="{to}">'
+            f'{I["globe"]}<span>{LANG_NAME[to]}</span></a>')
 
 
 def social_link(url, label, icon):
@@ -645,39 +798,106 @@ def social_link(url, label, icon):
     return f'<li><a href="{href}"{ext} aria-label="{label}">{I[icon]}</a></li>'
 
 
-def footer():
-    hours = "<br>\n          ".join(f"{e(day)}: {e(time)}" for day, time in HOURS)
-    address = "<br>\n          ".join(e(line) for line in ADDRESS)
+def socials(lang):
+    return (social_link(INSTAGRAM_URL, e(t(UI["instagram"], lang)), "instagram") + "\n        "
+            + social_link(X_URL, e(t(UI["x"], lang)), "x"))
+
+
+def header(lang, current):
+    name = t(SITE_NAME, lang)
+    logo = picture("logos/logo-almail-group-white.png", name, "brand-logo", lazy=False)
+    logo_first = picture("logos/logo-almail-group-white.png", name, "brand-logo", priority=True)
+    day, time = HOURS[0]
+    home = path_for(lang, "index.html")
+    return f'''
+<header class="site-header">
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <ul class="topbar-contact">
+        <li class="tb-address">{I["pin"]}<a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer"><span class="tb-long">{e(t(ADDRESS_LINE, lang))}</span><span class="tb-short">{e(t(ADDRESS_SHORT, lang))}</span></a></li>
+        <li>{I["phone"]}<a href="tel:{PHONE_HREF}">{ltr(PHONE, lang)}</a></li>
+        <li class="tb-email">{I["mail"]}<a href="mailto:{EMAIL_HREF}">{ltr(EMAIL, lang)}</a></li>
+      </ul>
+      <div class="topbar-end">
+        {lang_switch(lang, current, "lang-link")}
+        <ul class="topbar-social">
+        {socials(lang)}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap header-inner">
+    <a class="brand" href="{home}">{logo_first}</a>
+    <nav class="nav" aria-label="{e(t(UI["main_nav"], lang))}">
+      <ul>
+        {nav_items(lang, current, "nav-link")}
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <a class="call-btn" href="tel:{PHONE_HREF}" aria-label="{e(t(UI["call_label"], lang))} {e(PHONE)}">{I["phone"]}</a>
+      <button class="burger" type="button" aria-label="{e(t(UI["open_menu"], lang))}" aria-expanded="false" aria-controls="mobile-nav"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="backdrop" aria-hidden="true"></div>
+<nav class="mobile-nav" id="mobile-nav" aria-label="{e(t(UI["main_nav"], lang))}">
+  <div class="mobile-nav-head">
+    <a class="brand" href="{home}">{logo}</a>
+    <button class="close" type="button" aria-label="{e(t(UI["close_menu"], lang))}">{I["close"]}</button>
+  </div>
+  <ul>
+        {nav_items(lang, current, "m-link")}
+  </ul>
+  {lang_switch(lang, current, "m-lang")}
+  <div class="m-contact">
+    <a class="btn btn-primary m-call" href="tel:{PHONE_HREF}">{I["phone"]}<span>{e(t(UI["call"], lang))} {ltr(PHONE, lang)}</span></a>
+    <ul class="m-details">
+      <li>{I["mail"]}<a href="mailto:{EMAIL_HREF}">{ltr(EMAIL, lang)}</a></li>
+      <li>{I["pin"]}<a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{e(t(ADDRESS_SHORT, lang))}</a></li>
+      <li>{I["clock"]}<span>{e(t(day, lang))}: {e(t(time, lang))}</span></li>
+    </ul>
+    <ul class="social m-social">
+      {socials(lang)}
+    </ul>
+  </div>
+</nav>
+'''
+
+
+def footer(lang):
+    hours = "<br>\n          ".join(f"{e(t(day, lang))}: {e(t(time, lang))}" for day, time in HOURS)
+    address = "<br>\n          ".join(e(line) for line in t(ADDRESS, lang))
+    name = t(SITE_NAME, lang)
     return f'''
 <footer class="site-footer">
   <div class="footer-photo">{picture("photos/footer-skyscrapers-bw.jpg", "", sizes="(max-width: 900px) 100vw, 42vw")}</div>
   <div class="footer-panel">
-    <h2 class="footer-title">{SITE_NAME}</h2>
+    <h2 class="footer-title">{e(name)}</h2>
     <div class="footer-grid">
       <section>
-        <h3>Contact</h3>
+        <h3>{e(t(UI["contact"], lang))}</h3>
         <ul class="footer-contact">
-          <li><a href="tel:{PHONE_HREF}">{e(PHONE)}</a></li>
-          <li><a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
+          <li><a href="tel:{PHONE_HREF}">{ltr(PHONE, lang)}</a></li>
+          <li><a href="mailto:{EMAIL_HREF}">{ltr(EMAIL, lang)}</a></li>
         </ul>
       </section>
       <section>
-        <h3>Address</h3>
+        <h3>{e(t(UI["address"], lang))}</h3>
         <address><a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{address}</a></address>
       </section>
       <section>
-        <h3>Opening Hours</h3>
+        <h3>{e(t(UI["hours"], lang))}</h3>
         <p>{hours}</p>
       </section>
       <section>
-        <h3>Social</h3>
+        <h3>{e(t(UI["social"], lang))}</h3>
         <ul class="social">
-          {social_link(INSTAGRAM_URL, "Almail Group on Instagram", "instagram")}
-          {social_link(X_URL, "Almail Group on X", "x")}
+          {socials(lang)}
         </ul>
       </section>
     </div>
-    <p class="footer-legal">&copy; {datetime.date.today().year} {SITE_NAME}. All rights reserved.</p>
+    <p class="footer-legal">&copy; {datetime.date.today().year} {e(name)}. {e(t(UI["rights"], lang))}</p>
   </div>
 </footer>
 <script src="{asset_url("assets/js/main.js")}" defer></script>
@@ -689,9 +909,9 @@ def footer():
 PAGES = {}
 
 
-def page(fname, title, desc, body, noindex=False, preload=""):
-    PAGES[fname] = (head(fname, title, desc, noindex, preload) + header(fname)
-                    + f'<main id="main">\n{body}\n</main>\n' + footer())
+def page(lang, fname, title, desc, body, noindex=False, preload=""):
+    PAGES[(lang, fname)] = (head(lang, fname, title, desc, noindex, preload) + header(lang, fname)
+                            + f'<main id="main">\n{body}\n</main>\n' + footer(lang))
 
 
 def logo_list(items, cls, label):
@@ -699,6 +919,15 @@ def logo_list(items, cls, label):
         f'      <li class="reveal" data-delay="{(n % 5) * 70}">{picture(path, name)}</li>'
         for n, (name, path) in enumerate(items))
     return f'    <ul class="{cls}" aria-label="{e(label)}">\n{lis}\n    </ul>'
+
+
+def company_tiles(lang, companies):
+    """Company logos as tiles, each opening its card on Almail Group World."""
+    lis = "\n".join(
+        f'      <li class="reveal" data-delay="{(n % 4) * 70}"><a href="{link(lang, "almail-group-world.html#" + c["id"])}">'
+        f'{picture(c["logo"], t(c["name"], lang))}</a></li>'
+        for n, c in enumerate(companies))
+    return f'    <ul class="sub-logos" aria-label="{e(t(UI["companies"], lang))}">\n{lis}\n    </ul>'
 
 
 def hero_preload(photo):
@@ -728,63 +957,59 @@ def hero_preload(photo):
 HERO_PHOTO = "hero-glass-towers.jpg"
 
 
-def build_home():
-    subs = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 4) * 70}"><a href="{link("almail-group-world.html#" + c["id"])}">'
-        f'{picture(c["logo"], c["name"])}</a></li>'
-        for n, c in enumerate(SUBSIDIARIES))
-    subs = f'    <ul class="sub-logos" aria-label="Almail Group companies">\n{subs}\n    </ul>'
+def build_home(lang):
     sectors = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link("our-sectors.html#" + slug(s))}">'
-        f'<span class="sector-num" aria-hidden="true">{n + 1:02d}</span><span class="sector-name">{e(s)}</span>'
+        f'      <li class="reveal" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link(lang, "our-sectors.html#" + slug(s[0]))}">'
+        f'<span class="sector-num" aria-hidden="true">{n + 1:02d}</span><span class="sector-name">{e(t(s, lang))}</span>'
         f'<span class="sector-arrow">{I["arrow"]}</span></a></li>'
         for n, s in enumerate(SECTORS))
     actions = "\n".join(
-        f'      <a class="btn {"btn-primary" if n == 0 else "btn-ghost"}" href="{link(target)}">{e(label)}</a>'
+        f'      <a class="btn {"btn-primary" if n == 0 else "btn-ghost"}" href="{link(lang, target)}">{e(t(label, lang))}</a>'
         for n, (label, target) in enumerate(HOME["actions"]))
     areas = "\n".join(
-        f'          <li><span class="why-icon">{I[icon]}</span>{e(label)}</li>' for label, icon in WHY["areas"])
-    partners = logo_list(PARTNERS, "logo-grid logo-grid--partners", "Our partners")
-    clients = logo_list(CLIENTS, "logo-grid logo-grid--clients", "Our clients")
+        f'          <li><span class="why-icon">{I[icon]}</span>{e(t(label, lang))}</li>' for label, icon in WHY["areas"])
+    partners = logo_list(PARTNERS, "logo-grid logo-grid--partners", t(UI["partners"], lang))
+    clients = logo_list(CLIENTS, "logo-grid logo-grid--clients", t(UI["clients"], lang))
+    of = t(UI["of"], lang)
     slides = "\n".join(
-        f'''      <div class="quote-slide{" is-active" if n == 0 else ""}" role="group" aria-roledescription="slide" aria-label="{n + 1} of {len(QUOTES)}"{"" if n == 0 else " hidden"}>
+        f'''      <div class="quote-slide{" is-active" if n == 0 else ""}" role="group" aria-roledescription="{e(t(UI["slide"], lang))}" aria-label="{n + 1} {of} {len(QUOTES)}"{"" if n == 0 else " hidden"}>
         <figure>
-          <blockquote><p>&ldquo;{e(q["quote"])}&rdquo;</p></blockquote>
-          <figcaption><span class="quote-name">{e(q["name"])}</span><span class="quote-role">{e(q["role"])}</span></figcaption>
+          <blockquote><p>{QUOTE_MARKS[lang][0]}{e(t(q["quote"], lang))}{QUOTE_MARKS[lang][1]}</p></blockquote>
+          <figcaption><span class="quote-name">{e(t(q["name"], lang))}</span><span class="quote-role">{e(t(q["role"], lang))}</span></figcaption>
         </figure>
       </div>''' for n, q in enumerate(QUOTES))
     current = ' aria-current="true"'
     dots = "\n".join(
-        f'      <button class="quote-dot" type="button" aria-label="Show quote {n + 1}"{current if n == 0 else ""}></button>'
+        f'      <button class="quote-dot" type="button" aria-label="{e(t(UI["show_quote"], lang))} {n + 1}"{current if n == 0 else ""}></button>'
         for n in range(len(QUOTES)))
     # with one quote there is nothing to choose between, so no dots
-    dots = (f'    <div class="quote-dots" role="group" aria-label="Choose a quote">\n{dots}\n    </div>'
+    dots = (f'    <div class="quote-dots" role="group" aria-label="{e(t(UI["choose_quote"], lang))}">\n{dots}\n    </div>'
             if len(QUOTES) > 1 else "")
 
     body = f'''
 <section class="hero has-bg">
   {backdrop(HERO_PHOTO, priority=True)}
   <div class="wrap hero-inner">
-    <h1 class="hero-title">{e(HOME["h1"])}</h1>
-    <p class="hero-lead">{e(HOME["lead"])}</p>
+    <h1 class="hero-title">{e(t(HOME["h1"], lang))}</h1>
+    <p class="hero-lead">{e(t(HOME["lead"], lang))}</p>
     <div class="hero-actions">
 {actions}
     </div>
   </div>
-  <a class="scroll-cue" href="#why" aria-label="Scroll to the next section">{I["down"]}</a>
+  <a class="scroll-cue" href="#why" aria-label="{e(t(UI["scroll"], lang))}">{I["down"]}</a>
 </section>
 
 <section class="why has-bg" id="why" aria-labelledby="why-title">
   {backdrop("why-choose-towers.jpg")}
   <div class="wrap">
     <div class="why-band reveal">
-      <h2 id="why-title">{e(WHY["title"])}</h2>
+      <h2 id="why-title">{e(t(WHY["title"], lang))}</h2>
       <div class="why-body">
         <div class="why-copy">
-          <h3>{e(WHY["sub"])}</h3>
-          <p>{e(WHY["text"])}</p>
+          <h3>{e(t(WHY["sub"], lang))}</h3>
+          <p>{e(t(WHY["text"], lang))}</p>
         </div>
-        <ul class="why-areas" aria-label="Areas we work in">
+        <ul class="why-areas" aria-label="{e(t(UI["areas"], lang))}">
 {areas}
         </ul>
       </div>
@@ -797,12 +1022,12 @@ def build_home():
   <div class="wrap">
     <div class="about-head">
       <div class="section-head reveal">
-        <h2 id="about-title">{e(ABOUT["title"])}</h2>
-        <p class="subtitle">{e(ABOUT["sub"])}</p>
+        <h2 id="about-title">{e(t(ABOUT["title"], lang))}</h2>
+        <p class="subtitle">{e(t(ABOUT["sub"], lang))}</p>
       </div>
-      <p class="about-text reveal">{e(ABOUT["text"])}</p>
+      <p class="about-text reveal">{e(t(ABOUT["text"], lang))}</p>
     </div>
-{subs}
+{company_tiles(lang, SUBSIDIARIES)}
   </div>
 </section>
 
@@ -810,8 +1035,8 @@ def build_home():
   {backdrop("sectors-glass-facade.jpg")}
   <div class="wrap">
     <div class="sectors-head reveal">
-      <h2 id="sectors-title">Sectors</h2>
-      <p>{e(SECTORS_INTRO)}</p>
+      <h2 id="sectors-title">{e(t(UI["sectors"], lang))}</h2>
+      <p>{e(t(SECTORS_INTRO, lang))}</p>
     </div>
     <ul class="sector-list">
 {sectors}
@@ -821,12 +1046,12 @@ def build_home():
 
 <section class="partners" aria-labelledby="partners-title">
   <div class="wrap">
-    <h2 id="partners-title" class="reveal">Our Partners</h2>
+    <h2 id="partners-title" class="reveal">{e(t(UI["partners"], lang))}</h2>
 {partners}
   </div>
 </section>
 
-<section class="quote has-bg" aria-roledescription="carousel" aria-label="Leadership quotes">
+<section class="quote has-bg" aria-roledescription="{e(t(UI["carousel"], lang))}" aria-label="{e(t(UI["quotes"], lang))}">
   {backdrop("ceo-high-rise-window.jpg")}
   <div class="wrap">
     <div class="quote-track reveal" aria-live="polite">
@@ -839,7 +1064,7 @@ def build_home():
 <section class="clients" aria-labelledby="clients-title">
   <div class="clients-head">
     <div class="wrap">
-      <h2 id="clients-title" class="reveal">Our Clients</h2>
+      <h2 id="clients-title" class="reveal">{e(t(UI["clients"], lang))}</h2>
       <span class="divider" aria-hidden="true"></span>
     </div>
   </div>
@@ -850,7 +1075,8 @@ def build_home():
   </div>
 </section>
 '''
-    page("index.html", HOME["title"], HOME["desc"], body, preload=hero_preload(HERO_PHOTO))
+    page(lang, "index.html", t(HOME["title"], lang), t(HOME["desc"], lang), body,
+         preload=hero_preload(HERO_PHOTO))
 
 
 def page_hero(title, lead, photo):
@@ -865,26 +1091,26 @@ def page_hero(title, lead, photo):
 """
 
 
-def inner_page(fname, body):
+def inner_page(lang, fname, body):
     meta = INNER[fname]
-    page(fname, f'{meta['title']} | {SITE_NAME}', meta['desc'],
-         page_hero(meta['title'], meta['lead'], meta['photo']) + body,
+    title = t(meta['title'], lang)
+    page(lang, fname, f'{title} | {t(SITE_NAME, lang)}', t(meta['desc'], lang),
+         page_hero(title, t(meta['lead'], lang), meta['photo']) + body,
          preload=hero_preload(meta['photo']))
 
 
-def cta(title="Talk to us",
-        text="Questions about Almail Group or one of our companies? Call or email us."):
+def cta(lang):
     """The closing band on inner pages: a line and the two quickest ways to reach us."""
     return f"""
 <section class="cta-band" aria-labelledby="cta-title">
   <div class="wrap cta-inner">
     <div class="reveal">
-      <h2 id="cta-title">{e(title)}</h2>
-      <p>{e(text)}</p>
+      <h2 id="cta-title">{e(t(UI['talk'], lang))}</h2>
+      <p>{e(t(UI['talk_text'], lang))}</p>
     </div>
     <div class="cta-actions reveal">
-      <a class="btn btn-primary" href="tel:{PHONE_HREF}">{I['phone']}<span>Call {e(PHONE)}</span></a>
-      <a class="btn btn-ghost" href="mailto:{EMAIL_HREF}">{I['mail']}<span>Email us</span></a>
+      <a class="btn btn-primary" href="tel:{PHONE_HREF}">{I['phone']}<span>{e(t(UI['call'], lang))} {ltr(PHONE, lang)}</span></a>
+      <a class="btn btn-ghost" href="mailto:{EMAIL_HREF}">{I['mail']}<span>{e(t(UI['email_us'], lang))}</span></a>
     </div>
   </div>
 </section>
@@ -903,23 +1129,25 @@ def domain(url):
     return urlparse(url).netloc.removeprefix("www.")
 
 
-def website_link(c, cls="company-link"):
-    return (f'<a class="{cls}" href="{c['url']}" target="_blank" rel="noopener noreferrer">'
-            f'<span>Visit {e(domain(c['url']))}</span>{I['external']}</a>')
+def website_link(lang, c, cls="company-link"):
+    return (f'<a class="{cls}" href="{c["url"]}" target="_blank" rel="noopener noreferrer">'
+            f'<span>{e(t(UI["visit"], lang))} <bdi>{e(domain(c["url"]))}</bdi></span>{I["external"]}</a>')
 
 
-def build_world():
+def build_world(lang):
     cards = []
     for c in COMPANIES:
-        field = f'<p class="company-field">{e(c['field'])}</p>' if c['field'] else ""
-        text = e(c['text']) if c['text'] else f'More about {e(c['name'])} soon.'
-        sectors = chips([(s, link("our-sectors.html#" + slug(s))) for s in c['sectors']], "Sectors")
-        site = website_link(c) if c['url'] else ""
+        name = t(c['name'], lang)
+        field = f'<p class="company-field">{e(t(c["field"], lang))}</p>' if c['field'] else ""
+        text = e(t(c['text'], lang)) if c['text'] else e(t(UI['more_soon'], lang).format(name=name))
+        sectors = chips([(t(SECTOR[s], lang), link(lang, "our-sectors.html#" + slug(s))) for s in c['sectors']],
+                        t(UI['sectors'], lang))
+        site = website_link(lang, c) if c['url'] else ""
         cards.append(f"""      <article class="company-card reveal" id="{c['id']}">
         <div class="company-logo">{picture(c['logo'], '')}</div>
         <div class="company-body">
           {field}
-          <h3>{e(c['name'])}</h3>
+          <h3>{e(name)}</h3>
           <p class="company-text">{text}</p>
           {sectors}
           {site}
@@ -929,105 +1157,104 @@ def build_world():
 <section class="page-section" aria-labelledby="companies-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="companies-title">Our companies</h2>
-      <p class="lead-text">{e(ABOUT['text'])}</p>
+      <h2 id="companies-title">{e(t(UI['our_companies'], lang))}</h2>
+      <p class="lead-text">{e(t(ABOUT['text'], lang))}</p>
     </div>
     <div class="company-grid">
 {chr(10).join(cards)}
     </div>
   </div>
 </section>
-""" + cta()
-    inner_page("almail-group-world.html", body)
+""" + cta(lang)
+    inner_page(lang, "almail-group-world.html", body)
 
 
-def build_sectors():
+def build_sectors(lang):
     cards = []
     for n, s in enumerate(SECTORS):
-        icon, text = SECTOR_INFO[s]
-        companies = [(c['name'], link("almail-group-world.html#" + c['id']))
-                     for c in COMPANIES if s in c['sectors']]
-        cards.append(f"""      <article class="sector-card reveal" id="{slug(s)}" data-delay="{(n % 2) * 90}">
+        icon, text = SECTOR_INFO[s[0]]
+        companies = [(t(c['name'], lang), link(lang, "almail-group-world.html#" + c['id']))
+                     for c in COMPANIES if s[0] in c['sectors']]
+        cards.append(f"""      <article class="sector-card reveal" id="{slug(s[0])}" data-delay="{(n % 2) * 90}">
         <div class="sector-card-top"><span class="icon-badge">{I[icon]}</span><span class="sector-num" aria-hidden="true">{n + 1:02d}</span></div>
-        <h2>{e(s)}</h2>
-        <p class="sector-text">{e(text)}</p>
-        {chips(companies, 'Group companies')}
+        <h2>{e(t(s, lang))}</h2>
+        <p class="sector-text">{e(t(text, lang))}</p>
+        {chips(companies, t(UI['group_companies'], lang))}
       </article>""")
     body = f"""
 <section class="page-section">
   <div class="wrap">
-    <p class="lead-text page-intro reveal">{e(SECTORS_INTRO)}</p>
+    <p class="lead-text page-intro reveal">{e(t(SECTORS_INTRO, lang))}</p>
     <div class="sector-cards">
 {chr(10).join(cards)}
     </div>
   </div>
 </section>
-""" + cta()
-    inner_page("our-sectors.html", body)
+""" + cta(lang)
+    inner_page(lang, "our-sectors.html", body)
 
 
-def long_date(iso):
+def long_date(iso, lang):
     d = datetime.date.fromisoformat(iso)
-    return f"{d.day} {d.strftime('%B %Y')}"
+    month = d.strftime('%B') if lang == "en" else MONTHS_AR[d.month - 1]
+    return f"{d.day} {month} {d.year}"
 
 
-def build_news():
+def build_news(lang):
     if NEWS:
         items = "\n".join(
             f"""      <li><article class="item-card reveal">
-        <time class="item-meta" datetime="{n['date']}">{long_date(n['date'])}</time>
-        <h2>{e(n['title'])}</h2>
-        {''.join(f'<p>{e(par)}</p>' for par in n['text'])}
+        <time class="item-meta" datetime="{n['date']}">{long_date(n['date'], lang)}</time>
+        <h2>{e(t(n['title'], lang))}</h2>
+        {''.join(f'<p>{e(par)}</p>' for par in t(n['text'], lang))}
       </article></li>""" for n in NEWS)
         listing = f'    <ul class="item-list">\n{items}\n    </ul>'
     else:
-        listing = '    <p class="empty-note reveal">There is no news yet. Check back soon.</p>'
-    social = [(url, label, icon) for url, label, icon in
-              ((INSTAGRAM_URL, "Almail Group on Instagram", "instagram"), (X_URL, "Almail Group on X", "x")) if url]
+        listing = f'    <p class="empty-note reveal">{e(t(UI["no_news"], lang))}</p>'
+    social = [(url, e(t(UI[key], lang)), key) for url, key in ((INSTAGRAM_URL, "instagram"), (X_URL, "x")) if url]
     follow = ""
     if social:
-        follow = ('\n      <p>Follow us for the latest news.</p>\n      <ul class="social">'
+        follow = (f'\n      <p>{e(t(UI["follow"], lang))}</p>\n      <ul class="social">'
                   + "".join(social_link(*sl) for sl in social) + "</ul>")
     body = f"""
 <section class="page-section">
   <div class="wrap news-layout">
 {listing}
     <aside class="side-note reveal" aria-labelledby="media-title">
-      <h2 id="media-title">Media enquiries</h2>
-      <p>For press and media enquiries, email <a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a>.</p>{follow}
+      <h2 id="media-title">{e(t(UI['media'], lang))}</h2>
+      <p>{e(t(UI['media_text'], lang))} <a href="mailto:{EMAIL_HREF}">{ltr(EMAIL, lang)}</a>.</p>{follow}
     </aside>
   </div>
 </section>
 """
-    inner_page("news.html", body)
+    inner_page(lang, "news.html", body)
 
 
-def build_careers():
-    apply_href = f"mailto:{CAREERS_EMAIL}?subject={urlquote('Job application')}"
+def build_careers(lang):
+    apply_href = f"mailto:{CAREERS_EMAIL}?subject={urlquote(t(UI['job_application'], lang))}"
     if JOBS:
-        items = "\n".join(
-            f"""      <li><article class="item-card reveal">
-        <p class="item-meta">{e(' · '.join(x for x in (j.get('company'), j.get('location'), j.get('type')) if x))}</p>
-        <h3>{e(j['title'])}</h3>
-        <p>{e(j['text'])}</p>
-        <a class="btn btn-ghost" href="mailto:{CAREERS_EMAIL}?subject={urlquote('Application: ' + j['title'])}">Apply by email</a>
-      </article></li>""" for j in JOBS)
-        jobs = f'    <ul class="item-list">\n{items}\n    </ul>'
+        items = []
+        for j in JOBS:
+            company = t(COMPANY[j['company']]['name'], lang) if j.get('company') in COMPANY else t(j.get('company', ''), lang)
+            meta = " · ".join(x for x in (company, t(j.get('location', ''), lang), t(j.get('type', ''), lang)) if x)
+            subject = urlquote(f"{t(UI['application'], lang)}: {t(j['title'], lang)}")
+            items.append(f"""      <li><article class="item-card reveal">
+        <p class="item-meta">{e(meta)}</p>
+        <h3>{e(t(j['title'], lang))}</h3>
+        <p>{e(t(j['text'], lang))}</p>
+        <a class="btn btn-ghost" href="mailto:{CAREERS_EMAIL}?subject={subject}">{e(t(UI['apply_by_email'], lang))}</a>
+      </article></li>""")
+        jobs = '    <ul class="item-list">\n' + "\n".join(items) + '\n    </ul>'
     else:
-        jobs = ('    <p class="empty-note reveal">There are no open positions listed right now. You are still '
-                'welcome to send us your CV: tell us the company or the field you would like to work in.</p>')
-    fields = "".join(f'<li><span class="chip">{e(s)}</span></li>' for s in SECTORS)
-    companies = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 4) * 70}"><a href="{link("almail-group-world.html#" + c['id'])}">'
-        f'{picture(c['logo'], c['name'])}</a></li>'
-        for n, c in enumerate(COMPANIES))
+        jobs = f'    <p class="empty-note reveal">{e(t(UI["no_jobs"], lang))}</p>'
+    fields = "".join(f'<li><span class="chip">{e(t(s, lang))}</span></li>' for s in SECTORS)
+    send_to = e(t(UI['step3_text'], lang)).replace("{email}", f'<a href="{apply_href}">{ltr(EMAIL, lang)}</a>')
     body = f"""
 <section class="page-section" aria-labelledby="jobs-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="jobs-title">Open positions</h2>
-      <p class="lead-text">Almail Group brings together companies in security, real estate, e-commerce,
-        delivery and jewelry. Open roles across the group are listed here.</p>
+      <h2 id="jobs-title">{e(t(UI['open_positions'], lang))}</h2>
+      <p class="lead-text">{e(t(UI['careers_intro'], lang))}</p>
     </div>
 {jobs}
   </div>
@@ -1035,24 +1262,24 @@ def build_careers():
 
 <section class="page-section page-section--alt" aria-labelledby="apply-title">
   <div class="wrap">
-    <h2 id="apply-title" class="reveal">How to apply</h2>
+    <h2 id="apply-title" class="reveal">{e(t(UI['how_to_apply'], lang))}</h2>
     <ol class="steps">
       <li class="reveal">
         <span class="step-num" aria-hidden="true">1</span>
-        <h3>Choose a field</h3>
-        <p>Find where your experience fits among our sectors.</p>
+        <h3>{e(t(UI['step1'], lang))}</h3>
+        <p>{e(t(UI['step1_text'], lang))}</p>
         <ul class="chips">{fields}</ul>
       </li>
       <li class="reveal" data-delay="90">
         <span class="step-num" aria-hidden="true">2</span>
-        <h3>Prepare your CV</h3>
-        <p>Include your experience, your qualifications, and a phone number and email we can reach you on.</p>
+        <h3>{e(t(UI['step2'], lang))}</h3>
+        <p>{e(t(UI['step2_text'], lang))}</p>
       </li>
       <li class="reveal" data-delay="180">
         <span class="step-num" aria-hidden="true">3</span>
-        <h3>Email it to us</h3>
-        <p>Send it to <a href="{apply_href}">{e(EMAIL)}</a> with the role or the field in the subject line.</p>
-        <a class="btn btn-primary" href="{apply_href}">{I['mail']}<span>Email your CV</span></a>
+        <h3>{e(t(UI['step3'], lang))}</h3>
+        <p>{send_to}</p>
+        <a class="btn btn-primary" href="{apply_href}">{I['mail']}<span>{e(t(UI['email_cv'], lang))}</span></a>
       </li>
     </ol>
   </div>
@@ -1061,27 +1288,25 @@ def build_careers():
 <section class="page-section" aria-labelledby="where-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="where-title">Where you could work</h2>
-      <p class="lead-text">The companies of Almail Group. Choose one to read what it does.</p>
+      <h2 id="where-title">{e(t(UI['where'], lang))}</h2>
+      <p class="lead-text">{e(t(UI['where_text'], lang))}</p>
     </div>
-    <ul class="sub-logos" aria-label="Almail Group companies">
-{companies}
-    </ul>
+{company_tiles(lang, COMPANIES)}
   </div>
 </section>
 """
-    inner_page("careers.html", body)
+    inner_page(lang, "careers.html", body)
 
 
-def build_contact():
-    address = "<br>".join(e(line) for line in ADDRESS)
-    hours = "".join(f"<li><span>{e(day)}</span><span>{e(time)}</span></li>" for day, time in HOURS)
+def build_contact(lang):
+    address = "<br>".join(e(line) for line in t(ADDRESS, lang))
+    hours = "".join(f"<li><span>{e(t(day, lang))}</span><span>{e(t(time, lang))}</span></li>" for day, time in HOURS)
     online = "\n".join(
         f"""      <li class="reveal" data-delay="{n * 90}">
         <a class="online-card" href="{c['url']}" target="_blank" rel="noopener noreferrer">
           <span class="online-logo">{picture(c['logo'], '')}</span>
-          <span class="online-name">{e(c['name'])}</span>
-          <span class="online-url">{e(domain(c['url']))}{I['external']}</span>
+          <span class="online-name">{e(t(c['name'], lang))}</span>
+          <span class="online-url"><bdi>{e(domain(c['url']))}</bdi>{I['external']}</span>
         </a>
       </li>""" for n, c in enumerate(c for c in COMPANIES if c['url']))
     body = f"""
@@ -1090,25 +1315,25 @@ def build_contact():
     <div class="contact-cards">
       <article class="contact-card reveal">
         <span class="icon-badge">{I['phone']}</span>
-        <h2>Call us</h2>
-        <p><a href="tel:{PHONE_HREF}">{e(PHONE)}</a></p>
-        <a class="btn btn-primary" href="tel:{PHONE_HREF}">Call now</a>
+        <h2>{e(t(UI['call_us'], lang))}</h2>
+        <p><a href="tel:{PHONE_HREF}">{ltr(PHONE, lang)}</a></p>
+        <a class="btn btn-primary" href="tel:{PHONE_HREF}">{e(t(UI['call_now'], lang))}</a>
       </article>
       <article class="contact-card reveal" data-delay="70">
         <span class="icon-badge">{I['mail']}</span>
-        <h2>Email us</h2>
-        <p><a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></p>
-        <a class="btn btn-ghost" href="mailto:{EMAIL_HREF}">Send an email</a>
+        <h2>{e(t(UI['email_us'], lang))}</h2>
+        <p><a href="mailto:{EMAIL_HREF}">{ltr(EMAIL, lang)}</a></p>
+        <a class="btn btn-ghost" href="mailto:{EMAIL_HREF}">{e(t(UI['send_email'], lang))}</a>
       </article>
       <article class="contact-card reveal" data-delay="140">
         <span class="icon-badge">{I['pin']}</span>
-        <h2>Visit us</h2>
+        <h2>{e(t(UI['visit_us'], lang))}</h2>
         <address>{address}</address>
-        <a class="btn btn-ghost" href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">Get directions</a>
+        <a class="btn btn-ghost" href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{e(t(UI['directions'], lang))}</a>
       </article>
       <article class="contact-card reveal" data-delay="210">
         <span class="icon-badge">{I['clock']}</span>
-        <h2>Opening hours</h2>
+        <h2>{e(t(UI['hours'], lang))}</h2>
         <ul class="hours">{hours}</ul>
       </article>
     </div>
@@ -1118,8 +1343,8 @@ def build_contact():
 <section class="page-section page-section--alt" aria-labelledby="online-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="online-title">Our companies online</h2>
-      <p class="lead-text">Reach one of our companies directly through its own website.</p>
+      <h2 id="online-title">{e(t(UI['online'], lang))}</h2>
+      <p class="lead-text">{e(t(UI['online_text'], lang))}</p>
     </div>
     <ul class="online-list">
 {online}
@@ -1127,30 +1352,40 @@ def build_contact():
   </div>
 </section>
 """
-    inner_page("contact.html", body)
+    inner_page(lang, "contact.html", body)
 
 
 def build_404():
+    """One not-found page serves both languages (GitHub Pages has one), so it
+    offers the way home in each."""
     body = page_hero("Page Not Found", "The page you are looking for has moved or no longer exists.", HERO_PHOTO) + """
 <section class="page-section">
   <div class="wrap">
     <p><a class="text-link" href="/">Back to the home page</a></p>
+    <p class="not-found-ar" lang="ar" dir="rtl"><a class="text-link" href="/ar/">العودة إلى الصفحة الرئيسية</a></p>
   </div>
 </section>
 """
-    page("404.html", f"Page Not Found | {SITE_NAME}",
+    page("en", "404.html", "Page Not Found | Almail Group",
          "The page you requested could not be found.", body, noindex=True,
          preload=hero_preload(HERO_PHOTO))
 
 
 # ============================================================ write
 def write_sitemap():
+    """Every page in both languages, each naming its twin in the other."""
     today = datetime.date.today().isoformat()
-    urls = list(ROUTES)
-    rows = [f"  <url>\n    <loc>{SITE_URL + path_for(f)}</loc>\n    <lastmod>{today}</lastmod>\n  </url>"
-            for f in urls]
+    rows = []
+    for lang in LANGS:
+        for fname in ROUTES:
+            alts = "".join(
+                f'\n    <xhtml:link rel="alternate" hreflang="{code}" href="{SITE_URL + path_for(code, fname)}"/>'
+                for code in LANGS)
+            rows.append(f"  <url>\n    <loc>{SITE_URL + path_for(lang, fname)}</loc>{alts}\n"
+                        f"    <lastmod>{today}</lastmod>\n  </url>")
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
-           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+           'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
            + "\n".join(rows) + "\n</urlset>\n")
     with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as fh:
         fh.write(xml)
@@ -1158,16 +1393,17 @@ def write_sitemap():
 
 
 if __name__ == "__main__":
-    build_home()
-    build_world()
-    build_sectors()
-    build_news()
-    build_careers()
-    build_contact()
+    for lang in LANGS:
+        build_home(lang)
+        build_world(lang)
+        build_sectors(lang)
+        build_news(lang)
+        build_careers(lang)
+        build_contact(lang)
     build_404()
 
-    for fname, doc in PAGES.items():
-        out_path = out_file_for(fname)
+    for (lang, fname), doc in PAGES.items():
+        out_path = out_file_for(lang, fname)
         full = os.path.join(OUT, out_path)
         os.makedirs(os.path.dirname(full) or OUT, exist_ok=True)
         with open(full, "w", encoding="utf-8") as fh:
