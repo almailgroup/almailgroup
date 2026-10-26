@@ -45,14 +45,16 @@ PORTRAIT_RATIO = 9 / 16
 
 # Photos that fill a tall section on a phone, and where across the photo the
 # phone's strip is taken from (0 = left edge, 0.5 = middle). Keep these in step
-# with object-position in style.css. The footer photo is wide on a phone too,
-# so it has no portrait copy.
+# with object-position in style.css. Only the photos behind a section or a
+# page heading use the strip; the footer's photo is wide on a phone too, so the
+# footer itself never does.
 PORTRAIT = {
     "hero-glass-towers.jpg": 0.5,
     "why-choose-towers.jpg": 0.22,    # the left tower, as `.why .bg img` in style.css
     "about-curved-facade.jpg": 0.5,
     "sectors-glass-facade.jpg": 0.5,
     "ceo-high-rise-window.jpg": 0.5,
+    "footer-skyscrapers-bw.jpg": 0.8,  # behind the Careers heading: the darker right-hand tower
 }
 
 LOGO_DIRS = ("logos", "partners", "clients")

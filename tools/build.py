@@ -16,6 +16,7 @@ import html
 import json
 import os
 import re
+from urllib.parse import quote as urlquote, urlparse
 
 # Output to the repository root (this script lives in <repo>/tools).
 OUT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -216,15 +217,16 @@ def img(rel, alt, cls="", lazy=True, priority=False, sizes=None):
     return "<img " + " ".join(attrs) + ">"
 
 
-def picture(rel, alt, cls="", lazy=True, priority=False, sizes=None):
+def picture(rel, alt, cls="", lazy=True, priority=False, sizes=None, portrait=False):
     """img() inside a <picture> that offers the lighter copies first: for a
-    photo (given `sizes`) the portrait strip to an upright phone and AVIF to
-    everything else, for a logo lossless WebP. A browser that takes neither
-    format, or a copy that is missing or out of date, gets the original."""
+    photo (given `sizes`) AVIF, plus the portrait strip to an upright phone
+    when `portrait` is set (photos that fill a tall box there); for a logo
+    lossless WebP. A browser that takes neither format, or a copy that is
+    missing or out of date, gets the original."""
     tag = img(rel, alt, cls, lazy, priority, sizes)
     sources = []
     if sizes:
-        portrait = portrait_version(rel)
+        portrait = portrait and portrait_version(rel)
         if portrait:
             sources.append(f'<source media="{PORTRAIT_MEDIA}" type="image/avif" '
                            f'srcset="{asset_url(f"{IMG}/{portrait}")}">')
@@ -244,7 +246,7 @@ def backdrop(photo, priority=False, sizes="100vw"):
     """Full-bleed background photo. A real <img> rather than a CSS background,
     so it lazy-loads below the fold and the hero can be fetched early."""
     return (f'<div class="bg" aria-hidden="true">'
-            f'{picture("photos/" + photo, "", lazy=not priority, priority=priority, sizes=sizes)}</div>')
+            f'{picture("photos/" + photo, "", lazy=not priority, priority=priority, sizes=sizes, portrait=True)}</div>')
 
 
 # Images that are stand-ins until the real files are supplied, with the SHA-1
@@ -319,6 +321,10 @@ I = {
     "cart": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6.2"/></svg>',
     "shield": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
     "smarthome": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 14.2a4.2 4.2 0 0 1 6 0"/><path d="M10.8 16.6a1.7 1.7 0 0 1 2.4 0"/></svg>',
+    "truck": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5h11v10h-11z"/><path d="M13.5 10h4l3.5 3.5v3h-7.5"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+    "gem": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h11l3.5 5.5-9 11.5L3 9z"/><path d="M3 9h18"/><path d="m9.5 3.5-1.5 5.5 4 11.5 4-11.5-1.5-5.5"/></svg>',
+    "card": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M6 14.5h4"/></svg>',
+    "external": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10.5 13.5"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
     "arrow": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
     "down": '<svg viewBox="0 0 24 48" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v42"/><path d="m4 36 8 8 8-8"/></svg>',
 }
@@ -356,21 +362,70 @@ ABOUT = {
              "impact in every industry we serve."),
 }
 
-SUBSIDIARIES = [
-    ("AZSCO Systems", "logos/logo-azsco-systems.png"),
-    ("Bizarri", "logos/logo-bizarri.png"),
-    ("AZSCO Security", "logos/logo-azsco-security.png"),
-    ("Mailarti", "logos/logo-mailarti.png"),
-    ("Netlet", "logos/logo-netlet.png"),
-    ("Gemellry", "logos/logo-gemellry.png"),
-    ("Shiplee", "logos/logo-shiplee.png"),
+# The group's companies, in the order the Almail Group World page shows them.
+# `id` is the company's anchor on that page (/almail-group-world/#bizarri),
+# `sectors` the Our Sectors entries it is listed under, `url` its own website
+# ("" when it has none to link to). A company with no `text` yet shows
+# "More about ... soon"; fill it in when the description is ready.
+COMPANIES = [
+    {"id": "azsco-security", "name": "AZSCO Security", "logo": "logos/logo-azsco-security.png",
+     "field": "Security services", "url": "https://azsco.com", "sectors": ["Security"],
+     "text": ("A Kuwait-based security company: facility guarding, VIP protection and rapid "
+              "intervention, security patrols and a central operations room, together with "
+              "security systems.")},
+    {"id": "azsco-systems", "name": "AZSCO Systems", "logo": "logos/logo-azsco-systems.png",
+     "field": "Security systems", "url": "https://azsco.systems", "sectors": ["Security", "Smart Solutions"],
+     "text": ("Supplies and installs security systems in Kuwait: video surveillance, intrusion and "
+              "fire detection, access control, and the radio and network hardware behind them.")},
+    {"id": "bizarri", "name": "Bizarri", "logo": "logos/logo-bizarri.png",
+     "field": "Real estate", "url": "https://bizarri.com", "sectors": ["Real Estate"],
+     "text": ("Bizarri Chalet, a chalet to book in Al Khiran: seven bedrooms for 14 guests, a heated "
+              "pool, seating on the lagoon and a children's play area.")},
+    {"id": "netlet", "name": "NetLet", "logo": "logos/logo-netlet.png",
+     "field": "E-commerce", "url": "", "sectors": ["E-Commerce"],
+     "text": ("An online marketplace for Kuwait: products from many stores in one cart, delivered to "
+              "every governorate, with cash on delivery.")},
+    {"id": "shiplee", "name": "Shiplee", "logo": "logos/logo-shiplee.png",
+     "field": "Delivery", "url": "", "sectors": ["Delivery Services"],
+     "text": "The group's delivery company, getting orders to customers' doors."},
+    {"id": "gemellry", "name": "Gemellry", "logo": "logos/logo-gemellry.png",
+     "field": "Jewelry", "url": "", "sectors": ["Jewelry"],
+     "text": "The group's jewelry design business."},
+    {"id": "mailarti", "name": "Mailarti", "logo": "logos/logo-mailarti.png",
+     "field": "", "url": "", "sectors": [], "text": ""},
 ]
+COMPANY = {c["id"]: c for c in COMPANIES}
+
+# The home page's About row, in the order the live site shows them.
+SUBSIDIARIES = [COMPANY[i] for i in ("azsco-systems", "bizarri", "azsco-security", "mailarti",
+                                     "netlet", "gemellry", "shiplee")]
 
 SECTORS_INTRO = ("At Almail Group, we bring unparalleled expertise to every project we undertake. "
                  "Our team is proficient in various domains, ensuring exceptional outcomes for our clients.")
 
 SECTORS = ["Security", "Real Estate", "Maintenance", "Smart Solutions",
            "E-Commerce", "Delivery Services", "Jewelry", "Fin-tech"]
+
+# Our Sectors page: an icon and a description for each sector. The companies
+# listed under a sector come from each company's `sectors` in COMPANIES.
+SECTOR_INFO = {
+    "Security": ("shield", "Guarding for buildings and facilities, VIP protection and rapid intervention, "
+                 "security patrols and a central operations room, alongside the supply and installation "
+                 "of security systems."),
+    "Real Estate": ("building", "Real estate services, including Bizarri Chalet on the lagoon in Al Khiran."),
+    "Maintenance": ("helmet", "Construction and maintenance services."),
+    "Smart Solutions": ("smarthome", "Low voltage technology and smart home solutions: video surveillance, "
+                        "access control, intrusion and fire detection, and the networks that connect them."),
+    "E-Commerce": ("cart", "NetLet, an online marketplace that brings Kuwait's stores together in one cart."),
+    "Delivery Services": ("truck", "Delivery, with Shiplee getting orders to customers' doors."),
+    "Jewelry": ("gem", "Jewelry design, through Gemellry."),
+    "Fin-tech": ("card", "Technology for financial services."),
+}
+
+
+def slug(text):
+    """'Delivery Services' -> 'delivery-services', the anchor for that sector."""
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 PARTNERS = [
     ("Motorola", "partners/logo-motorola.png"),
@@ -413,14 +468,52 @@ CLIENTS = [
     ("Arkan Al Kuwait Real Estate", "clients/logo-arkan-al-kuwait.png"),
 ]
 
-# Pages that exist so the navigation works but have no content yet. They are
-# kept out of search results (noindex) and the sitemap until `stub` is False.
-STUBS = {
-    "almail-group-world.html": {"title": "Almail Group World", "stub": True},
-    "our-sectors.html": {"title": "Our Sectors", "stub": True},
-    "news.html": {"title": "News", "stub": True},
-    "careers.html": {"title": "Careers", "stub": True},
-    "contact.html": {"title": "Contact", "stub": False},
+# News, newest first. Add a dict to publish an item: the date (YYYY-MM-DD), a
+# title and the text, one paragraph per string.
+NEWS = [
+    {"date": "2026-10-26", "title": "Almail Group launches its new website",
+     "text": ["Almail Group's new website brings the group together in one place: its companies, the "
+              "sectors they work in, its partners and clients, and every way to reach us.",
+              "It is built to be quick and easy to use on a phone, and every page carries our phone "
+              "number, email and address."]},
+]
+
+# Open positions on the Careers page. With none listed, the page says so and
+# invites a CV. To list one, add for example:
+#   {"title": "Security Systems Technician", "company": "AZSCO Systems",
+#    "location": "Kuwait City", "type": "Full time",
+#    "text": "What the role involves and who it suits."},
+JOBS = []
+
+# Where applications go (the subject line is filled in for the applicant).
+CAREERS_EMAIL = EMAIL_HREF
+
+# The pages behind the navigation: title, the line under it, its meta
+# description and the photo behind its heading.
+INNER = {
+    "almail-group-world.html": {
+        "title": "Almail Group World", "photo": "about-curved-facade.jpg",
+        "lead": "The companies of Almail Group, from security and real estate to e-commerce, delivery and jewelry.",
+        "desc": ("The companies of Almail Group: AZSCO Security, AZSCO Systems, Bizarri, NetLet, Shiplee, "
+                 "Gemellry and Mailarti.")},
+    "our-sectors.html": {
+        "title": "Our Sectors", "photo": "sectors-glass-facade.jpg",
+        "lead": "Eight sectors, from security and smart solutions to e-commerce, delivery and fin-tech.",
+        "desc": ("Almail Group's sectors: security, real estate, maintenance, smart solutions, e-commerce, "
+                 "delivery services, jewelry and fin-tech.")},
+    "news.html": {
+        "title": "News", "photo": "why-choose-towers.jpg",
+        "lead": "News and announcements from Almail Group and its companies.",
+        "desc": "News and announcements from Almail Group, a holding group in Kuwait."},
+    "careers.html": {
+        "title": "Careers", "photo": "footer-skyscrapers-bw.jpg",
+        "lead": "Build your career with Almail Group and its companies.",
+        "desc": "Careers at Almail Group and its companies in Kuwait: open positions and how to apply."},
+    "contact.html": {
+        "title": "Contact", "photo": "hero-glass-towers.jpg",
+        "lead": "Call, email or visit us. We're open Sunday to Thursday, 8am to 5pm.",
+        "desc": (f"Contact {SITE_NAME}: {PHONE}, {EMAIL}. "
+                 "Kuwait Building Tower, Floor 27, Fahad Alsalem Street, Qibla City, Kuwait.")},
 }
 
 # ============================================================ templates
@@ -636,9 +729,13 @@ HERO_PHOTO = "hero-glass-towers.jpg"
 
 
 def build_home():
-    subs = logo_list(SUBSIDIARIES, "sub-logos", "Almail Group companies")
+    subs = "\n".join(
+        f'      <li class="reveal" data-delay="{(n % 4) * 70}"><a href="{link("almail-group-world.html#" + c["id"])}">'
+        f'{picture(c["logo"], c["name"])}</a></li>'
+        for n, c in enumerate(SUBSIDIARIES))
+    subs = f'    <ul class="sub-logos" aria-label="Almail Group companies">\n{subs}\n    </ul>'
     sectors = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link("our-sectors.html")}">'
+        f'      <li class="reveal" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link("our-sectors.html#" + slug(s))}">'
         f'<span class="sector-num" aria-hidden="true">{n + 1:02d}</span><span class="sector-name">{e(s)}</span>'
         f'<span class="sector-arrow">{I["arrow"]}</span></a></li>'
         for n, s in enumerate(SECTORS))
@@ -756,77 +853,291 @@ def build_home():
     page("index.html", HOME["title"], HOME["desc"], body, preload=hero_preload(HERO_PHOTO))
 
 
-def page_hero(title, lead=""):
-    lead_html = f'\n    <p class="page-lead">{lead}</p>' if lead else ""
-    return f'''
+def page_hero(title, lead, photo):
+    return f"""
 <section class="page-hero has-bg">
-  {backdrop(HERO_PHOTO, priority=True)}
+  {backdrop(photo, priority=True)}
   <div class="wrap">
-    <h1>{e(title)}</h1>{lead_html}
+    <h1>{e(title)}</h1>
+    <p class="page-lead">{e(lead)}</p>
   </div>
 </section>
-'''
+"""
 
 
-def coming_soon():
-    return f'''    <p class="stub-note">This page is coming soon.</p>
-    <p>In the meantime, call us on <a href="tel:{PHONE_HREF}">{e(PHONE)}</a> or email
-      <a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a>.</p>'''
+def inner_page(fname, body):
+    meta = INNER[fname]
+    page(fname, f'{meta['title']} | {SITE_NAME}', meta['desc'],
+         page_hero(meta['title'], meta['lead'], meta['photo']) + body,
+         preload=hero_preload(meta['photo']))
 
 
-def stub_section(inner):
-    return f'''
-<section class="stub">
+def cta(title="Talk to us",
+        text="Questions about Almail Group or one of our companies? Call or email us."):
+    """The closing band on inner pages: a line and the two quickest ways to reach us."""
+    return f"""
+<section class="cta-band" aria-labelledby="cta-title">
+  <div class="wrap cta-inner">
+    <div class="reveal">
+      <h2 id="cta-title">{e(title)}</h2>
+      <p>{e(text)}</p>
+    </div>
+    <div class="cta-actions reveal">
+      <a class="btn btn-primary" href="tel:{PHONE_HREF}">{I['phone']}<span>Call {e(PHONE)}</span></a>
+      <a class="btn btn-ghost" href="mailto:{EMAIL_HREF}">{I['mail']}<span>Email us</span></a>
+    </div>
+  </div>
+</section>
+"""
+
+
+def chips(items, label):
+    """A labelled row of links, e.g. a company's sectors: [(text, href)]."""
+    if not items:
+        return ""
+    lis = "".join(f'<li><a class="chip" href="{href}">{e(text)}</a></li>' for text, href in items)
+    return f'<p class="chips-label">{e(label)}</p><ul class="chips">{lis}</ul>'
+
+
+def domain(url):
+    return urlparse(url).netloc.removeprefix("www.")
+
+
+def website_link(c, cls="company-link"):
+    return (f'<a class="{cls}" href="{c['url']}" target="_blank" rel="noopener noreferrer">'
+            f'<span>Visit {e(domain(c['url']))}</span>{I['external']}</a>')
+
+
+def build_world():
+    cards = []
+    for c in COMPANIES:
+        field = f'<p class="company-field">{e(c['field'])}</p>' if c['field'] else ""
+        text = e(c['text']) if c['text'] else f'More about {e(c['name'])} soon.'
+        sectors = chips([(s, link("our-sectors.html#" + slug(s))) for s in c['sectors']], "Sectors")
+        site = website_link(c) if c['url'] else ""
+        cards.append(f"""      <article class="company-card reveal" id="{c['id']}">
+        <div class="company-logo">{picture(c['logo'], '')}</div>
+        <div class="company-body">
+          {field}
+          <h3>{e(c['name'])}</h3>
+          <p class="company-text">{text}</p>
+          {sectors}
+          {site}
+        </div>
+      </article>""")
+    body = f"""
+<section class="page-section" aria-labelledby="companies-title">
   <div class="wrap">
-{inner}
-  </div>
-</section>
-'''
-
-
-def build_stubs():
-    for fname, meta in STUBS.items():
-        title = meta["title"]
-        desc = f"{title} — {SITE_NAME}."
-        if fname == "contact.html":
-            hours = "<br>".join(f"{e(day)}: {e(time)}" for day, time in HOURS)
-            address = "<br>".join(e(line) for line in ADDRESS)
-            body = page_hero(title) + f'''
-<section class="stub">
-  <div class="wrap contact-grid">
-    <div>
-      <h2>Call or email</h2>
-      <ul class="contact-links">
-        <li><a href="tel:{PHONE_HREF}">{e(PHONE)}</a></li>
-        <li><a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
-      </ul>
+    <div class="section-head reveal">
+      <h2 id="companies-title">Our companies</h2>
+      <p class="lead-text">{e(ABOUT['text'])}</p>
     </div>
-    <div>
-      <h2>Visit</h2>
-      <address><a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{address}</a></address>
-    </div>
-    <div>
-      <h2>Opening hours</h2>
-      <p>{hours}</p>
+    <div class="company-grid">
+{chr(10).join(cards)}
     </div>
   </div>
 </section>
-'''
-            desc = (f"Contact {SITE_NAME}: {PHONE}, {EMAIL}. "
-                    "Kuwait Building Tower, Floor 27, Fahad Alsalem Street, Qibla City, Kuwait.")
-        elif fname == "our-sectors.html":
-            items = "\n".join(f'      <li>{e(s)}</li>' for s in SECTORS)
-            body = page_hero(title) + stub_section(
-                f'    <ul class="stub-sectors">\n{items}\n    </ul>\n' + coming_soon())
-        else:
-            body = page_hero(title) + stub_section(coming_soon())
-        page(fname, f"{title} | {SITE_NAME}", desc, body,
-             noindex=meta["stub"], preload=hero_preload(HERO_PHOTO))
+""" + cta()
+    inner_page("almail-group-world.html", body)
+
+
+def build_sectors():
+    cards = []
+    for n, s in enumerate(SECTORS):
+        icon, text = SECTOR_INFO[s]
+        companies = [(c['name'], link("almail-group-world.html#" + c['id']))
+                     for c in COMPANIES if s in c['sectors']]
+        cards.append(f"""      <article class="sector-card reveal" id="{slug(s)}" data-delay="{(n % 2) * 90}">
+        <div class="sector-card-top"><span class="icon-badge">{I[icon]}</span><span class="sector-num" aria-hidden="true">{n + 1:02d}</span></div>
+        <h2>{e(s)}</h2>
+        <p class="sector-text">{e(text)}</p>
+        {chips(companies, 'Group companies')}
+      </article>""")
+    body = f"""
+<section class="page-section">
+  <div class="wrap">
+    <p class="lead-text page-intro reveal">{e(SECTORS_INTRO)}</p>
+    <div class="sector-cards">
+{chr(10).join(cards)}
+    </div>
+  </div>
+</section>
+""" + cta()
+    inner_page("our-sectors.html", body)
+
+
+def long_date(iso):
+    d = datetime.date.fromisoformat(iso)
+    return f"{d.day} {d.strftime('%B %Y')}"
+
+
+def build_news():
+    if NEWS:
+        items = "\n".join(
+            f"""      <li><article class="item-card reveal">
+        <time class="item-meta" datetime="{n['date']}">{long_date(n['date'])}</time>
+        <h2>{e(n['title'])}</h2>
+        {''.join(f'<p>{e(par)}</p>' for par in n['text'])}
+      </article></li>""" for n in NEWS)
+        listing = f'    <ul class="item-list">\n{items}\n    </ul>'
+    else:
+        listing = '    <p class="empty-note reveal">There is no news yet. Check back soon.</p>'
+    social = [(url, label, icon) for url, label, icon in
+              ((INSTAGRAM_URL, "Almail Group on Instagram", "instagram"), (X_URL, "Almail Group on X", "x")) if url]
+    follow = ""
+    if social:
+        follow = ('\n      <p>Follow us for the latest news.</p>\n      <ul class="social">'
+                  + "".join(social_link(*sl) for sl in social) + "</ul>")
+    body = f"""
+<section class="page-section">
+  <div class="wrap news-layout">
+{listing}
+    <aside class="side-note reveal" aria-labelledby="media-title">
+      <h2 id="media-title">Media enquiries</h2>
+      <p>For press and media enquiries, email <a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a>.</p>{follow}
+    </aside>
+  </div>
+</section>
+"""
+    inner_page("news.html", body)
+
+
+def build_careers():
+    apply_href = f"mailto:{CAREERS_EMAIL}?subject={urlquote('Job application')}"
+    if JOBS:
+        items = "\n".join(
+            f"""      <li><article class="item-card reveal">
+        <p class="item-meta">{e(' · '.join(x for x in (j.get('company'), j.get('location'), j.get('type')) if x))}</p>
+        <h3>{e(j['title'])}</h3>
+        <p>{e(j['text'])}</p>
+        <a class="btn btn-ghost" href="mailto:{CAREERS_EMAIL}?subject={urlquote('Application: ' + j['title'])}">Apply by email</a>
+      </article></li>""" for j in JOBS)
+        jobs = f'    <ul class="item-list">\n{items}\n    </ul>'
+    else:
+        jobs = ('    <p class="empty-note reveal">There are no open positions listed right now. You are still '
+                'welcome to send us your CV: tell us the company or the field you would like to work in.</p>')
+    fields = "".join(f'<li><span class="chip">{e(s)}</span></li>' for s in SECTORS)
+    companies = "\n".join(
+        f'      <li class="reveal" data-delay="{(n % 4) * 70}"><a href="{link("almail-group-world.html#" + c['id'])}">'
+        f'{picture(c['logo'], c['name'])}</a></li>'
+        for n, c in enumerate(COMPANIES))
+    body = f"""
+<section class="page-section" aria-labelledby="jobs-title">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 id="jobs-title">Open positions</h2>
+      <p class="lead-text">Almail Group brings together companies in security, real estate, e-commerce,
+        delivery and jewelry. Open roles across the group are listed here.</p>
+    </div>
+{jobs}
+  </div>
+</section>
+
+<section class="page-section page-section--alt" aria-labelledby="apply-title">
+  <div class="wrap">
+    <h2 id="apply-title" class="reveal">How to apply</h2>
+    <ol class="steps">
+      <li class="reveal">
+        <span class="step-num" aria-hidden="true">1</span>
+        <h3>Choose a field</h3>
+        <p>Find where your experience fits among our sectors.</p>
+        <ul class="chips">{fields}</ul>
+      </li>
+      <li class="reveal" data-delay="90">
+        <span class="step-num" aria-hidden="true">2</span>
+        <h3>Prepare your CV</h3>
+        <p>Include your experience, your qualifications, and a phone number and email we can reach you on.</p>
+      </li>
+      <li class="reveal" data-delay="180">
+        <span class="step-num" aria-hidden="true">3</span>
+        <h3>Email it to us</h3>
+        <p>Send it to <a href="{apply_href}">{e(EMAIL)}</a> with the role or the field in the subject line.</p>
+        <a class="btn btn-primary" href="{apply_href}">{I['mail']}<span>Email your CV</span></a>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="page-section" aria-labelledby="where-title">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 id="where-title">Where you could work</h2>
+      <p class="lead-text">The companies of Almail Group. Choose one to read what it does.</p>
+    </div>
+    <ul class="sub-logos" aria-label="Almail Group companies">
+{companies}
+    </ul>
+  </div>
+</section>
+"""
+    inner_page("careers.html", body)
+
+
+def build_contact():
+    address = "<br>".join(e(line) for line in ADDRESS)
+    hours = "".join(f"<li><span>{e(day)}</span><span>{e(time)}</span></li>" for day, time in HOURS)
+    online = "\n".join(
+        f"""      <li class="reveal" data-delay="{n * 90}">
+        <a class="online-card" href="{c['url']}" target="_blank" rel="noopener noreferrer">
+          <span class="online-logo">{picture(c['logo'], '')}</span>
+          <span class="online-name">{e(c['name'])}</span>
+          <span class="online-url">{e(domain(c['url']))}{I['external']}</span>
+        </a>
+      </li>""" for n, c in enumerate(c for c in COMPANIES if c['url']))
+    body = f"""
+<section class="page-section">
+  <div class="wrap">
+    <div class="contact-cards">
+      <article class="contact-card reveal">
+        <span class="icon-badge">{I['phone']}</span>
+        <h2>Call us</h2>
+        <p><a href="tel:{PHONE_HREF}">{e(PHONE)}</a></p>
+        <a class="btn btn-primary" href="tel:{PHONE_HREF}">Call now</a>
+      </article>
+      <article class="contact-card reveal" data-delay="70">
+        <span class="icon-badge">{I['mail']}</span>
+        <h2>Email us</h2>
+        <p><a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></p>
+        <a class="btn btn-ghost" href="mailto:{EMAIL_HREF}">Send an email</a>
+      </article>
+      <article class="contact-card reveal" data-delay="140">
+        <span class="icon-badge">{I['pin']}</span>
+        <h2>Visit us</h2>
+        <address>{address}</address>
+        <a class="btn btn-ghost" href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">Get directions</a>
+      </article>
+      <article class="contact-card reveal" data-delay="210">
+        <span class="icon-badge">{I['clock']}</span>
+        <h2>Opening hours</h2>
+        <ul class="hours">{hours}</ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="page-section page-section--alt" aria-labelledby="online-title">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 id="online-title">Our companies online</h2>
+      <p class="lead-text">Reach one of our companies directly through its own website.</p>
+    </div>
+    <ul class="online-list">
+{online}
+    </ul>
+  </div>
+</section>
+"""
+    inner_page("contact.html", body)
 
 
 def build_404():
-    body = page_hero("Page Not Found", "The page you are looking for has moved or no longer exists.") + \
-        stub_section('    <p><a class="text-link" href="/">Back to the home page</a></p>')
+    body = page_hero("Page Not Found", "The page you are looking for has moved or no longer exists.", HERO_PHOTO) + """
+<section class="page-section">
+  <div class="wrap">
+    <p><a class="text-link" href="/">Back to the home page</a></p>
+  </div>
+</section>
+"""
     page("404.html", f"Page Not Found | {SITE_NAME}",
          "The page you requested could not be found.", body, noindex=True,
          preload=hero_preload(HERO_PHOTO))
@@ -834,9 +1145,8 @@ def build_404():
 
 # ============================================================ write
 def write_sitemap():
-    """Only pages with real content: stubs are noindex until they are filled."""
     today = datetime.date.today().isoformat()
-    urls = ["index.html"] + [f for f, m in STUBS.items() if not m["stub"]]
+    urls = list(ROUTES)
     rows = [f"  <url>\n    <loc>{SITE_URL + path_for(f)}</loc>\n    <lastmod>{today}</lastmod>\n  </url>"
             for f in urls]
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -849,7 +1159,11 @@ def write_sitemap():
 
 if __name__ == "__main__":
     build_home()
-    build_stubs()
+    build_world()
+    build_sectors()
+    build_news()
+    build_careers()
+    build_contact()
     build_404()
 
     for fname, doc in PAGES.items():

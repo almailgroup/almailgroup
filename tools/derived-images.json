@@ -281,6 +281,12 @@
     "width": 960,
     "height": 540
   },
+  "photos/footer-skyscrapers-bw-portrait.avif": {
+    "from": "photos/footer-skyscrapers-bw.jpg",
+    "sha1": "04523ba17287325b763ac721ba5972ceed664271",
+    "width": 529,
+    "height": 941
+  },
   "photos/footer-skyscrapers-bw.avif": {
     "from": "photos/footer-skyscrapers-bw.jpg",
     "sha1": "04523ba17287325b763ac721ba5972ceed664271",

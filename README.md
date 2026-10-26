@@ -9,19 +9,19 @@ served from any static host (GitHub Pages, S3, Netlify, nginx) by copying the re
 
 ## Pages
 
-| Page | URL | Status |
+| Page | URL | What is on it |
 | --- | --- | --- |
-| Home: hero, why choose us, about and group companies, sectors, partners, CEO quote, clients | `/` | Complete |
-| Almail Group World | `/almail-group-world/` | Stub |
-| Our Sectors (lists the eight sectors) | `/our-sectors/` | Stub |
-| News | `/news/` | Stub |
-| Careers | `/careers/` | Stub |
-| Contact: phone, email, address, opening hours | `/contact/` | Complete |
-| Not found | `/404.html` | Complete |
+| Home | `/` | Hero, why choose us, about and the group companies, sectors, partners, CEO quote, clients |
+| Almail Group World | `/almail-group-world/` | A card per company: what it does, its sectors, its website |
+| Our Sectors | `/our-sectors/` | The eight sectors, what each covers and the companies working in it |
+| News | `/news/` | News items, newest first, and who to email for media enquiries |
+| Careers | `/careers/` | Open positions, how to apply, and the companies to work for |
+| Contact | `/contact/` | Call, email, visit and opening hours, and the companies' own websites |
+| Not found | `/404.html` | |
 
-Stub pages share the header, footer and styling so the navigation works, and say the page is
-coming soon. They carry `noindex` and are left out of `sitemap.xml` until they have content:
-set `"stub": False` for the page in `STUBS` (`tools/build.py`) when you fill it in.
+On the home page each sector opens its card on Our Sectors, and each company logo opens its
+card on Almail Group World; the card arrived at is outlined in lavender. Every inner page ends
+with a "Talk to us" band with call and email buttons.
 
 ## Structure
 
@@ -67,9 +67,20 @@ python3 tools/build.py
 
 - **Contact details**: `PHONE`, `EMAIL`, `ADDRESS` and `HOURS` at the top of the file.
 - **Social links**: `INSTAGRAM_URL` and `X_URL`. While empty, the footer icons link to `#`.
-- **Group companies, partners, clients**: `SUBSIDIARIES`, `PARTNERS` and `CLIENTS`, each a list
-  of `(name, image)`. The name is the logo's alt text.
-- **Sectors**: `SECTORS` and `SECTORS_INTRO`.
+- **Companies**: `COMPANIES`, one entry each: name, logo, field, a description, the sectors it
+  works in and its website (leave `url` empty for none). The Almail Group World page, the
+  sector cards and the home page's logo row all read from it. A company with no description
+  yet says "More about ... soon".
+- **Partners, clients**: `PARTNERS` and `CLIENTS`, each a list of `(name, image)`. The name is
+  the logo's alt text.
+- **Sectors**: `SECTORS` (the names and their order), `SECTOR_INFO` (an icon and a
+  description each) and `SECTORS_INTRO`.
+- **News**: `NEWS`, newest first: a date, a title and one string per paragraph.
+- **Jobs**: `JOBS`, empty for now, so the Careers page says there are no openings and invites
+  a CV. Add an entry (the format is in the comment above it) and it is listed with an
+  "Apply by email" button. Applications go to `CAREERS_EMAIL`.
+- **Page headings**: `INNER` has each inner page's title, the line under it, its search
+  description and the photo behind it.
 - **CEO quote slider**: `QUOTES`. Add another entry and the slider gets a second dot and starts
   rotating every 7 seconds (paused on hover or keyboard focus, and off for visitors who ask for
   reduced motion).
