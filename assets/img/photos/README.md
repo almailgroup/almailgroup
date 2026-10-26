@@ -14,7 +14,6 @@ black overlay, so the photo itself can be a normal exposure.
 
 | File | Section | What it should show |
 | --- | --- | --- |
-| `about-curved-facade.jpg` | About | A modern building from below, curved glass and steel |
 | `sectors-glass-facade.jpg` | Sectors | A dark glass facade |
 | `ceo-high-rise-window.jpg` | CEO quote | A man in a suit at a high-rise window |
 
@@ -47,6 +46,8 @@ Logos are shown white on black, so supply white artwork with a transparent backg
 - **Why Choose photo** (`photos/why-choose-towers.jpg` and its `-960.jpg` copy): two towers
   at dusk, seen from below, supplied by Almail Group. On a phone it is cropped toward the left
   tower (`.why .bg img` in the stylesheet), since a narrow crop of the middle is only sky.
+- **About photo** (`photos/about-curved-facade.jpg` and its `-960.jpg` copy): a curved glass
+  tower at dusk, seen from below, supplied by Almail Group.
 - **Footer photo** (`photos/footer-skyscrapers-bw.jpg` and its `-960.jpg` copy): towers seen
   from below, supplied by Almail Group in colour. The stylesheet shows it in black and white
   (`.footer-photo img` in `assets/css/style.css`); take out `grayscale(1)` there for colour.
