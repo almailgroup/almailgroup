@@ -336,10 +336,10 @@ address { font-style: normal; }
 .about-text { font-size: 21px; line-height: 1.7; color: var(--white); }
 
 /* ---------------------------------------------------------------- sectors */
-.sectors { --overlay: .72; padding-block: var(--section); }
+.sectors { --overlay: .55; padding-block: var(--section); }   /* the photo is already night-dark */
 
 .sectors-head { max-width: 800px; margin: 0 auto clamp(48px, 7vw, 80px); text-align: center; }
-.sectors-head p { margin-top: 24px; font-size: 21px; color: var(--soft); }
+.sectors-head p { margin-top: 24px; font-size: 21px; color: var(--white); }   /* full white: the photo has lit windows behind it */
 
 .sector-list {
   display: grid;

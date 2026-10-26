@@ -14,7 +14,6 @@ black overlay, so the photo itself can be a normal exposure.
 
 | File | Section | What it should show |
 | --- | --- | --- |
-| `sectors-glass-facade.jpg` | Sectors | A dark glass facade |
 | `ceo-high-rise-window.jpg` | CEO quote | A man in a suit at a high-rise window |
 
 Each also has a `-960.jpg` copy (960px wide) that phones load instead. When you replace a
@@ -48,6 +47,10 @@ Logos are shown white on black, so supply white artwork with a transparent backg
   tower (`.why .bg img` in the stylesheet), since a narrow crop of the middle is only sky.
 - **About photo** (`photos/about-curved-facade.jpg` and its `-960.jpg` copy): a curved glass
   tower at dusk, seen from below, supplied by Almail Group.
+- **Sectors photo** (`photos/sectors-glass-facade.jpg` and its `-960.jpg` copy): a glass facade
+  at night, supplied by Almail Group. It is far darker than the others, so the section's overlay
+  is 55% rather than 72% and its intro is full white; every line was measured at its worst
+  point against the photo (the intro 5.2:1, the sector names 4.7:1 and up).
 - **Footer photo** (`photos/footer-skyscrapers-bw.jpg` and its `-960.jpg` copy): towers seen
   from below, supplied by Almail Group in colour. The stylesheet shows it in black and white
   (`.footer-photo img` in `assets/css/style.css`); take out `grayscale(1)` there for colour.
