@@ -35,12 +35,16 @@
     var backdrop = doc.querySelector('.backdrop');
     var closeBtn = doc.querySelector('.mobile-nav .close');
     if (!burger || !drawer || !backdrop) return;
+    // While the menu is open the page behind it is inert, so neither the
+    // keyboard nor a screen reader's swipe can wander out of the menu.
+    var behind = all('.skip-link, .site-header, main, .site-footer');
 
     function setState(open) {
       drawer.classList.toggle('is-open', open);
       backdrop.classList.toggle('is-open', open);
       burger.setAttribute('aria-expanded', open ? 'true' : 'false');
       doc.body.style.overflow = open ? 'hidden' : '';
+      behind.forEach(function (el) { if (open) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
       if (open) { var f = drawer.querySelector('a, button'); if (f) f.focus(); }
     }
 

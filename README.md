@@ -32,6 +32,7 @@ set `"stub": False` for the page in `STUBS` (`tools/build.py`) when you fill it 
 ├── assets/
 │   ├── css/style.css     # all styling: tokens, sections, responsive rules
 │   ├── js/main.js        # sticky header, mobile menu, scroll reveal, quote slider
+│   ├── fonts/            # Inter and Montserrat, served from the site (see its README)
 │   └── img/
 │       ├── logos/        # Almail Group and group-company logos (white)
 │       ├── partners/     # partner logos (white)
@@ -39,6 +40,8 @@ set `"stub": False` for the page in `STUBS` (`tools/build.py`) when you fill it 
 │       ├── photos/       # full-bleed background photography
 │       └── favicon-*.png, apple-touch-icon.png, og-share.jpg
 ├── tools/build.py        # regenerates every page and sitemap.xml
+├── tools/images.py       # makes the lighter image copies phones load (needs Pillow)
+├── tools/derived-images.json  # which original each of those copies was made from
 ├── robots.txt
 └── sitemap.xml
 ```
@@ -71,28 +74,44 @@ python3 tools/build.py
   rotating every 7 seconds (paused on hover or keyboard focus, and off for visitors who ask for
   reduced motion).
 
-CSS and JavaScript are edited directly in `assets/`, and the builder does not change them —
-but run it afterwards anyway. Every page asks for its stylesheet, script and images at an
-address carrying a version taken from the file's contents (`style.css?v=1a2b3c4d5e`), so a
-browser holding an older copy cannot draw new pages with it. GitHub Pages lets a browser keep
-a file for ten minutes, and before this a page could arrive new while its stylesheet and
-photos came from the browser's copy of the last version.
+CSS and JavaScript are edited directly in `assets/`; run the builder afterwards, because it
+writes the stylesheet into every page (a phone can then draw the page from the first response,
+without waiting for a second request) and gives every page the current version of each file.
+Scripts, fonts and images are asked for at an address carrying a version taken from the file's
+contents (`main.js?v=1a2b3c4d5e`), so a browser holding an older copy cannot draw new pages
+with it. GitHub Pages lets a browser keep a file for ten minutes, and before this a page could
+arrive new while its photos came from the browser's copy of the last version.
 
 ## Images
 
 Replacing an image is a matter of saving the new file over the old one with the same name, then
-running `python3 tools/build.py` so the `width`/`height` attributes match the new file and
-pages ask for the new file rather than a browser's copy of the old one.
+running both tools:
+
+```bash
+pip install Pillow          # once; 11.3 or later
+python3 tools/images.py     # the lighter copies phones and modern browsers load
+python3 tools/build.py      # the pages
+```
+
+`tools/images.py` makes, from each original:
+
+- **Photos**: a 960px JPEG, AVIF copies at full size and 960px (about half the bytes of a JPEG
+  that looks the same), and a tall strip at full resolution for phones held upright. A phone
+  only shows a narrow strip of a wide photo, so it gets that strip, sharper and lighter than the
+  whole photo. Which part of the photo the strip comes from is `PORTRAIT` in the tool.
+- **Logos**: a lossless WebP copy, pixel for pixel the PNG at about two thirds of the size.
+
+Pages offer these first and fall back to the original JPEG or PNG for a browser that takes
+neither format. `tools/derived-images.json` records which original each copy came from, so a
+photo replaced without running `tools/images.py` shows the new original everywhere (the build
+says so) rather than the old picture on phones. On an iPhone the home page is about 0.6 MB
+with every section scrolled into view, where it was 1.5 MB.
 
 Several images are **placeholders** until the real ones are supplied. The build lists whichever
 are still in place every time it runs. It recognises each placeholder by its exact contents, so a
 replaced file drops off the list by itself. See `assets/img/photos/README.md` for the list,
 sizes and naming.
 
-Background photos can have an optional 960px-wide copy beside them (`hero-glass-towers-960.jpg`
-next to `hero-glass-towers.jpg`), which phones download instead of the full-size file. A
-placeholder 960px copy is never used next to a real photo, so a replaced photo can't keep showing
-the old placeholder on phones; the build tells you to replace or delete the leftover copy.
 
 ## Design
 
@@ -104,6 +123,13 @@ the old placeholder on phones; the build tells you to replace or delete the left
   the bar keeps the phone number and the social links. Its address and map link are
   `ADDRESS_LINE`, `ADDRESS_SHORT` and `MAPS_URL` in `tools/build.py`.
 - The current page's navigation link is lavender (`#C9B8FF`); every other link is white.
+- On phones and tablets the header has a call button beside the menu button, and the menu ends
+  with a call button, the email, the address (opening Google Maps), the opening hours and the
+  social links. While the menu is open the page behind it can't be reached by keyboard or
+  screen reader.
+- Hover effects only exist where there is a mouse or trackpad; on a touch screen a tap flashes
+  lavender and buttons press in, and nothing stays lit after going Back. Every link and button
+  is at least 44px to tap.
 - Once the header has scrolled out of sight it comes back as a compact dark bar fixed to the
   top, without the contact bar, and goes back to normal near the top of the page.
 - The home page: the hero has two buttons (Explore our sectors, Contact us; `actions` in
@@ -111,16 +137,18 @@ the old placeholder on phones; the build tells you to replace or delete the left
   numbered rows, and the partners sit in a grid of hairline cells.
 - Sections fade and slide in as they scroll into view. Everything is visible with JavaScript
   off, and the motion is skipped for visitors who ask for reduced motion.
-- Breakpoints at 1080px (hamburger menu), 900px (one column for Why Choose, About, the sectors
-  and the footer; fewer logos to a row) and 640px (phone layout).
+- Breakpoints at 1080px (hamburger menu and call button), 900px (one column for Why Choose,
+  About, the sectors and the footer; fewer logos to a row) and 640px (phone layout: the sectors
+  intro left-aligned, the clients three to a row).
 
 ## Notes
 
 - **Domain**: the site is published at `www.almailgroup.com`. `CNAME` tells GitHub Pages which
   domain to serve, and `SITE_URL` in `tools/build.py` uses the same address for canonical URLs,
   link previews and the sitemap. Change both together if the domain ever changes.
-- **Fonts**: Inter and Montserrat load from Google Fonts as one variable file each, without
-  blocking the first paint, with system-font fallbacks if that request fails.
+- **Fonts**: Inter and Montserrat are served from the site itself (`assets/fonts/`), one
+  variable file each, preloaded and never blocking the first paint. Until they arrive the page
+  shows Arial resized to match them, so the text barely moves when they do.
 
 ## Browser support
 

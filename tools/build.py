@@ -6,11 +6,16 @@ directory (contact/index.html, news/index.html, ...) so addresses are clean:
 /contact/, not /contact.html. Stdlib only -- nothing to install.
 
     python3 tools/build.py
+
+The lighter image copies (AVIF photos, WebP logos, phone crops) come from
+tools/images.py, which needs Pillow; run it first after changing an image.
 """
 import datetime
 import hashlib
 import html
+import json
 import os
+import re
 
 # Output to the repository root (this script lives in <repo>/tools).
 OUT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -128,16 +133,39 @@ def asset_url(path):
     return f"/{path}?v={_VERSIONS[path]}"
 
 
+# Copies made by tools/images.py, each with the SHA-1 of the original it was
+# made from. A copy is only used while it still matches its original.
+try:
+    with open(os.path.join(OUT, "tools", "derived-images.json"), encoding="utf-8") as _fh:
+        DERIVED = json.load(_fh)
+except FileNotFoundError:
+    DERIVED = {}
+
+_STALE = set()
+
+
+def fresh(copy):
+    """True when `copy` (relative to assets/img) exists and was made from the
+    current version of its original. A stale copy is noted for the end of the
+    build rather than shown, so a replaced photo never reappears as the old one."""
+    entry = DERIVED.get(copy)
+    if not entry or not os.path.exists(os.path.join(OUT, IMG, copy)):
+        return False
+    if _sha1(entry["from"]) != entry["sha1"]:
+        _STALE.add(entry["from"])
+        return False
+    return True
+
+
 def small_version(rel):
-    """'photos/hero.jpg' -> 'photos/hero-960.jpg' when that file exists, for
-    phones. A placeholder small copy is only used beside a placeholder
-    full-size photo, so replacing a photo can never leave phones showing the
-    old placeholder."""
+    """'photos/hero.jpg' -> 'photos/hero-960.jpg' for phones, when that copy
+    exists and is up to date (a hand-made copy tools/images.py did not record
+    is trusted as it is)."""
     stem, ext = os.path.splitext(rel)
     small = f"{stem}-960{ext}"
     if not os.path.exists(os.path.join(OUT, IMG, small)):
         return None
-    if _is_placeholder(small) and not _is_placeholder(rel):
+    if small in DERIVED and not fresh(small):
         return None
     return small
 
@@ -149,6 +177,25 @@ def srcset(rel):
     w_small = _image_size(os.path.join(OUT, IMG, small))[0]
     w_full = _image_size(os.path.join(OUT, IMG, rel))[0]
     return f"{asset_url(f'{IMG}/{small}')} {w_small}w, {asset_url(f'{IMG}/{rel}')} {w_full}w"
+
+
+def avif_srcset(rel):
+    """The AVIF copies of a photo as a srcset, or "" when they are missing or stale."""
+    stem = os.path.splitext(rel)[0]
+    parts = [f"{stem}-960.avif", f"{stem}.avif"]
+    if not all(fresh(p) for p in parts):
+        return ""
+    return ", ".join(f"{asset_url(f'{IMG}/{p}')} {DERIVED[p]['width']}w" for p in parts)
+
+
+# A phone held upright shows only a tall strip of a wide photo, so it is sent
+# the portrait copy of that strip.
+PORTRAIT_MEDIA = "(max-width: 640px) and (orientation: portrait)"
+
+
+def portrait_version(rel):
+    copy = os.path.splitext(rel)[0] + "-portrait.avif"
+    return copy if fresh(copy) else None
 
 
 def img(rel, alt, cls="", lazy=True, priority=False, sizes=None):
@@ -169,11 +216,35 @@ def img(rel, alt, cls="", lazy=True, priority=False, sizes=None):
     return "<img " + " ".join(attrs) + ">"
 
 
+def picture(rel, alt, cls="", lazy=True, priority=False, sizes=None):
+    """img() inside a <picture> that offers the lighter copies first: for a
+    photo (given `sizes`) the portrait strip to an upright phone and AVIF to
+    everything else, for a logo lossless WebP. A browser that takes neither
+    format, or a copy that is missing or out of date, gets the original."""
+    tag = img(rel, alt, cls, lazy, priority, sizes)
+    sources = []
+    if sizes:
+        portrait = portrait_version(rel)
+        if portrait:
+            sources.append(f'<source media="{PORTRAIT_MEDIA}" type="image/avif" '
+                           f'srcset="{asset_url(f"{IMG}/{portrait}")}">')
+        avif = avif_srcset(rel)
+        if avif:
+            sources.append(f'<source type="image/avif" srcset="{avif}" sizes="{sizes}">')
+    else:
+        webp = os.path.splitext(rel)[0] + ".webp"
+        if fresh(webp):
+            sources.append(f'<source type="image/webp" srcset="{asset_url(f"{IMG}/{webp}")}">')
+    if not sources:
+        return tag
+    return "<picture>" + "".join(sources) + tag + "</picture>"
+
+
 def backdrop(photo, priority=False, sizes="100vw"):
     """Full-bleed background photo. A real <img> rather than a CSS background,
     so it lazy-loads below the fold and the hero can be fetched early."""
     return (f'<div class="bg" aria-hidden="true">'
-            f'{img("photos/" + photo, "", lazy=not priority, priority=priority, sizes=sizes)}</div>')
+            f'{picture("photos/" + photo, "", lazy=not priority, priority=priority, sizes=sizes)}</div>')
 
 
 # Images that are stand-ins until the real files are supplied, with the SHA-1
@@ -206,18 +277,6 @@ PLACEHOLDERS = {
         "bce200337bf6bb218c182b6d208c5bdc5f4aec00"),
     "photos/footer-skyscrapers-bw.jpg": ("Footer: black-and-white skyscrapers from below",
         "9cf6452c6e032f17d4816aa39c1e70556a1a9410"),
-    "photos/hero-glass-towers-960.jpg": ("960px-wide copy of hero-glass-towers.jpg: replace with a smaller copy of the new photo, or delete",
-        "052972cec056fe6cc8d5aa69002f3c5e487b4f75"),
-    "photos/why-choose-towers-960.jpg": ("960px-wide copy of why-choose-towers.jpg: replace with a smaller copy of the new photo, or delete",
-        "e08d5e548f17ff14254c4bcd99fc38625694ba6d"),
-    "photos/about-curved-facade-960.jpg": ("960px-wide copy of about-curved-facade.jpg: replace with a smaller copy of the new photo, or delete",
-        "e852c28e384b8c751123d3a16b5938377901a3cb"),
-    "photos/sectors-glass-facade-960.jpg": ("960px-wide copy of sectors-glass-facade.jpg: replace with a smaller copy of the new photo, or delete",
-        "9d8e639bb0d1e61a2cd204436e65732395128dbc"),
-    "photos/ceo-high-rise-window-960.jpg": ("960px-wide copy of ceo-high-rise-window.jpg: replace with a smaller copy of the new photo, or delete",
-        "f5f4e0d0d7dd15f54006484ac636f2b8b2a2490d"),
-    "photos/footer-skyscrapers-bw-960.jpg": ("960px-wide copy of footer-skyscrapers-bw.jpg: replace with a smaller copy of the new photo, or delete",
-        "5a3adf33dd1d94eeec59f1be5791693fb882ea54"),
     "favicon-32.png": ("Favicon, 32px (from the logo)",
         "41731e6927cba293ce5e42764fca7ce67f5de2b3"),
     "favicon-192.png": ("Favicon, 192px (from the logo)",
@@ -241,21 +300,13 @@ def _is_placeholder(rel):
 
 
 def placeholders_remaining():
-    """(rel, label) for every placeholder still in place. A -960 copy is only
-    listed once its full-size photo has been replaced, since it is then unused
-    and should be replaced or deleted too."""
-    left = []
-    for rel, (label, _) in PLACEHOLDERS.items():
-        if not _is_placeholder(rel):
-            continue
-        if rel.endswith("-960.jpg") and _is_placeholder(rel.replace("-960.jpg", ".jpg")):
-            continue
-        left.append((rel, label))
-    return left
+    """(rel, label) for every placeholder still in place."""
+    return [(rel, label) for rel, (label, _) in PLACEHOLDERS.items() if _is_placeholder(rel)]
 
 
 # ---------------------------------------------------------------- icons
 I = {
+    "clock": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     "instagram": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>',
     "x": '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 3h3l-6.6 7.5L21.7 21h-6l-4.7-6.1L5.6 21h-3l7-8L2.6 3h6.1l4.2 5.6zm-1 16h1.7L7.6 4.7H5.8z"/></svg>',
     "close": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
@@ -373,12 +424,29 @@ STUBS = {
 }
 
 # ============================================================ templates
-FONTS = ("https://fonts.googleapis.com/css2?family=Inter:wght@400..600"
-         "&family=Montserrat:wght@500..700&display=swap")
+FONT_FILES = ["assets/fonts/inter-latin.woff2", "assets/fonts/montserrat-latin.woff2"]
+
+_CSS = None
+
+
+def inline_css():
+    """The stylesheet, written into each page rather than linked: a phone can
+    draw the page from the first response instead of waiting for a second
+    request first. Comments and indentation are dropped, and the addresses of
+    the files it names get versions like every other asset."""
+    global _CSS
+    if _CSS is None:
+        with open(os.path.join(OUT, "assets", "css", "style.css"), encoding="utf-8") as fh:
+            css = re.sub(r"/\*.*?\*/", "", fh.read(), flags=re.S)
+        css = "\n".join(line.strip() for line in css.splitlines() if line.strip())
+        _CSS = re.sub(r"url\(/(assets/[^)?]+)\)", lambda m: f"url({asset_url(m.group(1))})", css)
+    return _CSS
 
 
 def head(fname, title, desc, noindex=False, preload=""):
     url = SITE_URL + path_for(fname)
+    fonts = "\n".join(f'<link rel="preload" href="{asset_url(f)}" as="font" type="font/woff2" crossorigin>'
+                      for f in FONT_FILES)
     robots = '<meta name="robots" content="noindex">\n' if noindex else ""
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -401,11 +469,10 @@ def head(fname, title, desc, noindex=False, preload=""):
 <link rel="icon" type="image/png" sizes="32x32" href="{asset_url(f"{IMG}/favicon-32.png")}">
 <link rel="icon" type="image/png" sizes="192x192" href="{asset_url(f"{IMG}/favicon-192.png")}">
 <link rel="apple-touch-icon" href="{asset_url(f"{IMG}/apple-touch-icon.png")}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-{preload}<link rel="stylesheet" href="{FONTS}" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="{FONTS}"></noscript>
-<link rel="stylesheet" href="{asset_url("assets/css/style.css")}">
+{fonts}
+{preload}<style>
+{inline_css()}
+</style>
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
@@ -422,8 +489,9 @@ def nav_items(current, cls):
 
 
 def header(current):
-    logo = img("logos/logo-almail-group-white.png", "Almail Group", "brand-logo", lazy=False)
-    logo_first = img("logos/logo-almail-group-white.png", "Almail Group", "brand-logo", priority=True)
+    logo = picture("logos/logo-almail-group-white.png", "Almail Group", "brand-logo", lazy=False)
+    logo_first = picture("logos/logo-almail-group-white.png", "Almail Group", "brand-logo", priority=True)
+    day, time = HOURS[0]
     return f'''
 <header class="site-header">
   <div class="topbar">
@@ -446,7 +514,10 @@ def header(current):
         {nav_items(current, "nav-link")}
       </ul>
     </nav>
-    <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span></button>
+    <div class="header-actions">
+      <a class="call-btn" href="tel:{PHONE_HREF}" aria-label="Call Almail Group on {e(PHONE)}">{I["phone"]}</a>
+      <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span></button>
+    </div>
   </div>
 </header>
 
@@ -459,6 +530,18 @@ def header(current):
   <ul>
         {nav_items(current, "m-link")}
   </ul>
+  <div class="m-contact">
+    <a class="btn btn-primary m-call" href="tel:{PHONE_HREF}">{I["phone"]}<span>Call {e(PHONE)}</span></a>
+    <ul class="m-details">
+      <li>{I["mail"]}<a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
+      <li>{I["pin"]}<a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{e(ADDRESS_SHORT)}</a></li>
+      <li>{I["clock"]}<span>{e(day)}: {e(time)}</span></li>
+    </ul>
+    <ul class="social m-social">
+      {social_link(INSTAGRAM_URL, "Almail Group on Instagram", "instagram")}
+      {social_link(X_URL, "Almail Group on X", "x")}
+    </ul>
+  </div>
 </nav>
 '''
 
@@ -474,18 +557,20 @@ def footer():
     address = "<br>\n          ".join(e(line) for line in ADDRESS)
     return f'''
 <footer class="site-footer">
-  <div class="footer-photo">{img("photos/footer-skyscrapers-bw.jpg", "", sizes="(max-width: 900px) 100vw, 50vw")}</div>
+  <div class="footer-photo">{picture("photos/footer-skyscrapers-bw.jpg", "", sizes="(max-width: 900px) 100vw, 42vw")}</div>
   <div class="footer-panel">
     <h2 class="footer-title">{SITE_NAME}</h2>
     <div class="footer-grid">
       <section>
         <h3>Contact</h3>
-        <p><a href="tel:{PHONE_HREF}">{e(PHONE)}</a><br>
-          <a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></p>
+        <ul class="footer-contact">
+          <li><a href="tel:{PHONE_HREF}">{e(PHONE)}</a></li>
+          <li><a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
+        </ul>
       </section>
       <section>
         <h3>Address</h3>
-        <address>{address}</address>
+        <address><a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{address}</a></address>
       </section>
       <section>
         <h3>Opening Hours</h3>
@@ -518,18 +603,32 @@ def page(fname, title, desc, body, noindex=False, preload=""):
 
 def logo_list(items, cls, label):
     lis = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 5) * 70}">{img(path, name)}</li>'
+        f'      <li class="reveal" data-delay="{(n % 5) * 70}">{picture(path, name)}</li>'
         for n, (name, path) in enumerate(items))
     return f'    <ul class="{cls}" aria-label="{e(label)}">\n{lis}\n    </ul>'
 
 
 def hero_preload(photo):
     """The hero photo is the largest thing on first paint; start fetching it
-    with the HTML instead of waiting for the parser to reach the <img>."""
+    with the HTML instead of waiting for the parser to reach the <img>. The
+    preloads name the same files the <picture> will choose: the portrait strip
+    on an upright phone, the AVIF copies elsewhere. A browser without AVIF
+    skips them and fetches the JPEG when it reaches the <img>."""
     rel = "photos/" + photo
-    ss = srcset(rel)
-    responsive = f' imagesrcset="{ss}" imagesizes="100vw"' if ss else ""
-    return f'<link rel="preload" as="image" href="{asset_url(f"{IMG}/{rel}")}"{responsive} fetchpriority="high">\n'
+    avif = avif_srcset(rel)
+    if not avif:
+        ss = srcset(rel)
+        responsive = f' imagesrcset="{ss}" imagesizes="100vw"' if ss else ""
+        return f'<link rel="preload" as="image" href="{asset_url(f"{IMG}/{rel}")}"{responsive} fetchpriority="high">\n'
+    full = asset_url(f"{IMG}/{os.path.splitext(rel)[0]}.avif")
+    portrait = portrait_version(rel)
+    media = f' media="not all and {PORTRAIT_MEDIA}"' if portrait else ""
+    out = (f'<link rel="preload" as="image" type="image/avif" href="{full}" imagesrcset="{avif}" '
+           f'imagesizes="100vw"{media} fetchpriority="high">\n')
+    if portrait:
+        out += (f'<link rel="preload" as="image" type="image/avif" href="{asset_url(f"{IMG}/{portrait}")}" '
+                f'media="{PORTRAIT_MEDIA}" fetchpriority="high">\n')
+    return out
 
 
 # ============================================================ pages
@@ -561,6 +660,9 @@ def build_home():
     dots = "\n".join(
         f'      <button class="quote-dot" type="button" aria-label="Show quote {n + 1}"{current if n == 0 else ""}></button>'
         for n in range(len(QUOTES)))
+    # with one quote there is nothing to choose between, so no dots
+    dots = (f'    <div class="quote-dots" role="group" aria-label="Choose a quote">\n{dots}\n    </div>'
+            if len(QUOTES) > 1 else "")
 
     body = f'''
 <section class="hero has-bg">
@@ -633,9 +735,7 @@ def build_home():
     <div class="quote-track reveal" aria-live="polite">
 {slides}
     </div>
-    <div class="quote-dots" role="group" aria-label="Choose a quote">
 {dots}
-    </div>
   </div>
 </section>
 
@@ -696,11 +796,14 @@ def build_stubs():
   <div class="wrap contact-grid">
     <div>
       <h2>Call or email</h2>
-      <p><a href="tel:{PHONE_HREF}">{e(PHONE)}</a><br><a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></p>
+      <ul class="contact-links">
+        <li><a href="tel:{PHONE_HREF}">{e(PHONE)}</a></li>
+        <li><a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
+      </ul>
     </div>
     <div>
       <h2>Visit</h2>
-      <address>{address}</address>
+      <address><a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{address}</a></address>
     </div>
     <div>
       <h2>Opening hours</h2>
@@ -758,6 +861,12 @@ if __name__ == "__main__":
         print("wrote", out_path, len(doc), "bytes")
 
     print("wrote sitemap.xml with", write_sitemap(), "urls")
+
+    if _STALE:
+        print(f"\n{len(_STALE)} image(s) changed since tools/images.py last ran, so pages use the original"
+              " file for now. Run python3 tools/images.py, then this again:")
+        for rel in sorted(_STALE):
+            print(f"  {rel}")
 
     left = placeholders_remaining()
     if left:

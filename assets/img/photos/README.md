@@ -1,8 +1,9 @@
 # Images
 
 All site images live under `assets/img/`. Replace a file by saving the new one **with the
-same name**, then run `python3 tools/build.py`. The build lists the placeholders that are
-still in place each time it runs.
+same name**, then run `python3 tools/images.py` (it makes the lighter copies phones load) and
+`python3 tools/build.py`. The build lists the placeholders that are still in place each time
+it runs.
 
 ## Placeholders to replace
 
@@ -16,8 +17,8 @@ black overlay, so the photo itself can be a normal exposure.
 | --- | --- | --- |
 | `ceo-high-rise-window.jpg` | CEO quote | A man in a suit at a high-rise window |
 
-Each also has a `-960.jpg` copy (960px wide) that phones load instead. When you replace a
-photo, either save a 960px-wide copy of it over the `-960.jpg` file or delete that file.
+Don't make the smaller copies by hand: `tools/images.py` makes them all (the `-960.jpg`,
+the `.avif` files and the `-portrait.avif` strip phones use) from the photo you supply.
 
 ### Logos (white on a transparent background, PNG)
 

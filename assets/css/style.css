@@ -3,6 +3,50 @@
    photography under dark overlays. Montserrat for headings and navigation,
    Inter for body copy. */
 
+/* ---------------------------------------------------------------- fonts */
+/* Served from this site (assets/fonts/README.md), so a phone needs no
+   connection to another server before it can draw the text. Until they
+   arrive the page shows Arial, resized to the same widths and line heights
+   (measured on this site's own text), so the words barely move when they do. */
+@font-face {
+  font-family: "Inter";
+  src: url(/assets/fonts/inter-latin.woff2) format("woff2");
+  font-weight: 400 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url(/assets/fonts/montserrat-latin.woff2) format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans");
+  size-adjust: 107.48%;
+  ascent-override: 90.13%;
+  descent-override: 22.44%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Montserrat Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans");
+  font-weight: 100 500;
+  size-adjust: 113.5%;
+  ascent-override: 85.29%;
+  descent-override: 22.11%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Montserrat Fallback";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold");
+  font-weight: 600 900;
+  size-adjust: 107.53%;
+  ascent-override: 90.02%;
+  descent-override: 23.34%;
+  line-gap-override: 0%;
+}
+
 /* ---------------------------------------------------------------- tokens */
 :root {
   --black: #000;
@@ -12,9 +56,9 @@
   --soft: rgba(255, 255, 255, .8);
   --lavender: #c9b8ff;
 
-  --font-head: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-nav: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-body: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-head: "Montserrat", "Montserrat Fallback", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-nav: var(--font-head);
+  --font-body: "Inter", "Inter Fallback", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   --h1: clamp(50px, 9vw, 80px);
   --h2: clamp(36px, 6vw, 56px);
@@ -28,7 +72,11 @@
 /* ---------------------------------------------------------------- base */
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;   /* a link to a section lands below the bar fixed to the top */
+}
 
 body {
   margin: 0;
@@ -37,10 +85,15 @@ body {
   font: 400 20px/1.7 var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 img { display: block; max-width: 100%; height: auto; }
+
+/* <picture> only offers the lighter copies; the <img> inside lays out as if it stood alone */
+picture { display: contents; }
+
+/* a tap shows as a brief lavender wash rather than the browser's grey box */
+a, button { -webkit-tap-highlight-color: rgba(201, 184, 255, .2); }
 
 h1, h2, h3 {
   margin: 0;
@@ -122,7 +175,6 @@ address { font-style: normal; }
 .topbar-contact li { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
 .topbar-contact svg { flex-shrink: 0; width: 16px; height: 16px; }
 .topbar-contact a { color: inherit; text-decoration: none; transition: color .25s var(--ease); }
-.topbar-contact a:hover { color: var(--white); }
 .tb-short { display: none; }
 
 .topbar-social { display: flex; gap: 8px; }
@@ -138,7 +190,6 @@ address { font-style: normal; }
   color: rgba(255, 255, 255, .85);
   transition: color .25s var(--ease), border-color .25s var(--ease);
 }
-.topbar-social a:hover { color: var(--lavender); border-color: rgba(201, 184, 255, .45); }
 .topbar-social svg { width: 15px; height: 15px; }
 
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-block: 26px; }
@@ -147,10 +198,8 @@ address { font-style: normal; }
    solid bar fixed to the top, so the navigation is always in reach. */
 .site-header.is-stuck {
   position: fixed;
-  background: rgba(8, 8, 10, .9);
+  background: rgba(8, 8, 10, .96);   /* near solid: a blur behind it costs a phone every frame of a scroll */
   border-bottom: 1px solid rgba(255, 255, 255, .08);
-  -webkit-backdrop-filter: saturate(140%) blur(14px);
-  backdrop-filter: saturate(140%) blur(14px);
   animation: header-in .35s var(--ease);
 }
 .site-header.is-stuck .topbar { display: none; }
@@ -190,8 +239,24 @@ address { font-style: normal; }
   transform-origin: left;
   transition: transform .35s var(--ease);
 }
-.nav-link:hover::after { transform: scaleX(1); }
 .nav-link[aria-current="page"] { color: var(--lavender); }
+
+/* phones and tablets: a call button beside the menu button, in reach from
+   anywhere on the page once the header is fixed to the top */
+.header-actions { display: none; align-items: center; gap: 10px; margin-right: -6px; }
+
+.call-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 50%;
+  color: var(--white);
+}
+.call-btn svg { width: 20px; height: 20px; }
+.call-btn:active { border-color: var(--lavender); color: var(--lavender); }
 
 .burger {
   display: none;
@@ -236,10 +301,13 @@ address { font-style: normal; }
   right: 0;
   bottom: 0;
   z-index: 50;
+  display: flex;
+  flex-direction: column;
   width: min(380px, 88vw);
-  padding: 22px 28px 40px;
+  padding: 22px 28px 32px;
   background: var(--ink);
   overflow-y: auto;
+  overscroll-behavior: contain;   /* scrolling the menu never scrolls the page behind it */
   transform: translateX(100%);
   visibility: hidden;
   transition: transform .4s var(--ease), visibility 0s .4s;
@@ -268,7 +336,20 @@ address { font-style: normal; }
   color: var(--white);
   text-decoration: none;
 }
-.m-link[aria-current="page"] { color: var(--lavender); }
+.m-link[aria-current="page"],
+.m-link:active { color: var(--lavender); }
+
+/* the menu ends with the ways to get in touch */
+.m-contact { margin-top: auto; padding-top: 36px; }
+.m-call { width: 100%; gap: 10px; }
+.m-call svg { width: 18px; height: 18px; }
+.m-details { display: grid; gap: 2px; margin-top: 18px; font-size: 16px; color: var(--soft); }
+.m-details li { display: flex; align-items: center; gap: 12px; }
+.m-details svg { flex-shrink: 0; width: 18px; height: 18px; color: var(--lavender); }
+.m-details a,
+.m-details span { padding-block: 9px; }
+.m-details a { color: var(--white); text-decoration: none; }
+.m-social { margin-top: 10px; }
 
 /* ---------------------------------------------------------------- hero */
 .hero {
@@ -299,12 +380,11 @@ address { font-style: normal; }
   font: 600 15px/1 var(--font-nav);
   letter-spacing: .03em;
   text-decoration: none;
-  transition: background .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease);
+  transition: background .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease), transform .15s var(--ease);
 }
+.btn:active { transform: scale(.97); }
 .btn-primary { background: var(--white); color: var(--black); }
-.btn-primary:hover { background: var(--lavender); }
 .btn-ghost { border-color: rgba(255, 255, 255, .6); color: var(--white); }
-.btn-ghost:hover { border-color: var(--white); background: rgba(255, 255, 255, .1); }
 
 .hero-lead {
   max-width: 620px;
@@ -325,7 +405,6 @@ address { font-style: normal; }
   opacity: .85;
 }
 .scroll-cue svg { width: 24px; height: 48px; animation: nudge 2.4s ease-in-out infinite; }
-.scroll-cue:hover { opacity: 1; }
 
 @keyframes nudge {
   0%, 100% { transform: translateY(-4px); }
@@ -423,7 +502,6 @@ address { font-style: normal; }
   background: rgba(10, 10, 14, .45);
   transition: background .3s var(--ease), border-color .3s var(--ease);
 }
-.sub-logos li:hover { border-color: rgba(255, 255, 255, .32); background: rgba(10, 10, 14, .62); }
 .sub-logos img { width: auto; max-width: 100%; max-height: 84px; object-fit: contain; }
 
 /* ---------------------------------------------------------------- sectors */
@@ -467,11 +545,9 @@ address { font-style: normal; }
   transition: opacity .35s var(--ease), transform .45s var(--ease);
 }
 .sector-arrow svg { width: 28px; height: 28px; }
-.sector-link:hover,
-.sector-link:focus-visible { color: var(--lavender); }
-.sector-link:hover .sector-name,
+.sector-link:focus-visible,
+.sector-link:active { color: var(--lavender); }
 .sector-link:focus-visible .sector-name { transform: translateX(6px); }
-.sector-link:hover .sector-arrow,
 .sector-link:focus-visible .sector-arrow { opacity: 1; transform: none; }
 
 /* ---------------------------------------------------------------- logo grids */
@@ -514,7 +590,6 @@ address { font-style: normal; }
   border-bottom: 1px solid rgba(255, 255, 255, .12);
   transition: background .3s var(--ease);
 }
-.logo-grid--partners li:hover { background: rgba(255, 255, 255, .04); }
 .logo-grid--partners img { max-height: 58px; max-width: min(210px, 100%); }
 
 /* clients */
@@ -537,10 +612,9 @@ address { font-style: normal; }
   opacity: .62;
   transition: opacity .35s var(--ease);
 }
-.logo-grid--clients li:hover img { opacity: 1; }
 
 /* ---------------------------------------------------------------- quote */
-.quote { --overlay: .58; padding-block: clamp(120px, 15vw, 190px) clamp(80px, 10vw, 120px); text-align: center; }
+.quote { --overlay: .58; padding-block: clamp(110px, 14vw, 170px); text-align: center; }
 
 .quote-track { display: grid; }
 .quote-slide { grid-area: 1 / 1; transition: opacity .7s var(--ease); }
@@ -603,14 +677,13 @@ address { font-style: normal; }
 }
 
 .footer-grid p,
-.footer-grid address { font-size: 18px; line-height: 1.75; color: var(--soft); }
+.footer-grid address,
+.footer-contact { font-size: 18px; line-height: 1.75; color: var(--soft); }
 
 .footer-grid a { color: var(--white); text-decoration: none; }
-.footer-grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 .social { display: flex; gap: 8px; margin-left: -10px; }
 .social a { display: inline-flex; width: 44px; height: 44px; padding: 10px; color: var(--white); transition: color .25s var(--ease); }
-.social a:hover { color: var(--lavender); }
 .social svg { width: 24px; height: 24px; }
 
 /* ---------------------------------------------------------------- inner pages */
@@ -640,10 +713,32 @@ address { font-style: normal; }
 .contact-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; }
 .contact-grid h2 { margin-bottom: 16px; font-size: clamp(24px, 2.6vw, 30px); }
 .contact-grid p,
-.contact-grid address { font-size: 20px; line-height: 1.75; color: var(--soft); }
+.contact-grid address,
+.contact-links { font-size: 20px; line-height: 1.75; color: var(--soft); }
 .contact-grid a { color: var(--white); }
 
 .text-link { color: var(--white); font: 600 17px var(--font-nav); text-underline-offset: 5px; }
+
+/* ---------------------------------------------------------------- hover */
+/* Only where a mouse or trackpad can hover: a phone applies :hover on a tap
+   and keeps it until the next tap elsewhere, so Back would return to a sector
+   still lit or a tile still raised. Touch gets the :active states above. */
+@media (hover: hover) {
+  .topbar-contact a:hover { color: var(--white); }
+  .topbar-social a:hover { color: var(--lavender); border-color: rgba(201, 184, 255, .45); }
+  .nav-link:hover::after { transform: scaleX(1); }
+  .btn-primary:hover { background: var(--lavender); }
+  .btn-ghost:hover { border-color: var(--white); background: rgba(255, 255, 255, .1); }
+  .scroll-cue:hover { opacity: 1; }
+  .sub-logos li:hover { border-color: rgba(255, 255, 255, .32); background: rgba(10, 10, 14, .62); }
+  .sector-link:hover { color: var(--lavender); }
+  .sector-link:hover .sector-name { transform: translateX(6px); }
+  .sector-link:hover .sector-arrow { opacity: 1; transform: none; }
+  .logo-grid--partners li:hover { background: rgba(255, 255, 255, .04); }
+  .logo-grid--clients li:hover img { opacity: 1; }
+  .footer-grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .social a:hover { color: var(--lavender); }
+}
 
 /* ---------------------------------------------------------------- scroll reveal */
 .js .reveal {
@@ -661,6 +756,7 @@ address { font-style: normal; }
 
 @media (max-width: 1080px) {
   .nav { display: none; }
+  .header-actions { display: flex; }
   .burger { display: block; }
   .logo-grid--clients { --cols: 4; }
 }
@@ -700,6 +796,7 @@ address { font-style: normal; }
   .why .bg img { object-position: 22% center; }   /* a phone's narrow crop: keep the left tower in frame */
   .why-areas li { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; font-size: 15px; }
   .why-icon { width: 38px; height: 38px; }
+  .sectors-head { text-align: left; }   /* six lines of centred text are hard to read on a phone */
   .sector-link { gap: 16px; padding: 18px 2px; }
   .sector-arrow svg { width: 22px; height: 22px; }
   .sub-logos { --cols: 2; --gx: 12px; }
@@ -707,19 +804,40 @@ address { font-style: normal; }
   .sub-logos img { max-height: 60px; }
   .logo-grid--partners li { height: 112px; padding: 18px; }
   .logo-grid--partners img { max-height: 44px; }
-  .logo-grid--clients { --cols: 2; }
-  .logo-grid--clients li { height: 88px; }
-  .logo-grid--clients img { max-height: 68px; opacity: .78; }
+  /* three to a row: 21 logos in 7 rows rather than 11 */
+  .logo-grid--clients { --cols: 3; --gx: 18px; row-gap: 22px; }
+  .logo-grid--clients li { height: 76px; }
+  .logo-grid--clients img { max-height: 60px; opacity: .8; }
+  .clients-head { padding-block: 72px 40px; }
+  .clients-body { padding-block: 48px 64px; }
   .footer-photo { height: 220px; }
+  .footer-grid { gap: 32px; }
+  /* shorter, quicker entrances: on a small screen a section is in view sooner */
+  .js .reveal { transform: translateY(16px); transition-duration: .6s; }
   .stub-sectors { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 420px) {
   .footer-grid { grid-template-columns: 1fr; }
+  .header-actions { gap: 6px; }
   /* "Delivery Services" on one line at 320px: a size down, and the arrow
      (a hover reveal, which a phone never shows) gives its width back */
   .sector-link { font-size: 24px; }
   .sector-arrow { display: none; }
+}
+
+@media (max-width: 359px) {
+  .logo-grid--clients { --cols: 2; }
+}
+
+/* touch screens: small links keep their look but take a 44px tap */
+@media (pointer: coarse) {
+  .topbar-contact a { padding-block: 10px; }
+  .topbar-social { gap: 12px; }
+  .topbar-social a { position: relative; }
+  .topbar-social a::after { content: ""; position: absolute; inset: -6px; }
+  .footer-contact a,
+  .contact-links a { display: inline-block; padding-block: 7px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
