@@ -382,7 +382,7 @@ COMPANIES = [
      "text": ("Bizarri Chalet, a chalet to book in Al Khiran: seven bedrooms for 14 guests, a heated "
               "pool, seating on the lagoon and a children's play area.")},
     {"id": "netlet", "name": "NetLet", "logo": "logos/logo-netlet.png",
-     "field": "E-commerce", "url": "", "sectors": ["E-Commerce"],
+     "field": "E-commerce", "url": "https://netlet.net", "sectors": ["E-Commerce"],
      "text": ("An online marketplace for Kuwait: products from many stores in one cart, delivered to "
               "every governorate, with cash on delivery.")},
     {"id": "shiplee", "name": "Shiplee", "logo": "logos/logo-shiplee.png",
