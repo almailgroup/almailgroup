@@ -1,75 +1,70 @@
-# Photographs
+# Images
 
-**Upload site photography into this folder: `assets/img/photos/`**
+All site images live under `assets/img/`. Replace a file by saving the new one **with the
+same name**, then run `python3 tools/build.py`. The build lists the placeholders that are
+still in place each time it runs.
 
-Brand assets (the logo and favicons) stay one level up in `assets/img/`. Keeping
-photography separate means a logo change never has to go hunting through
-photographs.
+## Placeholders to replace
 
-## How to upload
+### Background photos (`assets/img/photos/`)
 
-On GitHub: open this folder → **Add file** → **Upload files** → drag them in →
-Commit. Or drop them in locally and commit as usual.
+These are rendered stand-ins, not photographs. Supply dark architecture photography at
+about **1920 × 1080 px, JPEG, under ~300 KB**. Each section darkens its photo with a 50–72%
+black overlay, so the photo itself can be a normal exposure.
 
-## Naming
-
-Lowercase, hyphenated, descriptive — the filename becomes part of the URL:
-
-```
-hero.jpg                 not   IMG_4821.JPG
-service-guarding.jpg     not   Guarding Photo (1).jpg
-```
-
-## What's wired up already
-
-These images are live on the site, sourced from AZSCO's official company profile:
-
-| File | Used for | Size (px) |
+| File | Section | What it should show |
 | --- | --- | --- |
-| `hero.jpg` | Home page hero background | as supplied |
-| `partners-logos.png` | Partners page and home page, the 8 technology partner logos | 552 × 233 |
-| `clients-logos.jpg` | About page and Clients page, the client logo wall | 748 × 489 |
-| `certifications.jpg` | About page, ISO 9001 / SCK / IAS certification badges | 473 × 180 |
-| `uniforms/formal-front.jpg`, `formal-back.jpg` | About page, Uniform Models — Formal Uniform | 232 × 349 |
-| `uniforms/winter-front.jpg`, `winter-back.jpg` | About page, Uniform Models — Winter Uniform | 232 × 349 |
-| `uniforms/patrol-front.jpg`, `patrol-back.jpg` | About page, Uniform Models — Patrol Uniform | 232 × 349 |
-| `uniforms/security-front.jpg`, `security-back.jpg` | About page, Uniform Models — Duty Uniform | 232 × 349 |
+| `hero-glass-towers.jpg` | Hero | Looking up at glass towers |
+| `why-choose-towers.jpg` | Why Choose Almail Group | Architecture behind the white band |
+| `about-curved-facade.jpg` | About | A modern building from below, curved glass and steel |
+| `sectors-glass-facade.jpg` | Sectors | A dark glass facade |
+| `ceo-high-rise-window.jpg` | CEO quote | A man in a suit at a high-rise window |
+| `footer-skyscrapers-bw.jpg` | Footer, left half (about 1600 × 1000) | Skyscrapers from below, black and white |
 
-The partner, client and certification images are logo panels shown at their supplied colours —
-see "Logos keep their own colour" in the repository root README. The uniform photos are real
-AZSCO staff, as published in AZSCO's own external-facing company profile.
+Each also has a `-960.jpg` copy (960px wide) that phones load instead. When you replace a
+photo, either save a 960px-wide copy of it over the `-960.jpg` file or delete that file.
 
-## Open slots
+### Logos (white on a transparent background, PNG)
 
-The site currently uses drawn SVG panels for these. Upload a photograph and say the word to
-wire it in:
+Logos are shown white on black, so supply white artwork with a transparent background, about
+500px wide.
 
-| Suggested name | Used for | Size (px) |
-| --- | --- | --- |
-| `story.jpg` | About page, beside "Protecting Kuwait Since 2014" | 900 × 760 |
-| `about-home.jpg` | Home page, beside "A Leading Provider…" | 900 × 760 |
-| `service-guarding.jpg` | Services page, Facility Guarding section | 900 × 560 |
-| `service-protection.jpg` | Services page, VIP Protection & Rapid Intervention section | 900 × 560 |
-| `service-operations.jpg` | Services page, Central Operations Room section | 900 × 560 |
-| `service-patrols.jpg` | Services page, Security Patrols section | 900 × 560 |
-| `og-share.jpg` | The preview card when the site is shared on WhatsApp, LinkedIn etc. | 1200 × 630 |
+| File | Logo |
+| --- | --- |
+| `logos/logo-almail-group-white.png` | Almail Group (the sailboat/dhow mark), header |
+| `logos/logo-azsco-systems.png` | AZSCO Systems |
+| `logos/logo-mailarti.png` | Mailarti |
+| `logos/logo-gemellry.png` | Gemellry |
+| `logos/logo-shiplee.png` | Shiplee |
+| `clients/logo-xcite.png` | Xcite |
+| `clients/logo-arkan-al-kuwait.png` | Arkan Al Kuwait Real Estate |
 
-Partial uploads are fine — any slot without a photograph keeps its current SVG
-panel, so the site never shows a gap.
+### Generated from the placeholder logo
 
-## Format and size
+Regenerate these from the real Almail Group logo once it is in:
 
-- **JPEG** for photographs, or **WebP** if your camera or editor exports it
-  (roughly 30% smaller at the same quality).
-- **PNG** only for graphics with flat colour or transparency, not photographs.
-- Keep each file **under about 300 KB**. A 4 MB photo straight from a phone will
-  noticeably slow the page on Kuwaiti mobile data — resize to the dimensions in
-  the table before uploading.
+| File | Size |
+| --- | --- |
+| `favicon-32.png` | 32 × 32 |
+| `favicon-192.png` | 192 × 192 |
+| `apple-touch-icon.png` | 180 × 180, no transparency |
+| `og-share.jpg` | 1200 × 630, the preview card shown when a link is shared |
+
+## Real assets already in place
+
+- **Partners** (`partners/`): Motorola, Ajax, Rasilient, Avigilon, Teltonika, Inrico, Hikvision
+  and Pelco, cut from the partner logo sheet the AZSCO site used.
+- **Clients** (`clients/`): the other 19 clients, cut from the AZSCO client logo sheet. That
+  sheet was low resolution, so sharper originals are worth swapping in when you have them;
+  Ewan Complex especially.
+  `logo-al-asima.png` is the Arabic calligraphy mark from that sheet; please confirm it is Al Asima.
+- **Group companies** (`logos/`): AZSCO Security (from the AZSCO site), Bizarri (the Bizarri
+  Chalet logo from the Bizarri repository) and Netlet (from the Netlet repository, its orange
+  roof made white to match).
 
 ## Before uploading
 
-- Only upload photographs AZSCO owns or has licensed. Stock images taken from a
-  search engine are a copyright risk.
-- Client premises are usually confidential: get the client's agreement before
-  publishing a recognisable photograph of their site.
-- Faces of officers and members of the public need consent to publish.
+- Only upload photographs Almail Group owns or has licensed. Stock images taken from a search
+  engine are a copyright risk.
+- Keep photographs under about 300 KB. A 4 MB photo straight from a camera noticeably slows the
+  page on mobile data.

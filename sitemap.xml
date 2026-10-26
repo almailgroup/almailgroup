@@ -1,102 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.azsco.com/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>1.0</priority>
+    <loc>https://www.almailgroup.com/</loc>
+    <lastmod>2026-10-26</lastmod>
   </url>
   <url>
-    <loc>https://www.azsco.com/ar/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/services/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/services/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/services/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/ar/services/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/services/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/services/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/about/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/about/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/about/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/ar/about/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/about/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/about/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/contact/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/contact/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/contact/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/ar/contact/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/contact/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/contact/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/partners/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/partners/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/partners/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/ar/partners/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/partners/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/partners/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/clients/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/clients/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/clients/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/ar/clients/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/clients/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/clients/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/privacy-policy/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/privacy-policy/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/privacy-policy/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://www.azsco.com/ar/privacy-policy/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.azsco.com/privacy-policy/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.azsco.com/ar/privacy-policy/"/>
-    <lastmod>2026-09-27</lastmod>
-    <priority>0.3</priority>
+    <loc>https://www.almailgroup.com/contact/</loc>
+    <lastmod>2026-10-26</lastmod>
   </url>
 </urlset>
