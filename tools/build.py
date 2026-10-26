@@ -24,6 +24,13 @@ PHONE_HREF = "+9651808606"
 EMAIL = "Info@Almailgroup.com"
 EMAIL_HREF = "info@almailgroup.com"
 ADDRESS = ["Kuwait Building Tower, Floor 27,", "Fahad Alsalem Street,", "Qibla City - Kuwait."]
+# The top bar's one-line address, and the shorter form it falls back to on a
+# medium screen. The address opens Google Maps; paste the office's own share
+# link here (Maps -> Share -> Copy link) to land on the pin exactly.
+ADDRESS_LINE = "Floor 27, Kuwait Building Tower, Fahad Alsalem St., Qibla, Kuwait"
+ADDRESS_SHORT = "Kuwait Building Tower, Qibla"
+MAPS_URL = ("https://www.google.com/maps/search/?api=1&query="
+            "Kuwait+Building+Tower%2C+Fahad+Al+Salem+Street%2C+Qibla%2C+Kuwait")
 HOURS = [("Sunday - Thursday", "8am - 5pm"), ("Friday", "Closed"), ("Saturday", "Closed")]
 
 # Paste the profile URLs here and rebuild. Left empty, the icons still show
@@ -235,6 +242,9 @@ I = {
     "instagram": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>',
     "x": '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 3h3l-6.6 7.5L21.7 21h-6l-4.7-6.1L5.6 21h-3l7-8L2.6 3h6.1l4.2 5.6zm-1 16h1.7L7.6 4.7H5.8z"/></svg>',
     "close": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+    "pin": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    "phone": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>',
+    "mail": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>',
     "down": '<svg viewBox="0 0 24 48" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v42"/><path d="m4 36 8 8 8-8"/></svg>',
 }
 
@@ -334,8 +344,8 @@ STUBS = {
 }
 
 # ============================================================ templates
-FONTS = ("https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700"
-         "&family=Questrial&display=swap")
+FONTS = ("https://fonts.googleapis.com/css2?family=Inter:wght@400..600"
+         "&family=Montserrat:wght@500..700&display=swap")
 
 
 def head(fname, title, desc, noindex=False, preload=""):
@@ -387,6 +397,19 @@ def header(current):
     logo_first = img("logos/logo-almail-group-white.png", "Almail Group", "brand-logo", priority=True)
     return f'''
 <header class="site-header">
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <ul class="topbar-contact">
+        <li class="tb-address">{I["pin"]}<a href="{MAPS_URL}" target="_blank" rel="noopener noreferrer"><span class="tb-long">{e(ADDRESS_LINE)}</span><span class="tb-short">{e(ADDRESS_SHORT)}</span></a></li>
+        <li>{I["phone"]}<a href="tel:{PHONE_HREF}">{e(PHONE)}</a></li>
+        <li class="tb-email">{I["mail"]}<a href="mailto:{EMAIL_HREF}">{e(EMAIL)}</a></li>
+      </ul>
+      <ul class="topbar-social">
+        {social_link(INSTAGRAM_URL, "Almail Group on Instagram", "instagram")}
+        {social_link(X_URL, "Almail Group on X", "x")}
+      </ul>
+    </div>
+  </div>
   <div class="wrap header-inner">
     <a class="brand" href="/">{logo_first}</a>
     <nav class="nav" aria-label="Main">

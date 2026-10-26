@@ -91,8 +91,12 @@ the old placeholder on phones; the build tells you to replace or delete the left
 ## Design
 
 - Black and near-black surfaces, white type; full-bleed photographs under 50–72% black overlays.
-- Headings in Questrial (H1 80px, H2 56px, both scaling down on small screens); navigation in
-  Montserrat SemiBold 14px; body copy in the system's Avenir/Helvetica.
+- Headings and navigation in Montserrat (H1 80px and H2 56px at weight 600, scaling down on
+  small screens; the navigation 16px bold); body copy in Inter at 20px (18px on a phone).
+- A contact bar runs along the top of every page: the address (opening Google Maps), the
+  phone, the email and the social links. Below 1200px the address shortens, and on a phone
+  the bar keeps the phone number and the social links. Its address and map link are
+  `ADDRESS_LINE`, `ADDRESS_SHORT` and `MAPS_URL` in `tools/build.py`.
 - The current page's navigation link is lavender (`#C9B8FF`); every other link is white.
 - Sections fade and slide in as they scroll into view. Everything is visible with JavaScript
   off, and the motion is skipped for visitors who ask for reduced motion.
@@ -104,8 +108,8 @@ the old placeholder on phones; the build tells you to replace or delete the left
 - **Domain**: the site is published at `www.almailgroup.com`. `CNAME` tells GitHub Pages which
   domain to serve, and `SITE_URL` in `tools/build.py` uses the same address for canonical URLs,
   link previews and the sitemap. Change both together if the domain ever changes.
-- **Fonts**: Questrial and Montserrat load from Google Fonts without blocking the first paint,
-  with system-font fallbacks if that request fails.
+- **Fonts**: Inter and Montserrat load from Google Fonts as one variable file each, without
+  blocking the first paint, with system-font fallbacks if that request fails.
 
 ## Browser support
 
