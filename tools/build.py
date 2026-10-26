@@ -262,6 +262,13 @@ I = {
     "pin": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
     "phone": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>',
     "mail": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>',
+    "building": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V4.8a.8.8 0 0 1 .8-.8h9.4a.8.8 0 0 1 .8.8V21"/><path d="M15 9h4.2a.8.8 0 0 1 .8.8V21"/><path d="M2.5 21h19"/><path d="M8 8h3M8 12h3M8 16h3"/></svg>',
+    "helmet": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 18h19"/><path d="M4.5 18v-2.5a7.5 7.5 0 0 1 15 0V18"/><path d="M10 8.3V5h4v3.3"/><path d="M8 12.5v-2M16 12.5v-2"/></svg>',
+    "chip": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></svg>',
+    "cart": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6.2"/></svg>',
+    "shield": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
+    "smarthome": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 14.2a4.2 4.2 0 0 1 6 0"/><path d="M10.8 16.6a1.7 1.7 0 0 1 2.4 0"/></svg>',
+    "arrow": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
     "down": '<svg viewBox="0 0 24 48" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v42"/><path d="m4 36 8 8 8-8"/></svg>',
 }
 
@@ -275,6 +282,8 @@ HOME = {
              "including real estate services, construction and maintenance, low voltage technologies, "
              "jewelry design, e-commerce, security systems, security guard services, smart home "
              "solutions, and delivery."),
+    # (label, page) -- the first is the filled button
+    "actions": [("Explore our sectors", "our-sectors.html"), ("Contact us", "contact.html")],
 }
 
 WHY = {
@@ -283,6 +292,9 @@ WHY = {
     "text": ("Almail Group offers a diverse range of services including real estate, construction, "
              "technology, e-commerce, security, and smart home solutions. We are committed to "
              "delivering excellence in each domain."),
+    # the six areas the paragraph names, drawn beside it
+    "areas": [("Real estate", "building"), ("Construction", "helmet"), ("Technology", "chip"),
+              ("E-commerce", "cart"), ("Security", "shield"), ("Smart home", "smarthome")],
 }
 
 ABOUT = {
@@ -487,6 +499,7 @@ def footer():
         </ul>
       </section>
     </div>
+    <p class="footer-legal">&copy; {datetime.date.today().year} {SITE_NAME}. All rights reserved.</p>
   </div>
 </footer>
 <script src="{asset_url("assets/js/main.js")}" defer></script>
@@ -526,8 +539,15 @@ HERO_PHOTO = "hero-glass-towers.jpg"
 def build_home():
     subs = logo_list(SUBSIDIARIES, "sub-logos", "Almail Group companies")
     sectors = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link("our-sectors.html")}">{e(s)}</a></li>'
+        f'      <li class="reveal" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link("our-sectors.html")}">'
+        f'<span class="sector-num" aria-hidden="true">{n + 1:02d}</span><span class="sector-name">{e(s)}</span>'
+        f'<span class="sector-arrow">{I["arrow"]}</span></a></li>'
         for n, s in enumerate(SECTORS))
+    actions = "\n".join(
+        f'      <a class="btn {"btn-primary" if n == 0 else "btn-ghost"}" href="{link(target)}">{e(label)}</a>'
+        for n, (label, target) in enumerate(HOME["actions"]))
+    areas = "\n".join(
+        f'          <li><span class="why-icon">{I[icon]}</span>{e(label)}</li>' for label, icon in WHY["areas"])
     partners = logo_list(PARTNERS, "logo-grid logo-grid--partners", "Our partners")
     clients = logo_list(CLIENTS, "logo-grid logo-grid--clients", "Our clients")
     slides = "\n".join(
@@ -548,6 +568,9 @@ def build_home():
   <div class="wrap hero-inner">
     <h1 class="hero-title">{e(HOME["h1"])}</h1>
     <p class="hero-lead">{e(HOME["lead"])}</p>
+    <div class="hero-actions">
+{actions}
+    </div>
   </div>
   <a class="scroll-cue" href="#why" aria-label="Scroll to the next section">{I["down"]}</a>
 </section>
@@ -557,8 +580,15 @@ def build_home():
   <div class="wrap">
     <div class="why-band reveal">
       <h2 id="why-title">{e(WHY["title"])}</h2>
-      <h3>{e(WHY["sub"])}</h3>
-      <p>{e(WHY["text"])}</p>
+      <div class="why-body">
+        <div class="why-copy">
+          <h3>{e(WHY["sub"])}</h3>
+          <p>{e(WHY["text"])}</p>
+        </div>
+        <ul class="why-areas" aria-label="Areas we work in">
+{areas}
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -566,14 +596,14 @@ def build_home():
 <section class="about has-bg" aria-labelledby="about-title">
   {backdrop("about-curved-facade.jpg")}
   <div class="wrap">
-    <div class="section-head reveal">
-      <h2 id="about-title">{e(ABOUT["title"])}</h2>
-      <p class="subtitle">{e(ABOUT["sub"])}</p>
-    </div>
-    <div class="about-grid">
-{subs}
+    <div class="about-head">
+      <div class="section-head reveal">
+        <h2 id="about-title">{e(ABOUT["title"])}</h2>
+        <p class="subtitle">{e(ABOUT["sub"])}</p>
+      </div>
       <p class="about-text reveal">{e(ABOUT["text"])}</p>
     </div>
+{subs}
   </div>
 </section>
 

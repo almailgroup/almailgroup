@@ -1,4 +1,4 @@
-/* Almail Group — site behaviour: mobile menu, scroll reveal, quote slider */
+/* Almail Group — site behaviour: sticky header, mobile menu, scroll reveal, quote slider */
 (function () {
   'use strict';
 
@@ -6,6 +6,27 @@
   var on = function (el, ev, fn, opts) { if (el) el.addEventListener(ev, fn, opts); };
   var all = function (sel, ctx) { return Array.prototype.slice.call((ctx || doc).querySelectorAll(sel)); };
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- sticky header ----------
+     The header sits over the hero at the top of the page. Once it has
+     scrolled out of sight it comes back as a compact bar fixed to the top
+     (.is-stuck in style.css), and goes back to normal near the top. */
+  function stickyHeader() {
+    var header = doc.querySelector('.site-header');
+    if (!header) return;
+    var limit = header.offsetHeight + 120;
+    var pending = false;
+    function update() {
+      pending = false;
+      header.classList.toggle('is-stuck', window.scrollY > limit);
+    }
+    on(window, 'scroll', function () {
+      if (pending) return;
+      pending = true;
+      window.requestAnimationFrame(update);
+    }, { passive: true });
+    update();
+  }
 
   /* ---------- mobile drawer ---------- */
   function mobileNav() {
@@ -96,6 +117,7 @@
   }
 
   function init() {
+    stickyHeader();
     mobileNav();
     reveal();
     quoteSlider();
