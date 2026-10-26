@@ -661,7 +661,8 @@ address { font-style: normal; }
 
 .divider { display: block; width: 64px; height: 1px; margin: 26px auto 0; background: var(--white); }
 
-.clients-body { padding-block: clamp(64px, 8vw, 100px) clamp(80px, 10vw, 130px); background: var(--charcoal); }
+/* black like the heading above it, so the two read as one section */
+.clients-body { padding-block: clamp(8px, 2vw, 24px) clamp(80px, 10vw, 130px); background: var(--black); }
 
 .logo-grid--clients {
   --cols: 5;
@@ -1078,7 +1079,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .logo-grid--clients li { height: 76px; }
   .logo-grid--clients img { max-height: 60px; opacity: .8; }
   .clients-head { padding-block: 72px 40px; }
-  .clients-body { padding-block: 48px 64px; }
+  .clients-body { padding-block: 8px 64px; }
   .footer-photo { height: 220px; }
   .footer-grid { gap: 32px; }
   /* shorter, quicker entrances: on a small screen a section is in view sooner */
