@@ -31,7 +31,7 @@ set `"stub": False` for the page in `STUBS` (`tools/build.py`) when you fill it 
 ├── 404.html
 ├── assets/
 │   ├── css/style.css     # all styling: tokens, sections, responsive rules
-│   ├── js/main.js        # mobile menu, scroll reveal, quote slider
+│   ├── js/main.js        # sticky header, mobile menu, scroll reveal, quote slider
 │   └── img/
 │       ├── logos/        # Almail Group and group-company logos (white)
 │       ├── partners/     # partner logos (white)
@@ -104,10 +104,15 @@ the old placeholder on phones; the build tells you to replace or delete the left
   the bar keeps the phone number and the social links. Its address and map link are
   `ADDRESS_LINE`, `ADDRESS_SHORT` and `MAPS_URL` in `tools/build.py`.
 - The current page's navigation link is lavender (`#C9B8FF`); every other link is white.
+- Once the header has scrolled out of sight it comes back as a compact dark bar fixed to the
+  top, without the contact bar, and goes back to normal near the top of the page.
+- The home page: the hero has two buttons (Explore our sectors, Contact us; `actions` in
+  `HOME`), Why Choose lists six areas with an icon each (`areas` in `WHY`), the sectors are
+  numbered rows, and the partners sit in a grid of hairline cells.
 - Sections fade and slide in as they scroll into view. Everything is visible with JavaScript
   off, and the motion is skipped for visitors who ask for reduced motion.
-- Breakpoints at 1080px (hamburger menu), 900px (single-column about and footer, 2/3-column
-  logo grids) and 640px (phone layout).
+- Breakpoints at 1080px (hamburger menu), 900px (one column for Why Choose, About, the sectors
+  and the footer; fewer logos to a row) and 640px (phone layout).
 
 ## Notes
 
