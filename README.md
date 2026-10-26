@@ -101,9 +101,9 @@ the old placeholder on phones; the build tells you to replace or delete the left
 
 ## Notes
 
-- **Domain**: `CNAME` still says `azsco.com`, carried over from the AZSCO Security site this
-  repository was copied from. Canonical URLs and the sitemap use `https://www.almailgroup.com`
-  (`SITE_URL` in `tools/build.py`).
+- **Domain**: the site is published at `www.almailgroup.com`. `CNAME` tells GitHub Pages which
+  domain to serve, and `SITE_URL` in `tools/build.py` uses the same address for canonical URLs,
+  link previews and the sitemap. Change both together if the domain ever changes.
 - **Fonts**: Questrial and Montserrat load from Google Fonts without blocking the first paint,
   with system-font fallbacks if that request fails.
 
