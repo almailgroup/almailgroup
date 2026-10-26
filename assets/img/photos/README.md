@@ -18,7 +18,6 @@ black overlay, so the photo itself can be a normal exposure.
 | `about-curved-facade.jpg` | About | A modern building from below, curved glass and steel |
 | `sectors-glass-facade.jpg` | Sectors | A dark glass facade |
 | `ceo-high-rise-window.jpg` | CEO quote | A man in a suit at a high-rise window |
-| `footer-skyscrapers-bw.jpg` | Footer, left half (about 1600 × 1000) | Skyscrapers from below, black and white |
 
 Each also has a `-960.jpg` copy (960px wide) that phones load instead. When you replace a
 photo, either save a 960px-wide copy of it over the `-960.jpg` file or delete that file.
@@ -46,6 +45,9 @@ Logos are shown white on black, so supply white artwork with a transparent backg
   changes.
 - **Hero photo** (`photos/hero-glass-towers.jpg` and its `-960.jpg` copy): glass towers at dusk,
   supplied by Almail Group.
+- **Footer photo** (`photos/footer-skyscrapers-bw.jpg` and its `-960.jpg` copy): towers seen
+  from below, supplied by Almail Group in colour. The stylesheet shows it in black and white
+  (`.footer-photo img` in `assets/css/style.css`); take out `grayscale(1)` there for colour.
 - **Partners** (`partners/`): Motorola, Ajax, Rasilient, Avigilon, Teltonika, Inrico, Hikvision
   and Pelco, cut from the partner logo sheet the AZSCO site used.
 - **Clients** (`clients/`): the other 19 clients, cut from the AZSCO client logo sheet. That
