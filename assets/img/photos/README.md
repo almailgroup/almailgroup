@@ -14,7 +14,6 @@ black overlay, so the photo itself can be a normal exposure.
 
 | File | Section | What it should show |
 | --- | --- | --- |
-| `hero-glass-towers.jpg` | Hero | Looking up at glass towers |
 | `why-choose-towers.jpg` | Why Choose Almail Group | Architecture behind the white band |
 | `about-curved-facade.jpg` | About | A modern building from below, curved glass and steel |
 | `sectors-glass-facade.jpg` | Sectors | A dark glass facade |
@@ -31,7 +30,6 @@ Logos are shown white on black, so supply white artwork with a transparent backg
 
 | File | Logo |
 | --- | --- |
-| `logos/logo-almail-group-white.png` | Almail Group (the sailboat/dhow mark), header |
 | `logos/logo-azsco-systems.png` | AZSCO Systems |
 | `logos/logo-mailarti.png` | Mailarti |
 | `logos/logo-gemellry.png` | Gemellry |
@@ -39,19 +37,15 @@ Logos are shown white on black, so supply white artwork with a transparent backg
 | `clients/logo-xcite.png` | Xcite |
 | `clients/logo-arkan-al-kuwait.png` | Arkan Al Kuwait Real Estate |
 
-### Generated from the placeholder logo
-
-Regenerate these from the real Almail Group logo once it is in:
-
-| File | Size |
-| --- | --- |
-| `favicon-32.png` | 32 × 32 |
-| `favicon-192.png` | 192 × 192 |
-| `apple-touch-icon.png` | 180 × 180, no transparency |
-| `og-share.jpg` | 1200 × 630, the preview card shown when a link is shared |
-
 ## Real assets already in place
 
+- **Almail Group logo** (`logos/logo-almail-group-white.png`): the white dhow mark, trimmed and
+  made solid white. The favicons (`favicon-32.png`, `favicon-192.png`, `apple-touch-icon.png`)
+  are that mark on a near-black square, and `og-share.jpg`, the card shown when a link is
+  shared, is the hero photo darkened with the mark and the name. Remake those four if the logo
+  changes.
+- **Hero photo** (`photos/hero-glass-towers.jpg` and its `-960.jpg` copy): glass towers at dusk,
+  supplied by Almail Group.
 - **Partners** (`partners/`): Motorola, Ajax, Rasilient, Avigilon, Teltonika, Inrico, Hikvision
   and Pelco, cut from the partner logo sheet the AZSCO site used.
 - **Clients** (`clients/`): the other 19 clients, cut from the AZSCO client logo sheet. That
