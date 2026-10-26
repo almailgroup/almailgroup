@@ -112,7 +112,7 @@ address { font-style: normal; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
 
 .brand { display: inline-flex; flex-shrink: 0; }
-.brand-logo { width: auto; height: 72px; }
+.brand-logo { width: auto; height: 88px; }
 
 .nav ul { display: flex; align-items: center; gap: clamp(20px, 2.6vw, 40px); }
 
@@ -120,7 +120,7 @@ address { font-style: normal; }
   position: relative;
   display: inline-block;
   padding-block: 8px;
-  font: 600 14px/1.2 var(--font-nav);
+  font: 700 14px/1.2 var(--font-nav);
   letter-spacing: .02em;
   color: var(--white);
   text-decoration: none;
@@ -196,7 +196,7 @@ address { font-style: normal; }
 .mobile-nav.is-open { transform: none; visibility: visible; transition: transform .4s var(--ease); }
 
 .mobile-nav-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
-.mobile-nav-head .brand-logo { height: 48px; }
+.mobile-nav-head .brand-logo { height: 56px; }
 
 .close {
   width: 44px;
@@ -213,7 +213,7 @@ address { font-style: normal; }
   display: block;
   padding: 14px 0;
   border-bottom: 1px solid rgba(255, 255, 255, .1);
-  font: 600 17px/1.3 var(--font-nav);
+  font: 700 17px/1.3 var(--font-nav);
   color: var(--white);
   text-decoration: none;
 }
@@ -522,7 +522,7 @@ address { font-style: normal; }
 @media (max-width: 640px) {
   body { font-size: 17px; }
   .site-header { padding-block: 18px; }
-  .brand-logo { height: 52px; }
+  .brand-logo { height: 60px; }
   .hero { padding-block: 120px 110px; }
   .hero-lead { font-size: 18px; }
   .sector-list { grid-template-columns: 1fr; text-align: center; }

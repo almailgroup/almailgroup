@@ -334,7 +334,7 @@ STUBS = {
 }
 
 # ============================================================ templates
-FONTS = ("https://fonts.googleapis.com/css2?family=Montserrat:wght@600"
+FONTS = ("https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700"
          "&family=Questrial&display=swap")
 
 
