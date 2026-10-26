@@ -111,6 +111,23 @@ def _image_size(path):
     raise ValueError(f"{path}: no size marker found")
 
 
+_VERSIONS = {}
+
+
+def asset_url(path):
+    """Root-relative address of a file in the repository, with a version taken
+    from its contents ('assets/css/style.css' -> '/assets/css/style.css?v=…').
+
+    GitHub Pages lets a browser keep a file for ten minutes under the same
+    address, so a page could be drawn with a stylesheet or a photo from before
+    the last update: new markup under old styles. A file that changes gets a
+    new address, so nothing old can stand in for it."""
+    if path not in _VERSIONS:
+        with open(os.path.join(OUT, path), "rb") as fh:
+            _VERSIONS[path] = hashlib.sha1(fh.read()).hexdigest()[:10]
+    return f"/{path}?v={_VERSIONS[path]}"
+
+
 def small_version(rel):
     """'photos/hero.jpg' -> 'photos/hero-960.jpg' when that file exists, for
     phones. A placeholder small copy is only used beside a placeholder
@@ -131,7 +148,7 @@ def srcset(rel):
         return ""
     w_small = _image_size(os.path.join(OUT, IMG, small))[0]
     w_full = _image_size(os.path.join(OUT, IMG, rel))[0]
-    return f"/{IMG}/{small} {w_small}w, /{IMG}/{rel} {w_full}w"
+    return f"{asset_url(f'{IMG}/{small}')} {w_small}w, {asset_url(f'{IMG}/{rel}')} {w_full}w"
 
 
 def img(rel, alt, cls="", lazy=True, priority=False, sizes=None):
@@ -139,7 +156,7 @@ def img(rel, alt, cls="", lazy=True, priority=False, sizes=None):
     default. `rel` is relative to assets/img/. With `sizes`, a -960 copy of
     the file is offered to small screens when there is one."""
     w, h = _image_size(os.path.join(OUT, IMG, rel))
-    attrs = [f'src="/{IMG}/{rel}"', f'alt="{e(alt)}"', f'width="{w}"', f'height="{h}"']
+    attrs = [f'src="{asset_url(f"{IMG}/{rel}")}"', f'alt="{e(alt)}"', f'width="{w}"', f'height="{h}"']
     if cls:
         attrs.insert(0, f'class="{cls}"')
     if sizes and srcset(rel):
@@ -365,18 +382,18 @@ def head(fname, title, desc, noindex=False, preload=""):
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{SITE_URL}/{IMG}/og-share.jpg">
+<meta property="og:image" content="{SITE_URL}{asset_url(f"{IMG}/og-share.jpg")}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" sizes="32x32" href="/{IMG}/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/{IMG}/favicon-192.png">
-<link rel="apple-touch-icon" href="/{IMG}/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="{asset_url(f"{IMG}/favicon-32.png")}">
+<link rel="icon" type="image/png" sizes="192x192" href="{asset_url(f"{IMG}/favicon-192.png")}">
+<link rel="apple-touch-icon" href="{asset_url(f"{IMG}/apple-touch-icon.png")}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {preload}<link rel="stylesheet" href="{FONTS}" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="{FONTS}"></noscript>
-<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="{asset_url("assets/css/style.css")}">
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
@@ -472,7 +489,7 @@ def footer():
     </div>
   </div>
 </footer>
-<script src="/assets/js/main.js" defer></script>
+<script src="{asset_url("assets/js/main.js")}" defer></script>
 </body>
 </html>
 '''
@@ -499,7 +516,7 @@ def hero_preload(photo):
     rel = "photos/" + photo
     ss = srcset(rel)
     responsive = f' imagesrcset="{ss}" imagesizes="100vw"' if ss else ""
-    return f'<link rel="preload" as="image" href="/{IMG}/{rel}"{responsive} fetchpriority="high">\n'
+    return f'<link rel="preload" as="image" href="{asset_url(f"{IMG}/{rel}")}"{responsive} fetchpriority="high">\n'
 
 
 # ============================================================ pages

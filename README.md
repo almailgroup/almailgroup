@@ -71,12 +71,18 @@ python3 tools/build.py
   rotating every 7 seconds (paused on hover or keyboard focus, and off for visitors who ask for
   reduced motion).
 
-CSS and JavaScript are edited directly in `assets/`; the builder does not touch them.
+CSS and JavaScript are edited directly in `assets/`, and the builder does not change them —
+but run it afterwards anyway. Every page asks for its stylesheet, script and images at an
+address carrying a version taken from the file's contents (`style.css?v=1a2b3c4d5e`), so a
+browser holding an older copy cannot draw new pages with it. GitHub Pages lets a browser keep
+a file for ten minutes, and before this a page could arrive new while its stylesheet and
+photos came from the browser's copy of the last version.
 
 ## Images
 
 Replacing an image is a matter of saving the new file over the old one with the same name, then
-running `python3 tools/build.py` so the `width`/`height` attributes match the new file.
+running `python3 tools/build.py` so the `width`/`height` attributes match the new file and
+pages ask for the new file rather than a browser's copy of the old one.
 
 Several images are **placeholders** until the real ones are supplied. The build lists whichever
 are still in place every time it runs. It recognises each placeholder by its exact contents, so a
