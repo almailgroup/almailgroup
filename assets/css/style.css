@@ -569,6 +569,7 @@ address { font-style: normal; }
   .brand-logo { height: 60px; }
   .hero { padding-block: 160px 110px; }
   .hero-lead { font-size: 19px; }
+  .why .bg img { object-position: 22% center; }   /* a phone's narrow crop: keep the left tower in frame */
   .sector-list { grid-template-columns: 1fr; text-align: center; }
   .sector-link:hover,
   .sector-link:focus-visible { transform: none; }
