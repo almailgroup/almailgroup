@@ -352,6 +352,9 @@ I = {
     "arrow": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
     "down": '<svg viewBox="0 0 24 48" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v42"/><path d="m4 36 8 8 8-8"/></svg>',
 }
+I["up"] = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+           'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/>'
+           '<path d="m5 12 7-7 7 7"/></svg>')
 I["globe"] = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
               'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/>'
               '<path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/></svg>')
@@ -625,6 +628,7 @@ UI = {
     "hours": ("Opening Hours", "ساعات العمل"),
     "social": ("Social", "تابعنا"),
     "rights": ("All rights reserved.", "جميع الحقوق محفوظة."),
+    "to_top": ("Back to top", "العودة إلى الأعلى"),
     "scroll": ("Scroll to the next section", "الانتقال إلى القسم التالي"),
     "areas": ("Areas we work in", "مجالات عملنا"),
     "companies": ("Almail Group companies", "شركات مجموعة الميل"),
@@ -765,6 +769,8 @@ def head(lang, fname, title, desc, noindex=False, preload=""):
 <link rel="icon" type="image/png" sizes="32x32" href="{asset_url(f"{IMG}/favicon-32.png")}">
 <link rel="icon" type="image/png" sizes="192x192" href="{asset_url(f"{IMG}/favicon-192.png")}">
 <link rel="apple-touch-icon" href="{asset_url(f"{IMG}/apple-touch-icon.png")}">
+<link rel="manifest" href="{manifest_path(lang)}">
+<meta name="apple-mobile-web-app-title" content="{e(t(SITE_NAME, lang))}">
 {fonts}
 {preload}<style>
 {inline_css()}
@@ -899,6 +905,7 @@ def footer(lang):
     </div>
     <p class="footer-legal">&copy; {datetime.date.today().year} {e(name)}. {e(t(UI["rights"], lang))}</p>
   </div>
+  <button class="to-top" type="button" aria-label="{e(t(UI["to_top"], lang))}" hidden>{I["up"]}</button>
 </footer>
 <script src="{asset_url("assets/js/main.js")}" defer></script>
 </body>
@@ -1372,6 +1379,39 @@ def build_404():
 
 
 # ============================================================ write
+def manifest_path(lang):
+    return "/manifest.webmanifest" if lang == "en" else f"/{lang}/manifest.webmanifest"
+
+
+def write_manifests():
+    """What a phone uses when someone adds the site to their home screen: the
+    name under the icon, the icons, and the page it opens on, per language.
+    "minimal-ui" keeps a back button, which a site of pages needs."""
+    for lang in LANGS:
+        manifest = {
+            "name": t(SITE_NAME, lang),
+            "short_name": t(SITE_NAME, lang),
+            "description": t(HOME["desc"], lang),
+            "lang": lang,
+            "dir": "rtl" if lang == "ar" else "ltr",
+            "start_url": path_for(lang, "index.html"),
+            "scope": "/",
+            "display": "minimal-ui",
+            "background_color": "#000000",
+            "theme_color": "#000000",
+            "icons": [
+                {"src": asset_url(f"{IMG}/favicon-192.png"), "sizes": "192x192", "type": "image/png"},
+                {"src": asset_url(f"{IMG}/icon-512.png"), "sizes": "512x512", "type": "image/png"},
+                {"src": asset_url(f"{IMG}/icon-maskable-512.png"), "sizes": "512x512", "type": "image/png",
+                 "purpose": "maskable"},
+            ],
+        }
+        path = os.path.join(OUT, manifest_path(lang).lstrip("/"))
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(manifest, fh, ensure_ascii=False, indent=2)
+            fh.write("\n")
+
+
 def write_sitemap():
     """Every page in both languages, each naming its twin in the other."""
     today = datetime.date.today().isoformat()
@@ -1411,6 +1451,8 @@ if __name__ == "__main__":
         print("wrote", out_path, len(doc), "bytes")
 
     print("wrote sitemap.xml with", write_sitemap(), "urls")
+    write_manifests()
+    print("wrote manifest.webmanifest and ar/manifest.webmanifest")
 
     if _STALE:
         print(f"\n{len(_STALE)} image(s) changed since tools/images.py last ran, so pages use the original"

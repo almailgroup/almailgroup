@@ -1,0 +1,30 @@
+{
+  "name": "Almail Group",
+  "short_name": "Almail Group",
+  "description": "Almail Group is a Kuwait holding group: real estate, construction and maintenance, low voltage technology, security, e-commerce, jewelry, smart homes and delivery.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "minimal-ui",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/assets/img/favicon-192.png?v=b509cb3de9",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/icon-512.png?v=65f50b8a1a",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/icon-maskable-512.png?v=d14386c5a7",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

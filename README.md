@@ -35,7 +35,7 @@ with a "Talk to us" band with call and email buttons.
 ├── 404.html
 ├── assets/
 │   ├── css/style.css     # all styling: tokens, sections, responsive rules
-│   ├── js/main.js        # sticky header, mobile menu, scroll reveal, quote slider
+│   ├── js/main.js        # sticky header, mobile menu, back to top, scroll reveal, quote slider
 │   ├── fonts/            # Inter, Montserrat, Cairo and Tajawal, served from the site (see its README)
 │   └── img/
 │       ├── logos/        # Almail Group and group-company logos (white)
@@ -174,7 +174,15 @@ sizes and naming.
   lavender and buttons press in, and nothing stays lit after going Back. Every link and button
   is at least 44px to tap.
 - Once the header has scrolled out of sight it comes back as a compact dark bar fixed to the
-  top, without the contact bar, and goes back to normal near the top of the page.
+  top, without the contact bar, and goes back to normal near the top of the page. On phones
+  and tablets that bar slides away while the reader scrolls down and returns as soon as they
+  scroll up, so it doesn't take a tenth of the screen while reading.
+- A round "back to top" button appears once a page has scrolled a screen and a half.
+- A phone on its side (a screen under 500px tall) gets a slim header without the contact bar,
+  and smaller headings, so the hero's words and buttons fit on one screen.
+- Added to a phone's home screen, the site has its own name and icon (`manifest.webmanifest`,
+  and `ar/manifest.webmanifest` for the Arabic pages; icons `assets/img/icon-512.png` and
+  `icon-maskable-512.png`, made from the logo).
 - The home page: the hero has two buttons (Explore our sectors, Contact us; `actions` in
   `HOME`), Why Choose lists six areas with an icon each (`areas` in `WHY`), the sectors are
   numbered rows, and the partners sit in a grid of hairline cells.

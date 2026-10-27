@@ -24,6 +24,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png?v=187c327753">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png?v=b509cb3de9">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png?v=9ba8148e47">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Almail Group">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2?v=c0815e503a" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/montserrat-latin.woff2?v=a5ec54920b" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" type="image/avif" href="/assets/img/photos/sectors-glass-facade.avif?v=6c00987b5e" imagesrcset="/assets/img/photos/sectors-glass-facade-960.avif?v=9c88fc1933 960w, /assets/img/photos/sectors-glass-facade.avif?v=6c00987b5e 1672w" imagesizes="100vw" media="not all and (max-width: 640px) and (orientation: portrait)" fetchpriority="high">
@@ -229,6 +231,8 @@ animation: header-in .35s var(--ease);
 .site-header.is-stuck .topbar { display: none; }
 .site-header.is-stuck .header-inner { padding-block: 10px; }
 .site-header.is-stuck .brand-logo { height: 54px; }
+.site-header.is-stuck { transition: transform .25s var(--ease); }
+.site-header.is-stuck.is-hidden { animation: none; transform: translateY(-100%); }
 @keyframes header-in {
 from { transform: translateY(-100%); }
 to { transform: none; }
@@ -642,6 +646,31 @@ text-transform: uppercase;
 .social { display: flex; gap: 8px; margin-inline-start: -10px; }
 .social a { display: inline-flex; width: 44px; height: 44px; padding: 10px; color: var(--white); transition: color .25s var(--ease); }
 .social svg { width: 24px; height: 24px; }
+.to-top {
+position: fixed;
+inset-inline-end: 16px;
+bottom: 16px;
+z-index: 30;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 48px;
+height: 48px;
+padding: 0;
+border: 1px solid rgba(255, 255, 255, .3);
+border-radius: 50%;
+background: rgba(8, 8, 10, .92);
+color: var(--white);
+cursor: pointer;
+opacity: 0;
+visibility: hidden;
+transform: translateY(12px);
+transition: opacity .3s var(--ease), transform .3s var(--ease), visibility 0s .3s;
+}
+.to-top[hidden] { display: none; }
+.to-top.is-visible { opacity: 1; visibility: visible; transform: none; transition: opacity .3s var(--ease), transform .3s var(--ease); }
+.to-top svg { width: 20px; height: 20px; }
+.to-top:active { border-color: var(--lavender); color: var(--lavender); }
 .page-hero {
 --overlay: .62;
 display: flex;
@@ -678,7 +707,7 @@ color: var(--lavender);
 .sector-card { scroll-margin-top: 100px; transition: border-color .4s var(--ease); }
 .company-card:target,
 .sector-card:target { border-color: var(--lavender); }
-.chips-label { margin-top: 22px; font: 600 12px/1.2 var(--font-nav); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .62); }
+.chips-label { margin-top: 22px; font: 600 13px/1.2 var(--font-nav); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .62); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .chip {
 display: inline-flex;
@@ -811,6 +840,7 @@ transition: border-color .3s var(--ease);
 .logo-grid--clients li:hover img { opacity: 1; }
 .footer-grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .social a:hover { color: var(--lavender); }
+.to-top:hover { border-color: var(--lavender); color: var(--lavender); }
 a.chip:hover { border-color: var(--lavender); color: var(--lavender); }
 .company-link:hover { color: var(--lavender); }
 .online-card:hover { border-color: rgba(201, 184, 255, .6); }
@@ -880,14 +910,18 @@ transition: opacity .9s var(--ease), transform .9s var(--ease);
 .steps { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
+:root { --h1: clamp(38px, 11.6vw, 56px); --section: 72px; }
 body { font-size: 18px; }
-.header-inner { padding-block: 18px; }
-.brand-logo { height: 60px; }
+.header-inner { padding-block: 14px; }
+.brand-logo { height: 52px; }
 .site-header.is-stuck .header-inner { padding-block: 8px; }
-.site-header.is-stuck .brand-logo { height: 46px; }
-.hero { padding-block: 160px 110px; }
-.hero-lead { font-size: 19px; }
-.hero-actions { margin-top: 32px; }
+.site-header.is-stuck .brand-logo { height: 44px; }
+.hero { padding-block: 140px 96px; }
+.hero-title { margin-bottom: 20px; }
+.hero-lead { font-size: 18px; line-height: 1.6; }
+.hero-actions { margin-top: 28px; }
+.why { padding-block: 64px; }
+.why-band { padding: 28px; }
 .btn { padding: 0 20px; }
 .hero-actions .btn,
 .cta-actions .btn { flex: 1 1 auto; }
@@ -916,15 +950,37 @@ body { font-size: 18px; }
 .logo-grid--clients img { max-height: 60px; opacity: .8; }
 .clients-head { padding-block: 72px 40px; }
 .clients-body { padding-block: 8px 64px; }
-.footer-photo { height: 220px; }
+.footer-photo { height: 180px; }
 .footer-grid { gap: 32px; }
+.to-top { inset-inline-end: 12px; bottom: 12px; }
 .js .reveal { transform: translateY(16px); transition-duration: .6s; }
 }
 @media (max-width: 420px) {
 .footer-grid { grid-template-columns: 1fr; }
+.why-band { padding: 24px 20px; }
+.why-areas li { padding: 12px; font-size: 14px; }
 .header-actions { gap: 6px; }
 .sector-link { font-size: 24px; }
 .sector-arrow { display: none; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+:root { --h1: clamp(34px, 6vw, 52px); --h2: clamp(28px, 4.6vw, 40px); --section: 64px; }
+.topbar { display: none; }
+.header-inner { padding-block: 8px; }
+.brand-logo { height: 44px; }
+.site-header.is-stuck .brand-logo { height: 38px; }
+.site-header.is-stuck .header-inner { padding-block: 6px; }
+.hero { padding-block: 96px 56px; }
+.hero-title { margin-bottom: 18px; }
+.hero-lead { font-size: 18px; }
+.hero-actions { margin-top: 24px; }
+.scroll-cue { display: none; }
+.page-hero { min-height: 0; padding-block: 110px 44px; }
+.page-lead { font-size: 18px; }
+.why { padding-block: 56px; }
+.why-band { padding: 32px; }
+.clients-head { padding-block: 64px 36px; }
+.footer-photo { height: 200px; }
 }
 @media (max-width: 400px) {
 .topbar-social { display: none; }
@@ -1132,7 +1188,8 @@ html { scroll-behavior: auto; }
     </div>
     <p class="footer-legal">&copy; 2026 Almail Group. All rights reserved.</p>
   </div>
+  <button class="to-top" type="button" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button>
 </footer>
-<script src="/assets/js/main.js?v=dde10a306e" defer></script>
+<script src="/assets/js/main.js?v=416173db49" defer></script>
 </body>
 </html>

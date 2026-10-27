@@ -257,6 +257,11 @@ address { font-style: normal; }
 .site-header.is-stuck .header-inner { padding-block: 10px; }
 .site-header.is-stuck .brand-logo { height: 54px; }
 
+/* On a phone or tablet, scrolling down slides the bar away and scrolling up
+   brings it back (main.js): it is a tenth of a phone's screen. */
+.site-header.is-stuck { transition: transform .25s var(--ease); }
+.site-header.is-stuck.is-hidden { animation: none; transform: translateY(-100%); }
+
 @keyframes header-in {
   from { transform: translateY(-100%); }
   to { transform: none; }
@@ -751,6 +756,34 @@ address { font-style: normal; }
 .social a { display: inline-flex; width: 44px; height: 44px; padding: 10px; color: var(--white); transition: color .25s var(--ease); }
 .social svg { width: 24px; height: 24px; }
 
+/* ---------------------------------------------------------------- back to top */
+/* Appears once the page has scrolled a screen and a half (main.js). */
+.to-top {
+  position: fixed;
+  inset-inline-end: 16px;
+  bottom: 16px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 50%;
+  background: rgba(8, 8, 10, .92);
+  color: var(--white);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity .3s var(--ease), transform .3s var(--ease), visibility 0s .3s;
+}
+.to-top[hidden] { display: none; }
+.to-top.is-visible { opacity: 1; visibility: visible; transform: none; transition: opacity .3s var(--ease), transform .3s var(--ease); }
+.to-top svg { width: 20px; height: 20px; }
+.to-top:active { border-color: var(--lavender); color: var(--lavender); }
+
 /* ---------------------------------------------------------------- inner pages */
 .page-hero {
   --overlay: .62;
@@ -798,7 +831,7 @@ address { font-style: normal; }
 .sector-card:target { border-color: var(--lavender); }
 
 /* labelled rows of small pills: a company's sectors, a sector's companies */
-.chips-label { margin-top: 22px; font: 600 12px/1.2 var(--font-nav); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .62); }
+.chips-label { margin-top: 22px; font: 600 13px/1.2 var(--font-nav); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .62); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .chip {
   display: inline-flex;
@@ -950,6 +983,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .logo-grid--clients li:hover img { opacity: 1; }
   .footer-grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .social a:hover { color: var(--lavender); }
+  .to-top:hover { border-color: var(--lavender); color: var(--lavender); }
   a.chip:hover { border-color: var(--lavender); color: var(--lavender); }
   .company-link:hover { color: var(--lavender); }
   .online-card:hover { border-color: rgba(201, 184, 255, .6); }
@@ -1043,14 +1077,20 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
 }
 
 @media (max-width: 640px) {
+  /* "Almail Group" on one line down to 320px; sections closer together, so a
+     phone scrolls less between them */
+  :root { --h1: clamp(38px, 11.6vw, 56px); --section: 72px; }
   body { font-size: 18px; }
-  .header-inner { padding-block: 18px; }
-  .brand-logo { height: 60px; }
+  .header-inner { padding-block: 14px; }
+  .brand-logo { height: 52px; }
   .site-header.is-stuck .header-inner { padding-block: 8px; }
-  .site-header.is-stuck .brand-logo { height: 46px; }
-  .hero { padding-block: 160px 110px; }
-  .hero-lead { font-size: 19px; }
-  .hero-actions { margin-top: 32px; }
+  .site-header.is-stuck .brand-logo { height: 44px; }
+  .hero { padding-block: 140px 96px; }
+  .hero-title { margin-bottom: 20px; }
+  .hero-lead { font-size: 18px; line-height: 1.6; }
+  .hero-actions { margin-top: 28px; }
+  .why { padding-block: 64px; }
+  .why-band { padding: 28px; }
   .btn { padding: 0 20px; }
   .hero-actions .btn,
   .cta-actions .btn { flex: 1 1 auto; }
@@ -1080,19 +1120,46 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .logo-grid--clients img { max-height: 60px; opacity: .8; }
   .clients-head { padding-block: 72px 40px; }
   .clients-body { padding-block: 8px 64px; }
-  .footer-photo { height: 220px; }
+  .footer-photo { height: 180px; }
   .footer-grid { gap: 32px; }
+  .to-top { inset-inline-end: 12px; bottom: 12px; }
   /* shorter, quicker entrances: on a small screen a section is in view sooner */
   .js .reveal { transform: translateY(16px); transition-duration: .6s; }
 }
 
 @media (max-width: 420px) {
   .footer-grid { grid-template-columns: 1fr; }
+  /* the Why Choose tiles get the band's padding back, so "Technology" fits */
+  .why-band { padding: 24px 20px; }
+  .why-areas li { padding: 12px; font-size: 14px; }
   .header-actions { gap: 6px; }
   /* "Delivery Services" on one line at 320px: a size down, and the arrow
      (a hover reveal, which a phone never shows) gives its width back */
   .sector-link { font-size: 24px; }
   .sector-arrow { display: none; }
+}
+
+/* A phone on its side has a wide screen under 500px tall: the desktop's
+   header and type sizes would fill half of it. The top bar goes (its number,
+   language and links are in the menu), and the header and type come down. */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root { --h1: clamp(34px, 6vw, 52px); --h2: clamp(28px, 4.6vw, 40px); --section: 64px; }
+  .topbar { display: none; }
+  .header-inner { padding-block: 8px; }
+  .brand-logo { height: 44px; }
+  .site-header.is-stuck .brand-logo { height: 38px; }
+  .site-header.is-stuck .header-inner { padding-block: 6px; }
+  .hero { padding-block: 96px 56px; }
+  .hero-title { margin-bottom: 18px; }
+  .hero-lead { font-size: 18px; }
+  .hero-actions { margin-top: 24px; }
+  .scroll-cue { display: none; }
+  .page-hero { min-height: 0; padding-block: 110px 44px; }
+  .page-lead { font-size: 18px; }
+  .why { padding-block: 56px; }
+  .why-band { padding: 32px; }
+  .clients-head { padding-block: 64px 36px; }
+  .footer-photo { height: 200px; }
 }
 
 @media (max-width: 400px) {
