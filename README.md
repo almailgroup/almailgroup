@@ -178,6 +178,18 @@ sizes and naming.
   and tablets that bar slides away while the reader scrolls down and returns as soon as they
   scroll up, so it doesn't take a tenth of the screen while reading.
 - A round "back to top" button appears once a page has scrolled a screen and a half.
+- On a desktop, the fixed header carries the language link too, since the top bar that holds it
+  is hidden then. Every page's footer repeats the page links.
+- Large screens (1680px and up, again at 2200px) get a wider column and larger type, so a
+  1920 or 2560px monitor is filled the way a laptop is. The photos are 1672px wide, so on those
+  screens they are enlarged; larger originals (2560px or more) would sharpen them.
+- Tablets keep the desktop's two columns of sectors (from 800px) and four of partners (from
+  760px).
+- Moving between pages fades one into the next (Chrome, Edge, Safari 18+), and Chrome and Edge
+  fetch a page as soon as the pointer rests on its link or a finger lands on it, so it opens at
+  once.
+- The home pages describe the group to search engines (schema.org: name in both languages,
+  logo, contact details, address, the companies).
 - A phone on its side (a screen under 500px tall) gets a slim header without the contact bar,
   and smaller headings, so the hero's words and buttons fit on one screen.
 - Added to a phone's home screen, the site has its own name and icon (`manifest.webmanifest`,
@@ -188,9 +200,10 @@ sizes and naming.
   numbered rows, and the partners sit in a grid of hairline cells.
 - Sections fade and slide in as they scroll into view. Everything is visible with JavaScript
   off, and the motion is skipped for visitors who ask for reduced motion.
-- Breakpoints at 1080px (hamburger menu and call button), 900px (one column for Why Choose,
-  About, the sectors and the footer; fewer logos to a row) and 640px (phone layout: the sectors
-  intro left-aligned, the clients three to a row).
+- Breakpoints at 1680px and 2200px (large screens), 1080px (hamburger menu and call button),
+  900px (one column for Why Choose, About and the footer; fewer logos to a row), 800px (one
+  column of sectors), 760px (two of partners) and 640px (phone layout: the sectors intro
+  left-aligned, the clients three to a row).
 
 ## Notes
 

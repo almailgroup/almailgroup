@@ -270,7 +270,13 @@ address { font-style: normal; }
 .brand { display: inline-flex; flex-shrink: 0; }
 .brand-logo { width: auto; height: 88px; }
 
+.nav { margin-inline-start: auto; }
 .nav ul { display: flex; align-items: center; gap: clamp(20px, 2.6vw, 40px); }
+
+.header-lang { display: none; }
+@media (min-width: 1081px) {
+  .site-header.is-stuck .header-lang { display: inline-flex; }
+}
 
 .nav-link {
   position: relative;
@@ -729,10 +735,25 @@ address { font-style: normal; }
 
 .footer-title { margin-bottom: clamp(36px, 5vw, 56px); font-size: clamp(34px, 4.4vw, 48px); }
 
-.footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 44px clamp(24px, 4vw, 56px); }
+.footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 44px clamp(24px, 4vw, 56px); }
+
+/* every page's links once more at the foot, so a long page doesn't have to be
+   scrolled back up to move on */
+.footer-nav { margin-top: clamp(40px, 5vw, 56px); }
+.footer-nav ul { display: flex; flex-wrap: wrap; gap: 4px 24px; }
+.footer-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  font: 600 15px/1.2 var(--font-nav);
+  color: var(--soft);
+  text-decoration: none;
+  transition: color .25s var(--ease);
+}
+.footer-nav a[aria-current="page"] { color: var(--lavender); }
 
 .footer-legal {
-  margin-top: clamp(48px, 6vw, 72px);
+  margin-top: clamp(28px, 3vw, 36px);
   padding-top: 24px;
   border-top: 1px solid rgba(255, 255, 255, .1);
   font-size: 14px;
@@ -984,6 +1005,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .footer-grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .social a:hover { color: var(--lavender); }
   .to-top:hover { border-color: var(--lavender); color: var(--lavender); }
+  .footer-nav a:hover { color: var(--white); }
   a.chip:hover { border-color: var(--lavender); color: var(--lavender); }
   .company-link:hover { color: var(--lavender); }
   .online-card:hover { border-color: rgba(201, 184, 255, .6); }
@@ -991,6 +1013,15 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .side-note a:hover,
   .steps p a:hover { text-decoration: underline; text-underline-offset: 4px; }
 }
+
+/* ---------------------------------------------------------------- page changes */
+/* Moving between pages fades one into the next instead of flashing white,
+   where the browser can (Chrome, Edge, Safari 18+); elsewhere nothing changes. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: .22s; }
 
 /* ---------------------------------------------------------------- right to left */
 /* The layout mirrors by itself (flex, grid and logical sides follow the
@@ -1065,15 +1096,48 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .about-head { grid-template-columns: 1fr; align-items: start; }
   .about-text { max-width: 640px; }
   .sub-logos { --cols: 3; }
-  .sector-list { grid-template-columns: 1fr; }
-  .sector-list li:nth-child(2) { border-top: 0; }
-  .logo-grid--partners { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .logo-grid--clients { --cols: 3; }
   .site-footer { grid-template-columns: 1fr; }
   .footer-photo { height: 280px; }
   .sector-cards,
   .news-layout,
   .steps { grid-template-columns: 1fr; }
+}
+
+/* Large screens (a 1920 or 2560px monitor): a wider column and larger type,
+   so the page fills the screen the way it fills a laptop's. */
+@media (min-width: 1680px) {
+  :root { --wrap: 1480px; --h1: 96px; --h2: 64px; --section: 160px; }
+  body { font-size: 21px; }
+  .hero-lead { max-width: 720px; font-size: 26px; }
+  .page-lead { max-width: 720px; font-size: 24px; }
+  .nav-link { font-size: 17px; }
+  .why-band,
+  .logo-grid--partners,
+  .logo-grid--clients { max-width: 1360px; }
+  .sector-list { max-width: 1280px; }
+  .about-text,
+  .sectors-head p { font-size: 23px; }
+}
+@media (min-width: 2200px) {
+  :root { --wrap: 1720px; --h1: 112px; --h2: 72px; }
+  body { font-size: 22px; }
+  .hero-lead { max-width: 800px; font-size: 28px; }
+  .why-band,
+  .logo-grid--partners,
+  .logo-grid--clients { max-width: 1560px; }
+  .sector-list { max-width: 1440px; }
+}
+
+/* a tablet held upright keeps the desktop's two columns of sectors (from
+   800px, where "Delivery Services" fits one line) and four of partners; a
+   phone gets one and two */
+@media (max-width: 800px) {
+  .sector-list { grid-template-columns: 1fr; }
+  .sector-list li:nth-child(2) { border-top: 0; }
+}
+@media (max-width: 760px) {
+  .logo-grid--partners { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
@@ -1182,6 +1246,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .footer-contact a,
   .contact-card p a { display: inline-block; padding-block: 7px; }
   a.chip { min-height: 44px; }
+  .footer-nav a { min-height: 44px; min-width: 44px; justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

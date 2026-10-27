@@ -629,6 +629,7 @@ UI = {
     "social": ("Social", "تابعنا"),
     "rights": ("All rights reserved.", "جميع الحقوق محفوظة."),
     "to_top": ("Back to top", "العودة إلى الأعلى"),
+    "footer_nav": ("Site pages", "صفحات الموقع"),
     "scroll": ("Scroll to the next section", "الانتقال إلى القسم التالي"),
     "areas": ("Areas we work in", "مجالات عملنا"),
     "companies": ("Almail Group companies", "شركات مجموعة الميل"),
@@ -722,6 +723,58 @@ def inline_css():
     return _CSS
 
 
+# Chrome and Edge fetch a page of this site as soon as a mouse rests on a link
+# to it or a finger lands on one, so it opens at once; other browsers ignore it.
+SPECULATION = ('<script type="speculationrules">'
+               '{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]}'
+               '</script>\n')
+
+
+def structured_data(lang):
+    """Who the group is, in the form search engines read (schema.org): name in
+    both languages, logo, contact details, address and the group's companies."""
+    org = {
+        "@type": "Organization",
+        "@id": f"{SITE_URL}/#organization",
+        "name": SITE_NAME[0],
+        "alternateName": SITE_NAME[1],
+        "url": f"{SITE_URL}/",
+        "logo": f"{SITE_URL}/assets/img/icon-512.png",
+        "email": EMAIL_HREF,
+        "telephone": PHONE_HREF,
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Kuwait Building Tower, Floor 27, Fahad Alsalem Street",
+            "addressLocality": "Qibla",
+            "addressRegion": "Kuwait City",
+            "addressCountry": "KW",
+        },
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "telephone": PHONE_HREF,
+            "email": EMAIL_HREF,
+            "areaServed": "KW",
+            "availableLanguage": ["English", "Arabic"],
+        },
+        "subOrganization": [{"@type": "Organization", "name": t(c["name"], "en"), **({"url": c["url"]} if c["url"] else {})}
+                            for c in COMPANIES],
+    }
+    same_as = [u for u in (INSTAGRAM_URL, X_URL) if u]
+    if same_as:
+        org["sameAs"] = same_as
+    site = {
+        "@type": "WebSite",
+        "@id": f"{SITE_URL}/#website",
+        "url": f"{SITE_URL}/",
+        "name": t(SITE_NAME, lang),
+        "inLanguage": lang,
+        "publisher": {"@id": f"{SITE_URL}/#organization"},
+    }
+    data = json.dumps({"@context": "https://schema.org", "@graph": [org, site]}, ensure_ascii=False)
+    return f'<script type="application/ld+json">{data}</script>\n'
+
+
 def ltr(text, lang):
     """A phone number or an email address: always read left to right, so on an
     Arabic page it is isolated or its '+' and '-' would move about."""
@@ -776,7 +829,7 @@ def head(lang, fname, title, desc, noindex=False, preload=""):
 {inline_css()}
 </style>
 <script>document.documentElement.classList.add('js')</script>
-</head>
+{SPECULATION}{structured_data(lang) if fname == "index.html" else ""}</head>
 <body>
 <a class="skip-link" href="#main">{e(t(UI["skip"], lang))}</a>
 '''
@@ -786,7 +839,8 @@ def nav_items(lang, current, cls):
     out = []
     for label, fname in NAV:
         here = ' aria-current="page"' if fname == current else ""
-        out.append(f'<li><a class="{cls}" href="{link(lang, fname)}"{here}>{e(t(label, lang))}</a></li>')
+        cls_attr = f' class="{cls}"' if cls else ""
+        out.append(f'<li><a{cls_attr} href="{link(lang, fname)}"{here}>{e(t(label, lang))}</a></li>')
     return "\n        ".join(out)
 
 
@@ -839,6 +893,7 @@ def header(lang, current):
         {nav_items(lang, current, "nav-link")}
       </ul>
     </nav>
+    {lang_switch(lang, current, "lang-link header-lang")}
     <div class="header-actions">
       <a class="call-btn" href="tel:{PHONE_HREF}" aria-label="{e(t(UI["call_label"], lang))} {e(PHONE)}">{I["phone"]}</a>
       <button class="burger" type="button" aria-label="{e(t(UI["open_menu"], lang))}" aria-expanded="false" aria-controls="mobile-nav"><span></span></button>
@@ -871,7 +926,7 @@ def header(lang, current):
 '''
 
 
-def footer(lang):
+def footer(lang, current):
     hours = "<br>\n          ".join(f"{e(t(day, lang))}: {e(t(time, lang))}" for day, time in HOURS)
     address = "<br>\n          ".join(e(line) for line in t(ADDRESS, lang))
     name = t(SITE_NAME, lang)
@@ -903,6 +958,11 @@ def footer(lang):
         </ul>
       </section>
     </div>
+    <nav class="footer-nav" aria-label="{e(t(UI["footer_nav"], lang))}">
+      <ul>
+        {nav_items(lang, current, "")}
+      </ul>
+    </nav>
     <p class="footer-legal">&copy; {datetime.date.today().year} {e(name)}. {e(t(UI["rights"], lang))}</p>
   </div>
   <button class="to-top" type="button" aria-label="{e(t(UI["to_top"], lang))}" hidden>{I["up"]}</button>
@@ -918,7 +978,7 @@ PAGES = {}
 
 def page(lang, fname, title, desc, body, noindex=False, preload=""):
     PAGES[(lang, fname)] = (head(lang, fname, title, desc, noindex, preload) + header(lang, fname)
-                            + f'<main id="main">\n{body}\n</main>\n' + footer(lang))
+                            + f'<main id="main">\n{body}\n</main>\n' + footer(lang, fname))
 
 
 def logo_list(items, cls, label):
