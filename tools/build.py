@@ -412,8 +412,7 @@ HOME = {
              "والصيانة، وتقنيات التيار المنخفض، وتصميم المجوهرات، والتجارة الإلكترونية، والأنظمة "
              "الأمنية، وخدمات الحراسة الأمنية، وحلول المنازل الذكية، والتوصيل."),
     # (label, page) -- the first is the filled button
-    "actions": [(("Explore our sectors", "تعرّف على قطاعاتنا"), "our-sectors.html"),
-                (("Contact us", "تواصل معنا"), "contact.html")],
+    "actions": [(("Explore our sectors", "تعرّف على قطاعاتنا"), "our-sectors.html")],
 }
 
 WHY = {
@@ -554,7 +553,7 @@ QUOTES = [
     {"quote": ("Our Client Commitment is Beyond Success & Profit.",
                "التزامنا تجاه عملائنا يتجاوز النجاح والربح."),
      "name": ("Dr. Abdulaziz Almail", "د. عبدالعزيز الميل"),
-     "role": ("Group CEO", "الرئيس التنفيذي للمجموعة")},
+     "role": ("Almail Group Founder & CEO", "المؤسس والرئيس التنفيذي لمجموعة الميل")},
 ]
 
 CLIENTS = [
@@ -654,7 +653,6 @@ UI = {
     "open_menu": ("Open menu", "فتح القائمة"),
     "close_menu": ("Close menu", "إغلاق القائمة"),
     "home": ("Almail Group, home", "مجموعة الميل، الصفحة الرئيسية"),
-    "call_label": ("Call Almail Group on", "اتصل بمجموعة الميل على"),
     "call": ("Call", "اتصل على"),
     "instagram": ("Almail Group on Instagram", "مجموعة الميل على إنستغرام"),
     "x": ("Almail Group on X", "مجموعة الميل على إكس"),
@@ -933,7 +931,6 @@ def header(lang, current):
     </nav>
     {lang_switch(lang, current, "lang-link header-lang")}
     <div class="header-actions">
-      <a class="call-btn" href="tel:{PHONE_HREF}" aria-label="{e(t(UI["call_label"], lang))} {e(PHONE)}">{I["phone"]}</a>
       <button class="burger" type="button" aria-label="{e(t(UI["open_menu"], lang))}" aria-expanded="false" aria-controls="mobile-nav"><span></span></button>
     </div>
   </div>

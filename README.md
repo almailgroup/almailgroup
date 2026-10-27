@@ -161,15 +161,16 @@ sizes and naming.
 ## Design
 
 - Black and near-black surfaces, white type; full-bleed photographs under 50–72% black overlays.
-- Headings and navigation in Montserrat (H1 80px and H2 56px at weight 600, scaling down on
-  small screens; the navigation 16px bold); body copy in Inter at 20px (18px on a phone).
+- Headings and navigation in Montserrat (H1 68px and H2 46px at weight 600, scaling down on
+  small screens; the navigation 16px bold); body copy in Inter at 18px (16px on a phone), and
+  the hero's paragraph at 20px (16px on a phone).
 - A contact bar runs along the top of every page: the address (opening Google Maps), the
   phone, the email and the social links. Below 1200px the address shortens, and on a phone
   the bar keeps the phone number and the social links. Its address and map link are
   `ADDRESS_LINE`, `ADDRESS_SHORT` and `MAPS_URL` in `tools/build.py`.
 - The current page's navigation link is lavender (`#C9B8FF`); every other link is white.
-- On phones and tablets the header has a call button beside the menu button, and the menu ends
-  with a call button, the email, the address (opening Google Maps), the opening hours and the
+- On phones and tablets the header has a menu button, and the menu ends with a call button,
+  the email, the address (opening Google Maps), the opening hours and the
   social links. While the menu is open the page behind it can't be reached by keyboard or
   screen reader.
 - Hover effects only exist where there is a mouse or trackpad; on a touch screen a tap flashes
@@ -205,8 +206,7 @@ sizes and naming.
 - Added to a phone's home screen, the site has its own name and icon (`manifest.webmanifest`,
   and `ar/manifest.webmanifest` for the Arabic pages; icons `assets/img/icon-512.png` and
   `icon-maskable-512.png`, made from the logo).
-- The home page: the hero has two buttons (Explore our sectors, Contact us; `actions` in
-  `HOME`), Why Choose lists six areas with an icon each (`areas` in `WHY`), the sectors are
+- The home page: the hero has one button, Explore our sectors (`actions` in `HOME`), Why Choose lists six areas with an icon each (`areas` in `WHY`), the sectors are
   numbered rows, and the partners sit in a grid of hairline cells.
 - Motion on the way down (the "motion" section of `style.css`). As each part scrolls into view
   it plays once: blocks rise and fade in, the words of every heading rise out of a slot one
