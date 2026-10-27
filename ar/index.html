@@ -917,12 +917,159 @@ a.chip:hover { border-color: var(--lavender); color: var(--lavender); }
 background: linear-gradient(270deg, rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .58) 42%, rgba(0, 0, 0, .28) 100%);
 }
 }
+:root {
+--ease-out: cubic-bezier(.16, 1, .3, 1);
+--ease-pop: cubic-bezier(.34, 1.56, .64, 1);
+}
+.words .w { display: inline-block; overflow: hidden; padding-block: .1em .16em; margin-block: -.1em -.16em; vertical-align: top; }
+.words .w > span { display: inline-block; }
+.words .w { --d: 0s; }
+[dir="rtl"] .words .w { padding-block: .24em; margin-block: -.24em; }
+@media screen and (prefers-reduced-motion: no-preference) {
 .js .reveal {
 opacity: 0;
-transform: translateY(20px);
-transition: opacity .7s var(--ease), transform .7s var(--ease);
+transform: translateY(32px);
+transition: opacity .8s var(--ease), transform 1s var(--ease-out);
 }
 .js .reveal.is-in { opacity: 1; transform: none; }
+.js .reveal.words { opacity: 1; transform: none; }
+.js .words .w > span {
+transform: translateY(105%);
+transition: transform 1.05s var(--ease-out) var(--d, 0s);
+}
+.js .is-in .words .w > span,
+.js .words.is-in .w > span { transform: none; }
+.words .w:nth-child(2) { --d: 0.07s; }
+.words .w:nth-child(3) { --d: 0.14s; }
+.words .w:nth-child(4) { --d: 0.21s; }
+.words .w:nth-child(5) { --d: 0.28s; }
+.words .w:nth-child(6) { --d: 0.35s; }
+.words .w:nth-child(7) { --d: 0.42s; }
+.words .w:nth-child(8) { --d: 0.49s; }
+.words .w:nth-child(9) { --d: 0.56s; }
+.words .w:nth-child(10) { --d: 0.63s; }
+.words .w:nth-child(n + 11) { --d: .7s; }
+.js .hero-title .w > span,
+.js .page-hero h1 .w > span { transform: none; animation: word-rise 1.1s var(--ease-out) calc(var(--d, 0s) + .1s) both; }
+.js .hero-actions { animation: rise-in 1s var(--ease-out) .5s both; }
+.js .scroll-cue { animation: fade-in 1s var(--ease) 1.1s both; }
+.js .reveal-pop { transform: translateY(26px) scale(.9); transition-timing-function: var(--ease), var(--ease-pop); transition-duration: .7s, .8s; }
+.js .reveal-card { opacity: 1; transform: none; clip-path: inset(10% 8%); transition: clip-path 1.2s var(--ease-out); }
+.js .reveal-card.is-in { clip-path: inset(0); }
+.js .reveal-card .why-copy,
+.js .reveal-card .why-areas li {
+opacity: 0;
+transform: translateY(22px);
+transition: opacity .7s var(--ease) var(--d, .3s), transform .9s var(--ease-out) var(--d, .3s);
+}
+.js .reveal-card .why-icon { transform: scale(0); transition: transform .6s var(--ease-pop) calc(var(--d, .3s) + .15s); }
+.js .reveal-card.is-in .why-copy,
+.js .reveal-card.is-in .why-areas li { opacity: 1; transform: none; }
+.js .reveal-card.is-in .why-icon { transform: none; }
+.why-areas li:nth-child(1) { --d: 0.40s; }
+.why-areas li:nth-child(2) { --d: 0.48s; }
+.why-areas li:nth-child(3) { --d: 0.56s; }
+.why-areas li:nth-child(4) { --d: 0.64s; }
+.why-areas li:nth-child(5) { --d: 0.72s; }
+.why-areas li:nth-child(6) { --d: 0.80s; }
+.js .reveal-row { position: relative; opacity: 1; transform: none; border-color: transparent !important; }
+.js .reveal-row::after,
+.js .sector-list .reveal-row:nth-child(-n + 2)::before {
+content: "";
+position: absolute;
+inset-inline: 0;
+bottom: -1px;
+height: 1px;
+background: rgba(255, 255, 255, .16);
+transform: scaleX(0);
+transition: transform 1.3s var(--ease-out);
+}
+.js .sector-list .reveal-row:nth-child(-n + 2)::before { top: -1px; bottom: auto; }
+.js .sector-list .reveal-row::before,
+.js .sector-list .reveal-row::after { transform-origin: left; }
+[dir="rtl"] .sector-list .reveal-row::before,
+[dir="rtl"] .sector-list .reveal-row::after { transform-origin: right; }
+.js .reveal-row .sector-link {
+opacity: 0;
+transform: translateX(-36px);
+transition: color .35s var(--ease), opacity .7s var(--ease) .2s, transform 1s var(--ease-out) .2s;
+}
+.js[dir="rtl"] .reveal-row .sector-link { transform: translateX(36px); }
+.js .reveal-row.is-in::after,
+.js .reveal-row.is-in::before,
+.js .reveal-row.is-in .sector-link { opacity: 1; transform: none; }
+.js .quote-track figcaption::before,
+.js .clients-head .divider { transform: scaleX(0); transition: transform 1s var(--ease-out) .45s; }
+.js .quote-track.is-in figcaption::before,
+.js .clients-head .is-in + .divider { transform: none; }
+.js .reveal .icon-badge { transform: scale(.3); opacity: 0; transition: transform .7s var(--ease-pop) .25s, opacity .4s var(--ease) .25s; }
+.js .reveal.is-in .icon-badge { transform: none; opacity: 1; }
+.js .reveal-group { opacity: 1; transform: none; }
+.js .reveal-group .footer-grid > *,
+.js .reveal-group .footer-nav,
+.js .reveal-group .footer-legal {
+opacity: 0;
+transform: translateY(24px);
+transition: opacity .7s var(--ease) var(--d, .55s), transform .9s var(--ease-out) var(--d, .55s);
+}
+.js .reveal-group.is-in .footer-grid > *,
+.js .reveal-group.is-in .footer-nav,
+.js .reveal-group.is-in .footer-legal { opacity: 1; transform: none; }
+.reveal-group .footer-grid > :nth-child(1) { --d: 0.15s; }
+.reveal-group .footer-grid > :nth-child(2) { --d: 0.25s; }
+.reveal-group .footer-grid > :nth-child(3) { --d: 0.35s; }
+.reveal-group .footer-grid > :nth-child(4) { --d: 0.45s; }
+.js .reveal:focus-within,
+.js .reveal-row:focus-within .sector-link { opacity: 1; transform: none; transition: none; }
+@keyframes word-rise { from { transform: translateY(105%); } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(24px); } }
+@keyframes fade-in { from { opacity: 0; } }
+}
+@supports (animation-timeline: view()) {
+@media screen and (prefers-reduced-motion: no-preference) {
+.fx body::before {
+content: "";
+position: fixed;
+inset: 0 0 auto;
+z-index: 25;
+height: 2px;
+background: var(--lavender);
+transform-origin: left;
+pointer-events: none;
+animation: grow linear both;
+animation-timeline: scroll(root block);
+}
+.fx[dir="rtl"] body::before { transform-origin: right; }
+.has-bg > .bg { inset: -15% 0; }
+.fx .has-bg { view-timeline: --section block; view-timeline-inset: 0; }
+.fx .has-bg > .bg { animation: drift linear both; animation-timeline: --section; }
+.fx .hero > .bg,
+.fx .page-hero > .bg { animation-name: drift-away; animation-range: exit; }
+@media (max-width: 640px) {
+.has-bg > .bg { inset: -10% 0; }
+.fx .has-bg > .bg { animation-name: drift-small; }
+.fx .hero > .bg,
+.fx .page-hero > .bg { animation-name: drift-away-small; }
+}
+.fx .hero-inner,
+.fx .page-hero .wrap { animation: float-away linear both; animation-timeline: --section; animation-range: exit 0% exit 80%; }
+.fx .scroll-cue {
+animation: fade-in 1s var(--ease) 1.1s backwards, fade-out linear both;
+animation-timeline: auto, --section;
+animation-range: normal, exit 0% exit 15%;
+}
+.fx .footer-photo { view-timeline: --footer-photo block; view-timeline-inset: 0; }
+.fx .footer-photo img { animation: settle linear both; animation-timeline: --footer-photo; animation-range: entry 0% cover 50%; }
+@keyframes grow { from { transform: scaleX(0); } }
+@keyframes drift { from { transform: translateY(-11%); } to { transform: translateY(11%); } }
+@keyframes drift-small { from { transform: translateY(-7.5%); } to { transform: translateY(7.5%); } }
+@keyframes drift-away { to { transform: translateY(11%); } }
+@keyframes drift-away-small { to { transform: translateY(7.5%); } }
+@keyframes float-away { to { opacity: 0; transform: translateY(16vh) scale(.96); } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes settle { from { transform: scale(1.2); } }
+}
+}
 @media (max-width: 1200px) {
 .tb-long { display: none; }
 .tb-short { display: inline; }
@@ -977,6 +1124,7 @@ body { font-size: 22px; }
 @media (max-width: 800px) {
 .sector-list { grid-template-columns: 1fr; }
 .sector-list li:nth-child(2) { border-top: 0; }
+.js .sector-list .reveal-row:nth-child(2)::before { content: none; }
 }
 @media (max-width: 760px) {
 .logo-grid--partners { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1025,7 +1173,6 @@ body { font-size: 18px; }
 .footer-photo { height: 180px; }
 .footer-grid { gap: 32px; }
 .to-top { inset-inline-end: 12px; bottom: 12px; }
-.js .reveal { transform: translateY(14px); transition-duration: .5s; }
 }
 @media (max-width: 420px) {
 .footer-grid { grid-template-columns: 1fr; }
@@ -1074,7 +1221,6 @@ a.chip { min-height: 44px; }
 @media (prefers-reduced-motion: reduce) {
 html { scroll-behavior: auto; }
 *, *::before, *::after { animation: none !important; transition: none !important; }
-.js .reveal { opacity: 1; transform: none; }
 }
 </style>
 <script>document.documentElement.classList.add('js')</script>
@@ -1154,7 +1300,7 @@ html { scroll-behavior: auto; }
 <section class="hero has-bg">
   <div class="bg photo has-hint" style="--hint:url(data:image/webp;base64,UklGRs4AAABXRUJQVlA4IMIAAABwBQCdASogABIAPu1iqE2ppaOiMAgBMB2JQBOmUGf7CMp3zOHzE2okPRJvtD/vgx8YLzFAAPYOk4Pb11WWVEzh+dHt84NOtMrnEnHNWZqVPY80IyWOPWAsl8Gvzz54v5Y2v1zXJiDCFWtgchQGznob8z2avt7EQ7y/nkc+IW4PZ5AnxYdBdDzKh/KMn0VXsd8fhydw33aW6Mh9LhCcVi5c/ELUachLeFaYKm3tDg1m3fZ2XnrfggXMKolfc/iI80AAAA==);--focus:50%" aria-hidden="true"><picture><source media="(max-width: 640px) and (orientation: portrait)" type="image/avif" srcset="/assets/img/photos/hero-glass-towers-portrait.avif?v=7b2e46c33b"><source type="image/avif" srcset="/assets/img/photos/hero-glass-towers-960.avif?v=be827139dd 960w, /assets/img/photos/hero-glass-towers.avif?v=f19c75d0f5 1672w" sizes="100vw"><img src="/assets/img/photos/hero-glass-towers.jpg?v=db4db975e7" alt="" width="1672" height="941" srcset="/assets/img/photos/hero-glass-towers-960.jpg?v=9b527f7fe0 960w, /assets/img/photos/hero-glass-towers.jpg?v=db4db975e7 1672w" sizes="100vw" fetchpriority="high" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
   <div class="wrap hero-inner">
-    <h1 class="hero-title">مجموعة الميل</h1>
+    <h1 class="hero-title words" aria-label="مجموعة الميل"><span aria-hidden="true"><span class="w"><span>مجموعة</span></span> <span class="w"><span>الميل</span></span></span></h1>
     <p class="hero-lead">شركة قابضة تقدّم باقة متنوعة من المنتجات والخدمات، تشمل الخدمات العقارية، والإنشاءات والصيانة، وتقنيات التيار المنخفض، وتصميم المجوهرات، والتجارة الإلكترونية، والأنظمة الأمنية، وخدمات الحراسة الأمنية، وحلول المنازل الذكية، والتوصيل.</p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="/ar/our-sectors/">تعرّف على قطاعاتنا</a>
@@ -1167,8 +1313,8 @@ html { scroll-behavior: auto; }
 <section class="why has-bg" id="why" aria-labelledby="why-title">
   <div class="bg photo photo-fade has-hint" style="--hint:url(data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAACQBACdASogABIAPu1iqU2ppaOiMAgBMB2JajuEQsecDYH1j5/wJZ1cYU76ihAA/u0hv2n8cm+0Sgi0BD2bduKSB8I3UkRvafKC4d/GURxmdJYyGdezn1ZG1IdrN4s/nNbjTMGq7XGQcl+o5TxVuHN2Cp2xrMZOI/7tbAwv3tDAzTJxHT6aHSr7t3LeVOghr9ZR3vTG5JYFrT7ixcKwEwVgcisY8D5yPnVPgw1d6AdGoKOdHeDDTQuaBhZ7P8l+OYLU5JfL2c6MjfoA48cbAAAA);--focus:22%" aria-hidden="true"><picture><source media="(max-width: 640px) and (orientation: portrait)" type="image/avif" srcset="/assets/img/photos/why-choose-towers-portrait.avif?v=379ae1cae6"><source type="image/avif" srcset="/assets/img/photos/why-choose-towers-960.avif?v=aacbc784b4 960w, /assets/img/photos/why-choose-towers.avif?v=c389d11f03 1672w" sizes="100vw"><img src="/assets/img/photos/why-choose-towers.jpg?v=e97d2ebefb" alt="" width="1672" height="941" srcset="/assets/img/photos/why-choose-towers-960.jpg?v=033bd824cd 960w, /assets/img/photos/why-choose-towers.jpg?v=e97d2ebefb 1672w" sizes="100vw" loading="lazy" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
   <div class="wrap">
-    <div class="why-band reveal">
-      <h2 id="why-title">لماذا تختار مجموعة الميل؟</h2>
+    <div class="why-band reveal reveal-card">
+      <h2 id="why-title" class="words" aria-label="لماذا تختار مجموعة الميل؟"><span aria-hidden="true"><span class="w"><span>لماذا</span></span> <span class="w"><span>تختار</span></span> <span class="w"><span>مجموعة</span></span> <span class="w"><span>الميل؟</span></span></span></h2>
       <div class="why-body">
         <div class="why-copy">
           <h3>محفظة خدمات متنوعة</h3>
@@ -1192,19 +1338,19 @@ html { scroll-behavior: auto; }
   <div class="wrap">
     <div class="about-head">
       <div class="section-head reveal">
-        <h2 id="about-title">عن مجموعة الميل</h2>
+        <h2 id="about-title" class="words" aria-label="عن مجموعة الميل"><span aria-hidden="true"><span class="w"><span>عن</span></span> <span class="w"><span>مجموعة</span></span> <span class="w"><span>الميل</span></span></span></h2>
         <p class="subtitle">التمكين من خلال الابتكار</p>
       </div>
       <p class="about-text reveal">تكرّس مجموعة الميل جهودها لتمكين الأفراد والشركات من خلال حلول مبتكرة. ونلتزم بتقديم خدمات على أعلى مستوى، وبإحداث أثر إيجابي في كل قطاع نخدمه.</p>
     </div>
     <ul class="sub-logos" aria-label="شركات مجموعة الميل">
-      <li class="reveal" data-delay="0"><a href="/ar/almail-group-world/#azsco-systems"><picture><source type="image/webp" srcset="/assets/img/logos/logo-azsco-systems.webp?v=147b8efc41"><img src="/assets/img/logos/logo-azsco-systems.png?v=9a5d7dc999" alt="أنظمة أزسكو الأمنية" width="503" height="192" loading="lazy" decoding="async"></picture></a></li>
-      <li class="reveal" data-delay="50"><a href="/ar/almail-group-world/#bizarri"><picture><source type="image/webp" srcset="/assets/img/logos/logo-bizarri.webp?v=2903e10004"><img src="/assets/img/logos/logo-bizarri.png?v=b1b7ca46dc" alt="بيزاري" width="520" height="211" loading="lazy" decoding="async"></picture></a></li>
-      <li class="reveal" data-delay="100"><a href="/ar/almail-group-world/#azsco-security"><picture><source type="image/webp" srcset="/assets/img/logos/logo-azsco-security.webp?v=f27b55e10a"><img src="/assets/img/logos/logo-azsco-security.png?v=6d0af0daa8" alt="أزسكو للأمن" width="352" height="168" loading="lazy" decoding="async"></picture></a></li>
-      <li class="reveal" data-delay="150"><a href="/ar/almail-group-world/#mailarti"><picture><source type="image/webp" srcset="/assets/img/logos/logo-mailarti.webp?v=88ada1965b"><img src="/assets/img/logos/logo-mailarti.png?v=1fc17ce499" alt="Mailarti" width="520" height="89" loading="lazy" decoding="async"></picture></a></li>
-      <li class="reveal" data-delay="0"><a href="/ar/almail-group-world/#netlet"><picture><source type="image/webp" srcset="/assets/img/logos/logo-netlet.webp?v=1a95689e97"><img src="/assets/img/logos/logo-netlet.png?v=c76b96c888" alt="نت‑لت" width="520" height="236" loading="lazy" decoding="async"></picture></a></li>
-      <li class="reveal" data-delay="50"><a href="/ar/almail-group-world/#gemellry"><picture><source type="image/webp" srcset="/assets/img/logos/logo-gemellry.webp?v=98d09e44d3"><img src="/assets/img/logos/logo-gemellry.png?v=f9e910f349" alt="Gemellry" width="520" height="82" loading="lazy" decoding="async"></picture></a></li>
-      <li class="reveal" data-delay="100"><a href="/ar/almail-group-world/#shiplee"><picture><source type="image/webp" srcset="/assets/img/logos/logo-shiplee.webp?v=074c624393"><img src="/assets/img/logos/logo-shiplee.png?v=2b2647856d" alt="Shiplee" width="520" height="97" loading="lazy" decoding="async"></picture></a></li>
+      <li class="reveal reveal-pop" data-delay="0"><a href="/ar/almail-group-world/#azsco-systems"><picture><source type="image/webp" srcset="/assets/img/logos/logo-azsco-systems.webp?v=147b8efc41"><img src="/assets/img/logos/logo-azsco-systems.png?v=9a5d7dc999" alt="أنظمة أزسكو الأمنية" width="503" height="192" loading="lazy" decoding="async"></picture></a></li>
+      <li class="reveal reveal-pop" data-delay="70"><a href="/ar/almail-group-world/#bizarri"><picture><source type="image/webp" srcset="/assets/img/logos/logo-bizarri.webp?v=2903e10004"><img src="/assets/img/logos/logo-bizarri.png?v=b1b7ca46dc" alt="بيزاري" width="520" height="211" loading="lazy" decoding="async"></picture></a></li>
+      <li class="reveal reveal-pop" data-delay="140"><a href="/ar/almail-group-world/#azsco-security"><picture><source type="image/webp" srcset="/assets/img/logos/logo-azsco-security.webp?v=f27b55e10a"><img src="/assets/img/logos/logo-azsco-security.png?v=6d0af0daa8" alt="أزسكو للأمن" width="352" height="168" loading="lazy" decoding="async"></picture></a></li>
+      <li class="reveal reveal-pop" data-delay="210"><a href="/ar/almail-group-world/#mailarti"><picture><source type="image/webp" srcset="/assets/img/logos/logo-mailarti.webp?v=88ada1965b"><img src="/assets/img/logos/logo-mailarti.png?v=1fc17ce499" alt="Mailarti" width="520" height="89" loading="lazy" decoding="async"></picture></a></li>
+      <li class="reveal reveal-pop" data-delay="0"><a href="/ar/almail-group-world/#netlet"><picture><source type="image/webp" srcset="/assets/img/logos/logo-netlet.webp?v=1a95689e97"><img src="/assets/img/logos/logo-netlet.png?v=c76b96c888" alt="نت‑لت" width="520" height="236" loading="lazy" decoding="async"></picture></a></li>
+      <li class="reveal reveal-pop" data-delay="70"><a href="/ar/almail-group-world/#gemellry"><picture><source type="image/webp" srcset="/assets/img/logos/logo-gemellry.webp?v=98d09e44d3"><img src="/assets/img/logos/logo-gemellry.png?v=f9e910f349" alt="Gemellry" width="520" height="82" loading="lazy" decoding="async"></picture></a></li>
+      <li class="reveal reveal-pop" data-delay="140"><a href="/ar/almail-group-world/#shiplee"><picture><source type="image/webp" srcset="/assets/img/logos/logo-shiplee.webp?v=074c624393"><img src="/assets/img/logos/logo-shiplee.png?v=2b2647856d" alt="Shiplee" width="520" height="97" loading="lazy" decoding="async"></picture></a></li>
     </ul>
   </div>
 </section>
@@ -1213,34 +1359,34 @@ html { scroll-behavior: auto; }
   <div class="bg photo photo-fade has-hint" style="--hint:url(data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAAAQAwCdASogABIAPu1wsFIppiSjqAgBMB2JZwC90Ban4gAA/vByPjf416G8N1i1JFYX4jw3JbqJNmgxgAAAAA==);--focus:50%" aria-hidden="true"><picture><source media="(max-width: 640px) and (orientation: portrait)" type="image/avif" srcset="/assets/img/photos/sectors-glass-facade-portrait.avif?v=4fbb54ac94"><source type="image/avif" srcset="/assets/img/photos/sectors-glass-facade-960.avif?v=9c88fc1933 960w, /assets/img/photos/sectors-glass-facade.avif?v=6c00987b5e 1672w" sizes="100vw"><img src="/assets/img/photos/sectors-glass-facade.jpg?v=88f03c48b4" alt="" width="1672" height="941" srcset="/assets/img/photos/sectors-glass-facade-960.jpg?v=0fbd76ca16 960w, /assets/img/photos/sectors-glass-facade.jpg?v=88f03c48b4 1672w" sizes="100vw" loading="lazy" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
   <div class="wrap">
     <div class="sectors-head reveal">
-      <h2 id="sectors-title">القطاعات</h2>
+      <h2 id="sectors-title" class="words" aria-label="القطاعات"><span aria-hidden="true"><span class="w"><span>القطاعات</span></span></span></h2>
       <p>في مجموعة الميل، نقدّم خبرة لا مثيل لها في كل مشروع نتولّاه. ويتمتع فريقنا بالكفاءة في مجالات متعددة، بما يضمن نتائج استثنائية لعملائنا.</p>
     </div>
     <ul class="sector-list">
-      <li class="reveal" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#security"><span class="sector-num" aria-hidden="true">01</span><span class="sector-name">الأمن</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
-      <li class="reveal" data-delay="60"><a class="sector-link" href="/ar/our-sectors/#real-estate"><span class="sector-num" aria-hidden="true">02</span><span class="sector-name">العقارات</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
-      <li class="reveal" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#maintenance"><span class="sector-num" aria-hidden="true">03</span><span class="sector-name">الصيانة</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
-      <li class="reveal" data-delay="60"><a class="sector-link" href="/ar/our-sectors/#smart-solutions"><span class="sector-num" aria-hidden="true">04</span><span class="sector-name">الحلول الذكية</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
-      <li class="reveal" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#e-commerce"><span class="sector-num" aria-hidden="true">05</span><span class="sector-name">التجارة الإلكترونية</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
-      <li class="reveal" data-delay="60"><a class="sector-link" href="/ar/our-sectors/#delivery-services"><span class="sector-num" aria-hidden="true">06</span><span class="sector-name">خدمات التوصيل</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
-      <li class="reveal" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#jewelry"><span class="sector-num" aria-hidden="true">07</span><span class="sector-name">المجوهرات</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
-      <li class="reveal" data-delay="60"><a class="sector-link" href="/ar/our-sectors/#fin-tech"><span class="sector-num" aria-hidden="true">08</span><span class="sector-name">التكنولوجيا المالية</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#security"><span class="sector-num" aria-hidden="true">01</span><span class="sector-name">الأمن</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="90"><a class="sector-link" href="/ar/our-sectors/#real-estate"><span class="sector-num" aria-hidden="true">02</span><span class="sector-name">العقارات</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#maintenance"><span class="sector-num" aria-hidden="true">03</span><span class="sector-name">الصيانة</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="90"><a class="sector-link" href="/ar/our-sectors/#smart-solutions"><span class="sector-num" aria-hidden="true">04</span><span class="sector-name">الحلول الذكية</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#e-commerce"><span class="sector-num" aria-hidden="true">05</span><span class="sector-name">التجارة الإلكترونية</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="90"><a class="sector-link" href="/ar/our-sectors/#delivery-services"><span class="sector-num" aria-hidden="true">06</span><span class="sector-name">خدمات التوصيل</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="0"><a class="sector-link" href="/ar/our-sectors/#jewelry"><span class="sector-num" aria-hidden="true">07</span><span class="sector-name">المجوهرات</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
+      <li class="reveal reveal-row" data-delay="90"><a class="sector-link" href="/ar/our-sectors/#fin-tech"><span class="sector-num" aria-hidden="true">08</span><span class="sector-name">التكنولوجيا المالية</span><span class="sector-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a></li>
     </ul>
   </div>
 </section>
 
 <section class="partners" aria-labelledby="partners-title">
   <div class="wrap">
-    <h2 id="partners-title" class="reveal">شركاؤنا</h2>
+    <h2 id="partners-title" class="reveal words" aria-label="شركاؤنا"><span aria-hidden="true"><span class="w"><span>شركاؤنا</span></span></span></h2>
     <ul class="logo-grid logo-grid--partners" aria-label="شركاؤنا">
-      <li class="reveal" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/partners/logo-motorola.webp?v=2e1e4cf269"><img src="/assets/img/partners/logo-motorola.png?v=2774422276" alt="Motorola" width="507" height="129" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="50"><picture><source type="image/webp" srcset="/assets/img/partners/logo-ajax.webp?v=41bef0c156"><img src="/assets/img/partners/logo-ajax.png?v=e718481833" alt="Ajax" width="293" height="78" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="100"><picture><source type="image/webp" srcset="/assets/img/partners/logo-rasilient.webp?v=8ce89f4f22"><img src="/assets/img/partners/logo-rasilient.png?v=1c7dfc5a78" alt="Rasilient" width="329" height="108" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="150"><picture><source type="image/webp" srcset="/assets/img/partners/logo-avigilon.webp?v=99d9ba45ea"><img src="/assets/img/partners/logo-avigilon.png?v=03c3e021d1" alt="Avigilon" width="302" height="83" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="200"><picture><source type="image/webp" srcset="/assets/img/partners/logo-teltonika.webp?v=dddb0e9a8b"><img src="/assets/img/partners/logo-teltonika.png?v=4cb5ec97ba" alt="Teltonika" width="335" height="85" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/partners/logo-inrico.webp?v=d4d9970916"><img src="/assets/img/partners/logo-inrico.png?v=ab84f6b16c" alt="Inrico" width="259" height="79" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="50"><picture><source type="image/webp" srcset="/assets/img/partners/logo-hikvision.webp?v=6fd03af393"><img src="/assets/img/partners/logo-hikvision.png?v=6276f6cd2e" alt="Hikvision" width="368" height="72" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="100"><picture><source type="image/webp" srcset="/assets/img/partners/logo-pelco.webp?v=fe8a08328e"><img src="/assets/img/partners/logo-pelco.png?v=7b40f9d211" alt="Pelco" width="303" height="98" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/partners/logo-motorola.webp?v=2e1e4cf269"><img src="/assets/img/partners/logo-motorola.png?v=2774422276" alt="Motorola" width="507" height="129" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="70"><picture><source type="image/webp" srcset="/assets/img/partners/logo-ajax.webp?v=41bef0c156"><img src="/assets/img/partners/logo-ajax.png?v=e718481833" alt="Ajax" width="293" height="78" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="140"><picture><source type="image/webp" srcset="/assets/img/partners/logo-rasilient.webp?v=8ce89f4f22"><img src="/assets/img/partners/logo-rasilient.png?v=1c7dfc5a78" alt="Rasilient" width="329" height="108" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="210"><picture><source type="image/webp" srcset="/assets/img/partners/logo-avigilon.webp?v=99d9ba45ea"><img src="/assets/img/partners/logo-avigilon.png?v=03c3e021d1" alt="Avigilon" width="302" height="83" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="280"><picture><source type="image/webp" srcset="/assets/img/partners/logo-teltonika.webp?v=dddb0e9a8b"><img src="/assets/img/partners/logo-teltonika.png?v=4cb5ec97ba" alt="Teltonika" width="335" height="85" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/partners/logo-inrico.webp?v=d4d9970916"><img src="/assets/img/partners/logo-inrico.png?v=ab84f6b16c" alt="Inrico" width="259" height="79" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="70"><picture><source type="image/webp" srcset="/assets/img/partners/logo-hikvision.webp?v=6fd03af393"><img src="/assets/img/partners/logo-hikvision.png?v=6276f6cd2e" alt="Hikvision" width="368" height="72" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="140"><picture><source type="image/webp" srcset="/assets/img/partners/logo-pelco.webp?v=fe8a08328e"><img src="/assets/img/partners/logo-pelco.png?v=7b40f9d211" alt="Pelco" width="303" height="98" loading="lazy" decoding="async"></picture></li>
     </ul>
   </div>
 </section>
@@ -1263,34 +1409,34 @@ html { scroll-behavior: auto; }
 <section class="clients" aria-labelledby="clients-title">
   <div class="clients-head">
     <div class="wrap">
-      <h2 id="clients-title" class="reveal">عملاؤنا</h2>
+      <h2 id="clients-title" class="reveal words" aria-label="عملاؤنا"><span aria-hidden="true"><span class="w"><span>عملاؤنا</span></span></span></h2>
       <span class="divider" aria-hidden="true"></span>
     </div>
   </div>
   <div class="clients-body">
     <div class="wrap">
     <ul class="logo-grid logo-grid--clients" aria-label="عملاؤنا">
-      <li class="reveal" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-sayed-hamid-behbehani-sons.webp?v=68e0ef83ba"><img src="/assets/img/clients/logo-sayed-hamid-behbehani-sons.png?v=3be0ba861c" alt="Sayed Hamid Behbehani &amp; Sons" width="130" height="132" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="50"><picture><source type="image/webp" srcset="/assets/img/clients/logo-ream.webp?v=fb0b3ccd4e"><img src="/assets/img/clients/logo-ream.png?v=f5fc38c4fc" alt="Ream" width="195" height="158" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="100"><picture><source type="image/webp" srcset="/assets/img/clients/logo-ewan-complex.webp?v=bee4b85048"><img src="/assets/img/clients/logo-ewan-complex.png?v=e42fe1ed06" alt="Ewan Complex" width="291" height="101" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="150"><picture><source type="image/webp" srcset="/assets/img/clients/logo-millennium-hotels.webp?v=0d29b2f850"><img src="/assets/img/clients/logo-millennium-hotels.png?v=bace910c42" alt="Millennium Hotels" width="279" height="173" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="200"><picture><source type="image/webp" srcset="/assets/img/clients/logo-sahara.webp?v=4280676688"><img src="/assets/img/clients/logo-sahara.png?v=8b49550c37" alt="Sahara" width="103" height="143" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-radisson.webp?v=e61a6b8ada"><img src="/assets/img/clients/logo-radisson.png?v=2bb29164ae" alt="Radisson" width="250" height="120" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="50"><picture><source type="image/webp" srcset="/assets/img/clients/logo-alnasser.webp?v=1306c2964a"><img src="/assets/img/clients/logo-alnasser.png?v=27b6579446" alt="Alnasser" width="170" height="101" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="100"><picture><source type="image/webp" srcset="/assets/img/clients/logo-nbtc.webp?v=08683cfb46"><img src="/assets/img/clients/logo-nbtc.png?v=f5ce67636b" alt="NBTC" width="252" height="73" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="150"><picture><source type="image/webp" srcset="/assets/img/clients/logo-national-investments-company.webp?v=8cab8ab9de"><img src="/assets/img/clients/logo-national-investments-company.png?v=af26d333ff" alt="National Investments Company" width="292" height="144" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="200"><picture><source type="image/webp" srcset="/assets/img/clients/logo-al-asima.webp?v=de433b1c4d"><img src="/assets/img/clients/logo-al-asima.png?v=aa59eac581" alt="Al Asima" width="153" height="123" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-massaleh-real-estate.webp?v=b57f16a9b8"><img src="/assets/img/clients/logo-massaleh-real-estate.png?v=6c3cff85aa" alt="Massaleh Real Estate" width="321" height="88" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="50"><picture><source type="image/webp" srcset="/assets/img/clients/logo-al-ahleia-switchgear.webp?v=c042e143b6"><img src="/assets/img/clients/logo-al-ahleia-switchgear.png?v=ab2bdbbe74" alt="Al-Ahleia Switchgear" width="434" height="71" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="100"><picture><source type="image/webp" srcset="/assets/img/clients/logo-awtad.webp?v=3ac8fb64cd"><img src="/assets/img/clients/logo-awtad.png?v=c54b6d50db" alt="Awtad" width="142" height="102" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="150"><picture><source type="image/webp" srcset="/assets/img/clients/logo-national-contracting-co.webp?v=2d9f431977"><img src="/assets/img/clients/logo-national-contracting-co.png?v=033672f70c" alt="National Contracting Co." width="409" height="84" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="200"><picture><source type="image/webp" srcset="/assets/img/clients/logo-alghanim-industries.webp?v=e26a443de8"><img src="/assets/img/clients/logo-alghanim-industries.png?v=3767002742" alt="Alghanim Industries" width="208" height="66" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-xcite.webp?v=013c605a3c"><img src="/assets/img/clients/logo-xcite.png?v=abc17100fb" alt="Xcite" width="416" height="112" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="50"><picture><source type="image/webp" srcset="/assets/img/clients/logo-wafra.webp?v=a2dc5acfb3"><img src="/assets/img/clients/logo-wafra.png?v=96235eb3fb" alt="Wafra" width="187" height="146" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="100"><picture><source type="image/webp" srcset="/assets/img/clients/logo-kuwait-ports-authority.webp?v=a5c2632a6a"><img src="/assets/img/clients/logo-kuwait-ports-authority.png?v=25bd7de7fb" alt="Kuwait Ports Authority" width="208" height="148" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="150"><picture><source type="image/webp" srcset="/assets/img/clients/logo-ministry-of-electricity-water.webp?v=50e266ebb0"><img src="/assets/img/clients/logo-ministry-of-electricity-water.png?v=824e0e2f0a" alt="Ministry of Electricity &amp; Water" width="293" height="128" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="200"><picture><source type="image/webp" srcset="/assets/img/clients/logo-the-regency.webp?v=40596b62f1"><img src="/assets/img/clients/logo-the-regency.png?v=0ec448e06d" alt="The Regency" width="144" height="139" loading="lazy" decoding="async"></picture></li>
-      <li class="reveal" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-arkan-al-kuwait.webp?v=2a852361fa"><img src="/assets/img/clients/logo-arkan-al-kuwait.png?v=52ca498792" alt="Arkan Al Kuwait Real Estate" width="520" height="100" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-sayed-hamid-behbehani-sons.webp?v=68e0ef83ba"><img src="/assets/img/clients/logo-sayed-hamid-behbehani-sons.png?v=3be0ba861c" alt="Sayed Hamid Behbehani &amp; Sons" width="130" height="132" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="70"><picture><source type="image/webp" srcset="/assets/img/clients/logo-ream.webp?v=fb0b3ccd4e"><img src="/assets/img/clients/logo-ream.png?v=f5fc38c4fc" alt="Ream" width="195" height="158" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="140"><picture><source type="image/webp" srcset="/assets/img/clients/logo-ewan-complex.webp?v=bee4b85048"><img src="/assets/img/clients/logo-ewan-complex.png?v=e42fe1ed06" alt="Ewan Complex" width="291" height="101" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="210"><picture><source type="image/webp" srcset="/assets/img/clients/logo-millennium-hotels.webp?v=0d29b2f850"><img src="/assets/img/clients/logo-millennium-hotels.png?v=bace910c42" alt="Millennium Hotels" width="279" height="173" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="280"><picture><source type="image/webp" srcset="/assets/img/clients/logo-sahara.webp?v=4280676688"><img src="/assets/img/clients/logo-sahara.png?v=8b49550c37" alt="Sahara" width="103" height="143" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-radisson.webp?v=e61a6b8ada"><img src="/assets/img/clients/logo-radisson.png?v=2bb29164ae" alt="Radisson" width="250" height="120" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="70"><picture><source type="image/webp" srcset="/assets/img/clients/logo-alnasser.webp?v=1306c2964a"><img src="/assets/img/clients/logo-alnasser.png?v=27b6579446" alt="Alnasser" width="170" height="101" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="140"><picture><source type="image/webp" srcset="/assets/img/clients/logo-nbtc.webp?v=08683cfb46"><img src="/assets/img/clients/logo-nbtc.png?v=f5ce67636b" alt="NBTC" width="252" height="73" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="210"><picture><source type="image/webp" srcset="/assets/img/clients/logo-national-investments-company.webp?v=8cab8ab9de"><img src="/assets/img/clients/logo-national-investments-company.png?v=af26d333ff" alt="National Investments Company" width="292" height="144" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="280"><picture><source type="image/webp" srcset="/assets/img/clients/logo-al-asima.webp?v=de433b1c4d"><img src="/assets/img/clients/logo-al-asima.png?v=aa59eac581" alt="Al Asima" width="153" height="123" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-massaleh-real-estate.webp?v=b57f16a9b8"><img src="/assets/img/clients/logo-massaleh-real-estate.png?v=6c3cff85aa" alt="Massaleh Real Estate" width="321" height="88" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="70"><picture><source type="image/webp" srcset="/assets/img/clients/logo-al-ahleia-switchgear.webp?v=c042e143b6"><img src="/assets/img/clients/logo-al-ahleia-switchgear.png?v=ab2bdbbe74" alt="Al-Ahleia Switchgear" width="434" height="71" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="140"><picture><source type="image/webp" srcset="/assets/img/clients/logo-awtad.webp?v=3ac8fb64cd"><img src="/assets/img/clients/logo-awtad.png?v=c54b6d50db" alt="Awtad" width="142" height="102" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="210"><picture><source type="image/webp" srcset="/assets/img/clients/logo-national-contracting-co.webp?v=2d9f431977"><img src="/assets/img/clients/logo-national-contracting-co.png?v=033672f70c" alt="National Contracting Co." width="409" height="84" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="280"><picture><source type="image/webp" srcset="/assets/img/clients/logo-alghanim-industries.webp?v=e26a443de8"><img src="/assets/img/clients/logo-alghanim-industries.png?v=3767002742" alt="Alghanim Industries" width="208" height="66" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-xcite.webp?v=013c605a3c"><img src="/assets/img/clients/logo-xcite.png?v=abc17100fb" alt="Xcite" width="416" height="112" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="70"><picture><source type="image/webp" srcset="/assets/img/clients/logo-wafra.webp?v=a2dc5acfb3"><img src="/assets/img/clients/logo-wafra.png?v=96235eb3fb" alt="Wafra" width="187" height="146" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="140"><picture><source type="image/webp" srcset="/assets/img/clients/logo-kuwait-ports-authority.webp?v=a5c2632a6a"><img src="/assets/img/clients/logo-kuwait-ports-authority.png?v=25bd7de7fb" alt="Kuwait Ports Authority" width="208" height="148" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="210"><picture><source type="image/webp" srcset="/assets/img/clients/logo-ministry-of-electricity-water.webp?v=50e266ebb0"><img src="/assets/img/clients/logo-ministry-of-electricity-water.png?v=824e0e2f0a" alt="Ministry of Electricity &amp; Water" width="293" height="128" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="280"><picture><source type="image/webp" srcset="/assets/img/clients/logo-the-regency.webp?v=40596b62f1"><img src="/assets/img/clients/logo-the-regency.png?v=0ec448e06d" alt="The Regency" width="144" height="139" loading="lazy" decoding="async"></picture></li>
+      <li class="reveal reveal-pop" data-delay="0"><picture><source type="image/webp" srcset="/assets/img/clients/logo-arkan-al-kuwait.webp?v=2a852361fa"><img src="/assets/img/clients/logo-arkan-al-kuwait.png?v=52ca498792" alt="Arkan Al Kuwait Real Estate" width="520" height="100" loading="lazy" decoding="async"></picture></li>
     </ul>
     </div>
   </div>
@@ -1300,8 +1446,8 @@ html { scroll-behavior: auto; }
 
 <footer class="site-footer">
   <div class="footer-photo photo photo-fade has-hint" style="--hint:url(data:image/webp;base64,UklGRgABAABXRUJQVlA4IPQAAACQBQCdASogABIAPu1iqE2ppaOiMAgBMB2JYgCdOUDgkuW8bYDordrqJKWgmu/cqzSoJO8IAAD+fIw7kFKJFuaM4P/S/oJLurEcSSi70zEXjEFLW40RLSgZODhT/p0XYCBJW8z8oq0Ldmu7KMPblRaj0cQaUzlLxQa4ZWw9/96+MN73yRpNWmf42lFUPUFkZ28xbBN8xp7XR9Gdqx90eD1h0W57neMyp9/+XLYNLBPrNEHycIh4dje2K8uNWzZ0HQoSIaVwgjays66CN2LbeRle8kY8sxv3SwPX137BVq6LMqNPpBFUwbnOqcBBUUYRRUVNJsAA);--focus:80%" aria-hidden="true"><picture><source type="image/avif" srcset="/assets/img/photos/footer-skyscrapers-bw-960.avif?v=c5af413aeb 960w, /assets/img/photos/footer-skyscrapers-bw.avif?v=7cd6192219 1672w" sizes="(max-width: 900px) 100vw, 42vw"><img src="/assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172" alt="" width="1672" height="941" srcset="/assets/img/photos/footer-skyscrapers-bw-960.jpg?v=6e53873a52 960w, /assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172 1672w" sizes="(max-width: 900px) 100vw, 42vw" loading="lazy" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
-  <div class="footer-panel">
-    <h2 class="footer-title">مجموعة الميل</h2>
+  <div class="footer-panel reveal reveal-group">
+    <h2 class="footer-title words" aria-label="مجموعة الميل"><span aria-hidden="true"><span class="w"><span>مجموعة</span></span> <span class="w"><span>الميل</span></span></span></h2>
     <div class="footer-grid">
       <section>
         <h3>تواصل</h3>
@@ -1344,6 +1490,6 @@ html { scroll-behavior: auto; }
   </div>
   <button class="to-top" type="button" aria-label="العودة إلى الأعلى" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button>
 </footer>
-<script src="/assets/js/main.js?v=879d56e23f" defer></script>
+<script src="/assets/js/main.js?v=484e4de899" defer></script>
 </body>
 </html>

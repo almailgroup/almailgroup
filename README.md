@@ -208,8 +208,17 @@ sizes and naming.
 - The home page: the hero has two buttons (Explore our sectors, Contact us; `actions` in
   `HOME`), Why Choose lists six areas with an icon each (`areas` in `WHY`), the sectors are
   numbered rows, and the partners sit in a grid of hairline cells.
-- Sections fade and slide in as they scroll into view, in 0.7s (0.5s on a phone). Everything is
-  visible with JavaScript off, and the motion is skipped for visitors who ask for reduced motion.
+- Motion on the way down (the "motion" section of `style.css`). As each part scrolls into view
+  it plays once: blocks rise and fade in, the words of every heading rise out of a slot one
+  after another (`rising()` in `tools/build.py`), logos and company tiles pop up, the white Why
+  Choose panel opens out from its middle and fills in, the sectors' rules draw across before
+  their rows slide in, and the footer's columns follow its name. Tied to the scroll itself, in
+  browsers that run it off the main thread (Chrome, Edge, Safari 26 and later): the section
+  photos drift slower than the page, the hero's words float away as it scrolls off, the footer
+  photo settles into place, and a thin lavender line along the top of the screen shows how far
+  down the page is. Everything is visible with JavaScript off, a link reached with the keyboard
+  shows at once, and all of it is skipped for visitors who ask for reduced motion. On an Arabic
+  page the rows and lines come in from the right.
 - Breakpoints at 1680px and 2200px (large screens), 1080px (hamburger menu and call button),
   900px (one column for Why Choose, About and the footer; fewer logos to a row), 800px (one
   column of sectors), 760px (two of partners) and 640px (phone layout: the sectors intro

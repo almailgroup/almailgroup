@@ -1,4 +1,4 @@
-/* Almail Group — site behaviour: sticky header, mobile menu, back to top, scroll reveal, photo hints, quote slider */
+/* Almail Group — site behaviour: sticky header, mobile menu, back to top, scroll reveal and effects, photo hints, quote slider */
 (function () {
   'use strict';
 
@@ -158,7 +158,7 @@
         setTimeout(function () { el.classList.add('is-in'); }, delay);
         io.unobserve(el);
       });
-    }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
     items.forEach(function (el) { io.observe(el); });
   }
 
@@ -227,6 +227,11 @@
     // iOS Safari shows :active (the tap feedback in style.css) only on a page
     // that listens for touches.
     on(doc, 'touchstart', function () {}, { passive: true });
+    // The effects tied to the scroll (style.css, "motion") start once the
+    // first frame is on screen, so setting them up doesn't delay it.
+    window.requestAnimationFrame(function () {
+      setTimeout(function () { doc.documentElement.classList.add('fx'); }, 0);
+    });
     stickyHeader();
     mobileNav();
     toTop();

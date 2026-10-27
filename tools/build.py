@@ -971,8 +971,8 @@ def footer(lang, current):
     return f'''
 <footer class="site-footer">
   {photo_box("footer-photo", "photos/footer-skyscrapers-bw.jpg", sizes="(max-width: 900px) 100vw, 42vw")}
-  <div class="footer-panel">
-    <h2 class="footer-title">{e(name)}</h2>
+  <div class="footer-panel reveal reveal-group">
+    {rising("h2", name, lang, "footer-title")}
     <div class="footer-grid">
       <section>
         <h3>{e(t(UI["contact"], lang))}</h3>
@@ -1021,7 +1021,7 @@ def page(lang, fname, title, desc, body, noindex=False, preload=""):
 
 def logo_list(items, cls, label):
     lis = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 5) * 50}">{picture(path, name)}</li>'
+        f'      <li class="reveal reveal-pop" data-delay="{(n % 5) * 70}">{picture(path, name)}</li>'
         for n, (name, path) in enumerate(items))
     return f'    <ul class="{cls}" aria-label="{e(label)}">\n{lis}\n    </ul>'
 
@@ -1029,7 +1029,7 @@ def logo_list(items, cls, label):
 def company_tiles(lang, companies):
     """Company logos as tiles, each opening its card on Almail Group World."""
     lis = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 4) * 50}"><a href="{link(lang, "almail-group-world.html#" + c["id"])}">'
+        f'      <li class="reveal reveal-pop" data-delay="{(n % 4) * 70}"><a href="{link(lang, "almail-group-world.html#" + c["id"])}">'
         f'{picture(c["logo"], t(c["name"], lang))}</a></li>'
         for n, c in enumerate(companies))
     return f'    <ul class="sub-logos" aria-label="{e(t(UI["companies"], lang))}">\n{lis}\n    </ul>'
@@ -1064,7 +1064,7 @@ HERO_PHOTO = "hero-glass-towers.jpg"
 
 def build_home(lang):
     sectors = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 2) * 60}"><a class="sector-link" href="{link(lang, "our-sectors.html#" + slug(s[0]))}">'
+        f'      <li class="reveal reveal-row" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link(lang, "our-sectors.html#" + slug(s[0]))}">'
         f'<span class="sector-num" aria-hidden="true">{n + 1:02d}</span><span class="sector-name">{e(t(s, lang))}</span>'
         f'<span class="sector-arrow">{I["arrow"]}</span></a></li>'
         for n, s in enumerate(SECTORS))
@@ -1095,7 +1095,7 @@ def build_home(lang):
 <section class="hero has-bg">
   {backdrop(HERO_PHOTO, priority=True)}
   <div class="wrap hero-inner">
-    <h1 class="hero-title">{e(t(HOME["h1"], lang))}</h1>
+    {rising("h1", t(HOME["h1"], lang), lang, "hero-title")}
     <p class="hero-lead">{e(t(HOME["lead"], lang))}</p>
     <div class="hero-actions">
 {actions}
@@ -1107,8 +1107,8 @@ def build_home(lang):
 <section class="why has-bg" id="why" aria-labelledby="why-title">
   {backdrop("why-choose-towers.jpg")}
   <div class="wrap">
-    <div class="why-band reveal">
-      <h2 id="why-title">{e(t(WHY["title"], lang))}</h2>
+    <div class="why-band reveal reveal-card">
+      {rising("h2", t(WHY["title"], lang), lang, attrs=' id="why-title"')}
       <div class="why-body">
         <div class="why-copy">
           <h3>{e(t(WHY["sub"], lang))}</h3>
@@ -1127,7 +1127,7 @@ def build_home(lang):
   <div class="wrap">
     <div class="about-head">
       <div class="section-head reveal">
-        <h2 id="about-title">{e(t(ABOUT["title"], lang))}</h2>
+        {rising("h2", t(ABOUT["title"], lang), lang, attrs=' id="about-title"')}
         <p class="subtitle">{e(t(ABOUT["sub"], lang))}</p>
       </div>
       <p class="about-text reveal">{e(t(ABOUT["text"], lang))}</p>
@@ -1140,7 +1140,7 @@ def build_home(lang):
   {backdrop("sectors-glass-facade.jpg")}
   <div class="wrap">
     <div class="sectors-head reveal">
-      <h2 id="sectors-title">{e(t(UI["sectors"], lang))}</h2>
+      {rising("h2", t(UI["sectors"], lang), lang, attrs=' id="sectors-title"')}
       <p>{e(t(SECTORS_INTRO, lang))}</p>
     </div>
     <ul class="sector-list">
@@ -1151,7 +1151,7 @@ def build_home(lang):
 
 <section class="partners" aria-labelledby="partners-title">
   <div class="wrap">
-    <h2 id="partners-title" class="reveal">{e(t(UI["partners"], lang))}</h2>
+    {rising("h2", t(UI["partners"], lang), lang, "reveal", ' id="partners-title"')}
 {partners}
   </div>
 </section>
@@ -1169,7 +1169,7 @@ def build_home(lang):
 <section class="clients" aria-labelledby="clients-title">
   <div class="clients-head">
     <div class="wrap">
-      <h2 id="clients-title" class="reveal">{e(t(UI["clients"], lang))}</h2>
+      {rising("h2", t(UI["clients"], lang), lang, "reveal", ' id="clients-title"')}
       <span class="divider" aria-hidden="true"></span>
     </div>
   </div>
@@ -1184,12 +1184,34 @@ def build_home(lang):
          preload=hero_preload(HERO_PHOTO))
 
 
-def page_hero(title, lead, photo):
+# Arabic letters (and their presentation forms), to tell an Arabic word from a Latin one
+ARABIC_LETTER = re.compile(r"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]")
+
+
+def rising(tag, text, lang, cls="", attrs=""):
+    """A heading whose words rise into place one after another as it comes
+    into view (style.css, "motion"). Each word is a box of its own, so the
+    heading carries its text whole in aria-label and screen readers don't read
+    it word by word. On an Arabic page a run of Latin words (a company's name,
+    say) stays one box, so it keeps its own left-to-right order."""
+    groups = []
+    for word in text.split():
+        latin = lang == "ar" and not ARABIC_LETTER.search(word)
+        if latin and groups and groups[-1][1]:
+            groups[-1][0].append(word)
+        else:
+            groups.append(([word], latin))
+    inner = " ".join(f'<span class="w"><span>{e(" ".join(g))}</span></span>' for g, _ in groups)
+    classes = f"{cls} words".strip()
+    return f'<{tag}{attrs} class="{classes}" aria-label="{e(text)}"><span aria-hidden="true">{inner}</span></{tag}>'
+
+
+def page_hero(title, lead, photo, lang):
     return f"""
 <section class="page-hero has-bg">
   {backdrop(photo, priority=True)}
   <div class="wrap">
-    <h1>{e(title)}</h1>
+    {rising("h1", title, lang)}
     <p class="page-lead">{e(lead)}</p>
   </div>
 </section>
@@ -1200,7 +1222,7 @@ def inner_page(lang, fname, body):
     meta = INNER[fname]
     title = t(meta['title'], lang)
     page(lang, fname, f'{title} | {t(SITE_NAME, lang)}', t(meta['desc'], lang),
-         page_hero(title, t(meta['lead'], lang), meta['photo']) + body,
+         page_hero(title, t(meta['lead'], lang), meta['photo'], lang) + body,
          preload=hero_preload(meta['photo']))
 
 
@@ -1210,7 +1232,7 @@ def cta(lang):
 <section class="cta-band" aria-labelledby="cta-title">
   <div class="wrap cta-inner">
     <div class="reveal">
-      <h2 id="cta-title">{e(t(UI['talk'], lang))}</h2>
+      {rising("h2", t(UI['talk'], lang), lang, attrs=' id="cta-title"')}
       <p>{e(t(UI['talk_text'], lang))}</p>
     </div>
     <div class="cta-actions reveal">
@@ -1262,7 +1284,7 @@ def build_world(lang):
 <section class="page-section" aria-labelledby="companies-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="companies-title">{e(t(UI['our_companies'], lang))}</h2>
+      {rising("h2", t(UI['our_companies'], lang), lang, attrs=' id="companies-title"')}
       <p class="lead-text">{e(t(ABOUT['text'], lang))}</p>
     </div>
     <div class="company-grid">
@@ -1326,7 +1348,7 @@ def build_news(lang):
   <div class="wrap news-layout">
 {listing}
     <aside class="side-note reveal" aria-labelledby="media-title">
-      <h2 id="media-title">{e(t(UI['media'], lang))}</h2>
+      {rising("h2", t(UI['media'], lang), lang, attrs=' id="media-title"')}
       <p>{e(t(UI['media_text'], lang))} <a href="mailto:{EMAIL_HREF}">{ltr(EMAIL, lang)}</a>.</p>{follow}
     </aside>
   </div>
@@ -1358,7 +1380,7 @@ def build_careers(lang):
 <section class="page-section" aria-labelledby="jobs-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="jobs-title">{e(t(UI['open_positions'], lang))}</h2>
+      {rising("h2", t(UI['open_positions'], lang), lang, attrs=' id="jobs-title"')}
       <p class="lead-text">{e(t(UI['careers_intro'], lang))}</p>
     </div>
 {jobs}
@@ -1367,7 +1389,7 @@ def build_careers(lang):
 
 <section class="page-section page-section--alt" aria-labelledby="apply-title">
   <div class="wrap">
-    <h2 id="apply-title" class="reveal">{e(t(UI['how_to_apply'], lang))}</h2>
+    {rising("h2", t(UI['how_to_apply'], lang), lang, "reveal", ' id="apply-title"')}
     <ol class="steps">
       <li class="reveal">
         <span class="step-num" aria-hidden="true">1</span>
@@ -1393,7 +1415,7 @@ def build_careers(lang):
 <section class="page-section" aria-labelledby="where-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="where-title">{e(t(UI['where'], lang))}</h2>
+      {rising("h2", t(UI['where'], lang), lang, attrs=' id="where-title"')}
       <p class="lead-text">{e(t(UI['where_text'], lang))}</p>
     </div>
 {company_tiles(lang, COMPANIES)}
@@ -1448,7 +1470,7 @@ def build_contact(lang):
 <section class="page-section page-section--alt" aria-labelledby="online-title">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 id="online-title">{e(t(UI['online'], lang))}</h2>
+      {rising("h2", t(UI['online'], lang), lang, attrs=' id="online-title"')}
       <p class="lead-text">{e(t(UI['online_text'], lang))}</p>
     </div>
     <ul class="online-list">
@@ -1463,7 +1485,7 @@ def build_contact(lang):
 def build_404():
     """One not-found page serves both languages (GitHub Pages has one), so it
     offers the way home in each."""
-    body = page_hero("Page Not Found", "The page you are looking for has moved or no longer exists.", HERO_PHOTO) + """
+    body = page_hero("Page Not Found", "The page you are looking for has moved or no longer exists.", HERO_PHOTO, "en") + """
 <section class="page-section">
   <div class="wrap">
     <p><a class="text-link" href="/">Back to the home page</a></p>
