@@ -15,6 +15,10 @@ For each photo in assets/img/photos/ (name.jpg, the original):
                         upright: a phone only shows a narrow strip of a wide
                         photo, so it gets that strip, sharper and smaller than
                         the whole photo scaled down (photos in PORTRAIT only)
+    (placeholder)       the photo 32px wide, kept in the record rather than as
+                        a file: the pages show it, blurred, while the photo
+                        loads, so a section fades from a hint of its photo to
+                        the photo instead of from black
 
 For each logo (logos/, partners/, clients/ *.png): name.webp, lossless, so
 it is pixel for pixel the PNG at about two thirds of the size.
@@ -24,7 +28,9 @@ SHA-1). The build uses a copy only while it still matches its original, so a
 photo replaced without running this shows the new JPEG everywhere rather than
 the old picture on phones. Copies that are already up to date are skipped.
 """
+import base64
 import hashlib
+import io
 import json
 import os
 import sys
@@ -42,6 +48,7 @@ SMALL_WIDTH = 960
 JPEG_QUALITY = 72
 AVIF_QUALITY = 50    # the photos sit under 50-78% black overlays; compared side by side, no worse than the JPEGs
 PORTRAIT_RATIO = 9 / 16
+PLACEHOLDER_WIDTH = 32
 
 # Photos that fill a tall section on a phone, and where across the photo the
 # phone's strip is taken from (0 = left edge, 0.5 = middle). Keep these in step
@@ -88,8 +95,13 @@ def photo_copies(name):
         f"{stem}.avif": lambda im: im,
         f"{stem}-960.avif": small,
     }
+    def placeholder(im):
+        w, h = im.size
+        return im.resize((PLACEHOLDER_WIDTH, max(1, round(h * PLACEHOLDER_WIDTH / w))), Image.LANCZOS)
+
     if name in PORTRAIT:
         copies[f"{stem}-portrait.avif"] = portrait
+    copies[f"{stem}.placeholder"] = placeholder
     return copies
 
 
@@ -132,17 +144,28 @@ def main():
         wanted.add(key)
         digest = sha1(src)
         entry = manifest.get(key)
-        if entry and entry["sha1"] == digest and entry["from"] == rel(src) and os.path.exists(dst):
+        inline = dst.endswith(".placeholder")     # kept in the record, not as a file
+        if entry and entry["sha1"] == digest and entry["from"] == rel(src) and (inline or os.path.exists(dst)):
             kept += 1
             continue
         with Image.open(src) as im:
             im.load()
             # logos keep their transparency; photos are plain RGB
             out = make(im.convert("RGBA") if dst.endswith(".webp") else im.convert("RGB"))
-        save(out, dst)
         manifest[key] = {"from": rel(src), "sha1": digest, "width": out.width, "height": out.height}
+        if inline:
+            buf = io.BytesIO()
+            out.save(buf, "WEBP", quality=40, method=6)
+            manifest[key]["data"] = "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode()
+            # where across the photo a narrow screen looks, for the page to
+            # position the placeholder as the photo is positioned
+            manifest[key]["focus"] = PORTRAIT.get(os.path.basename(src), 0.5)
+            size = f"{buf.tell()} bytes"
+        else:
+            save(out, dst)
+            size = f"{os.path.getsize(dst) // 1024} KB"
         made += 1
-        print(f"made {key:48s} {out.width}x{out.height}  {os.path.getsize(dst) // 1024} KB")
+        print(f"made {key:48s} {out.width}x{out.height}  {size}")
 
     # forget copies of originals that no longer exist
     for key in sorted(set(manifest) - wanted):

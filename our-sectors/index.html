@@ -166,6 +166,18 @@ text-decoration: none;
 .has-bg { position: relative; isolation: isolate; overflow: hidden; }
 .bg { position: absolute; inset: 0; z-index: -2; }
 .bg img { width: 100%; height: 100%; object-fit: cover; }
+.photo { isolation: isolate; }
+.has-hint.is-near::before {
+content: "";
+position: absolute;
+inset: -40px;
+z-index: -1;
+background: var(--hint) var(--focus) 50% / cover no-repeat;
+filter: blur(24px);
+}
+.has-hint.is-loaded::before { visibility: hidden; transition: visibility 0s .8s; }
+.js .photo-fade img { opacity: 0; transition: opacity .7s var(--ease); }
+.js .photo-fade.is-loaded img { opacity: 1; }
 .has-bg::before {
 content: "";
 position: absolute;
@@ -626,7 +638,8 @@ transition: background .3s var(--ease);
 }
 .quote-dot[aria-current="true"]::before { background: var(--white); }
 .site-footer { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); background: var(--black); }
-.footer-photo { position: relative; min-height: 100%; }
+.footer-photo { position: relative; min-height: 100%; overflow: hidden; }
+.footer-photo.has-hint::before { background-position: center; filter: grayscale(1) brightness(.78) blur(24px); }
 .footer-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.78); }
 .footer-panel { padding: clamp(56px, 7vw, 100px) clamp(28px, 5vw, 80px) clamp(32px, 4vw, 48px); }
 .footer-title { margin-bottom: clamp(36px, 5vw, 56px); font-size: clamp(34px, 4.4vw, 48px); }
@@ -866,6 +879,16 @@ a.chip:hover { border-color: var(--lavender); color: var(--lavender); }
 .side-note a:hover,
 .steps p a:hover { text-decoration: underline; text-underline-offset: 4px; }
 }
+.topbar-contact a:active,
+.lang-link:active,
+.footer-nav a:active { color: var(--white); }
+.topbar-social a:active,
+.social a:active,
+.company-link:active { color: var(--lavender); }
+.footer-grid a:active,
+.contact-card p a:active,
+.side-note a:active,
+.steps p a:active { text-decoration: underline; text-underline-offset: 4px; }
 @media (prefers-reduced-motion: no-preference) {
 @view-transition { navigation: auto; }
 }
@@ -896,8 +919,8 @@ background: linear-gradient(270deg, rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .58) 42
 }
 .js .reveal {
 opacity: 0;
-transform: translateY(26px);
-transition: opacity .9s var(--ease), transform .9s var(--ease);
+transform: translateY(20px);
+transition: opacity .7s var(--ease), transform .7s var(--ease);
 }
 .js .reveal.is-in { opacity: 1; transform: none; }
 @media (max-width: 1200px) {
@@ -1002,7 +1025,7 @@ body { font-size: 18px; }
 .footer-photo { height: 180px; }
 .footer-grid { gap: 32px; }
 .to-top { inset-inline-end: 12px; bottom: 12px; }
-.js .reveal { transform: translateY(16px); transition-duration: .6s; }
+.js .reveal { transform: translateY(14px); transition-duration: .5s; }
 }
 @media (max-width: 420px) {
 .footer-grid { grid-template-columns: 1fr; }
@@ -1038,13 +1061,13 @@ body { font-size: 18px; }
 .logo-grid--clients { --cols: 2; }
 }
 @media (pointer: coarse) {
-.topbar-contact a { padding-block: 10px; }
+.topbar-contact a { padding-block: 11px; }
 .lang-link { min-height: 44px; }
 .topbar-social { gap: 12px; }
 .topbar-social a { position: relative; }
 .topbar-social a::after { content: ""; position: absolute; inset: -6px; }
 .footer-contact a,
-.contact-card p a { display: inline-block; padding-block: 7px; }
+.contact-card p a { display: inline-block; padding-block: 8px; }
 a.chip { min-height: 44px; }
 .footer-nav a { min-height: 44px; min-width: 44px; justify-content: center; }
 }
@@ -1055,7 +1078,7 @@ html { scroll-behavior: auto; }
 }
 </style>
 <script>document.documentElement.classList.add('js')</script>
-<script type="speculationrules">{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]}</script>
+<script type="speculationrules">{"prerender": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}], "prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]}</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -1128,7 +1151,7 @@ html { scroll-behavior: auto; }
 <main id="main">
 
 <section class="page-hero has-bg">
-  <div class="bg" aria-hidden="true"><picture><source media="(max-width: 640px) and (orientation: portrait)" type="image/avif" srcset="/assets/img/photos/sectors-glass-facade-portrait.avif?v=4fbb54ac94"><source type="image/avif" srcset="/assets/img/photos/sectors-glass-facade-960.avif?v=9c88fc1933 960w, /assets/img/photos/sectors-glass-facade.avif?v=6c00987b5e 1672w" sizes="100vw"><img src="/assets/img/photos/sectors-glass-facade.jpg?v=88f03c48b4" alt="" width="1672" height="941" srcset="/assets/img/photos/sectors-glass-facade-960.jpg?v=0fbd76ca16 960w, /assets/img/photos/sectors-glass-facade.jpg?v=88f03c48b4 1672w" sizes="100vw" fetchpriority="high" decoding="async"></picture></div>
+  <div class="bg photo has-hint" style="--hint:url(data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAAAQAwCdASogABIAPu1wsFIppiSjqAgBMB2JZwC90Ban4gAA/vByPjf416G8N1i1JFYX4jw3JbqJNmgxgAAAAA==);--focus:50%" aria-hidden="true"><picture><source media="(max-width: 640px) and (orientation: portrait)" type="image/avif" srcset="/assets/img/photos/sectors-glass-facade-portrait.avif?v=4fbb54ac94"><source type="image/avif" srcset="/assets/img/photos/sectors-glass-facade-960.avif?v=9c88fc1933 960w, /assets/img/photos/sectors-glass-facade.avif?v=6c00987b5e 1672w" sizes="100vw"><img src="/assets/img/photos/sectors-glass-facade.jpg?v=88f03c48b4" alt="" width="1672" height="941" srcset="/assets/img/photos/sectors-glass-facade-960.jpg?v=0fbd76ca16 960w, /assets/img/photos/sectors-glass-facade.jpg?v=88f03c48b4 1672w" sizes="100vw" fetchpriority="high" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
   <div class="wrap">
     <h1>Our Sectors</h1>
     <p class="page-lead">Eight sectors, from security and smart solutions to e-commerce, delivery and fin-tech.</p>
@@ -1145,7 +1168,7 @@ html { scroll-behavior: auto; }
         <p class="sector-text">Guarding for buildings and facilities, VIP protection and rapid intervention, security patrols and a central operations room, alongside the supply and installation of security systems.</p>
         <p class="chips-label">Group companies</p><ul class="chips"><li><a class="chip" href="/almail-group-world/#azsco-security">AZSCO Security</a></li><li><a class="chip" href="/almail-group-world/#azsco-systems">AZSCO Systems</a></li></ul>
       </article>
-      <article class="sector-card reveal" id="real-estate" data-delay="90">
+      <article class="sector-card reveal" id="real-estate" data-delay="60">
         <div class="sector-card-top"><span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V4.8a.8.8 0 0 1 .8-.8h9.4a.8.8 0 0 1 .8.8V21"/><path d="M15 9h4.2a.8.8 0 0 1 .8.8V21"/><path d="M2.5 21h19"/><path d="M8 8h3M8 12h3M8 16h3"/></svg></span><span class="sector-num" aria-hidden="true">02</span></div>
         <h2>Real Estate</h2>
         <p class="sector-text">Real estate services, including Bizarri Chalet on the lagoon in Al Khiran.</p>
@@ -1157,7 +1180,7 @@ html { scroll-behavior: auto; }
         <p class="sector-text">Construction and maintenance services.</p>
         
       </article>
-      <article class="sector-card reveal" id="smart-solutions" data-delay="90">
+      <article class="sector-card reveal" id="smart-solutions" data-delay="60">
         <div class="sector-card-top"><span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 14.2a4.2 4.2 0 0 1 6 0"/><path d="M10.8 16.6a1.7 1.7 0 0 1 2.4 0"/></svg></span><span class="sector-num" aria-hidden="true">04</span></div>
         <h2>Smart Solutions</h2>
         <p class="sector-text">Low voltage technology and smart home solutions: video surveillance, access control, intrusion and fire detection, and the networks that connect them.</p>
@@ -1169,7 +1192,7 @@ html { scroll-behavior: auto; }
         <p class="sector-text">NetLet, an online marketplace that brings Kuwait&#x27;s stores together in one cart.</p>
         <p class="chips-label">Group companies</p><ul class="chips"><li><a class="chip" href="/almail-group-world/#netlet">NetLet</a></li></ul>
       </article>
-      <article class="sector-card reveal" id="delivery-services" data-delay="90">
+      <article class="sector-card reveal" id="delivery-services" data-delay="60">
         <div class="sector-card-top"><span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5h11v10h-11z"/><path d="M13.5 10h4l3.5 3.5v3h-7.5"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span><span class="sector-num" aria-hidden="true">06</span></div>
         <h2>Delivery Services</h2>
         <p class="sector-text">Delivery, with Shiplee getting orders to customers&#x27; doors.</p>
@@ -1181,7 +1204,7 @@ html { scroll-behavior: auto; }
         <p class="sector-text">Jewelry design, through Gemellry.</p>
         <p class="chips-label">Group companies</p><ul class="chips"><li><a class="chip" href="/almail-group-world/#gemellry">Gemellry</a></li></ul>
       </article>
-      <article class="sector-card reveal" id="fin-tech" data-delay="90">
+      <article class="sector-card reveal" id="fin-tech" data-delay="60">
         <div class="sector-card-top"><span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M6 14.5h4"/></svg></span><span class="sector-num" aria-hidden="true">08</span></div>
         <h2>Fin-tech</h2>
         <p class="sector-text">Technology for financial services.</p>
@@ -1207,7 +1230,7 @@ html { scroll-behavior: auto; }
 </main>
 
 <footer class="site-footer">
-  <div class="footer-photo"><picture><source type="image/avif" srcset="/assets/img/photos/footer-skyscrapers-bw-960.avif?v=c5af413aeb 960w, /assets/img/photos/footer-skyscrapers-bw.avif?v=7cd6192219 1672w" sizes="(max-width: 900px) 100vw, 42vw"><img src="/assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172" alt="" width="1672" height="941" srcset="/assets/img/photos/footer-skyscrapers-bw-960.jpg?v=6e53873a52 960w, /assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172 1672w" sizes="(max-width: 900px) 100vw, 42vw" loading="lazy" decoding="async"></picture></div>
+  <div class="footer-photo photo photo-fade has-hint" style="--hint:url(data:image/webp;base64,UklGRgABAABXRUJQVlA4IPQAAACQBQCdASogABIAPu1iqE2ppaOiMAgBMB2JYgCdOUDgkuW8bYDordrqJKWgmu/cqzSoJO8IAAD+fIw7kFKJFuaM4P/S/oJLurEcSSi70zEXjEFLW40RLSgZODhT/p0XYCBJW8z8oq0Ldmu7KMPblRaj0cQaUzlLxQa4ZWw9/96+MN73yRpNWmf42lFUPUFkZ28xbBN8xp7XR9Gdqx90eD1h0W57neMyp9/+XLYNLBPrNEHycIh4dje2K8uNWzZ0HQoSIaVwgjays66CN2LbeRle8kY8sxv3SwPX137BVq6LMqNPpBFUwbnOqcBBUUYRRUVNJsAA);--focus:80%" aria-hidden="true"><picture><source type="image/avif" srcset="/assets/img/photos/footer-skyscrapers-bw-960.avif?v=c5af413aeb 960w, /assets/img/photos/footer-skyscrapers-bw.avif?v=7cd6192219 1672w" sizes="(max-width: 900px) 100vw, 42vw"><img src="/assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172" alt="" width="1672" height="941" srcset="/assets/img/photos/footer-skyscrapers-bw-960.jpg?v=6e53873a52 960w, /assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172 1672w" sizes="(max-width: 900px) 100vw, 42vw" loading="lazy" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
   <div class="footer-panel">
     <h2 class="footer-title">Almail Group</h2>
     <div class="footer-grid">
@@ -1252,6 +1275,6 @@ html { scroll-behavior: auto; }
   </div>
   <button class="to-top" type="button" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button>
 </footer>
-<script src="/assets/js/main.js?v=416173db49" defer></script>
+<script src="/assets/js/main.js?v=879d56e23f" defer></script>
 </body>
 </html>

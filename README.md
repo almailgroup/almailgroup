@@ -35,7 +35,7 @@ with a "Talk to us" band with call and email buttons.
 ├── 404.html
 ├── assets/
 │   ├── css/style.css     # all styling: tokens, sections, responsive rules
-│   ├── js/main.js        # sticky header, mobile menu, back to top, scroll reveal, quote slider
+│   ├── js/main.js        # sticky header, mobile menu, back to top, scroll reveal, photo previews, quote slider
 │   ├── fonts/            # Inter, Montserrat, Cairo and Tajawal, served from the site (see its README)
 │   └── img/
 │       ├── logos/        # Almail Group and group-company logos (white)
@@ -141,7 +141,9 @@ python3 tools/build.py      # the pages
 - **Photos**: a 960px JPEG, AVIF copies at full size and 960px (about half the bytes of a JPEG
   that looks the same), and a tall strip at full resolution for phones held upright. A phone
   only shows a narrow strip of a wide photo, so it gets that strip, sharper and lighter than the
-  whole photo. Which part of the photo the strip comes from is `PORTRAIT` in the tool.
+  whole photo. Which part of the photo the strip comes from is `PORTRAIT` in the tool. And a
+  copy 32px wide, a few hundred bytes, kept inside `tools/derived-images.json` rather than as a
+  file: the pages show it blurred while the photo loads (see Design).
 - **Logos**: a lossless WebP copy, pixel for pixel the PNG at about two thirds of the size.
 
 Pages offer these first and fall back to the original JPEG or PNG for a browser that takes
@@ -186,8 +188,16 @@ sizes and naming.
 - Tablets keep the desktop's two columns of sectors (from 800px) and four of partners (from
   760px).
 - Moving between pages fades one into the next (Chrome, Edge, Safari 18+), and Chrome and Edge
-  fetch a page as soon as the pointer rests on its link or a finger lands on it, so it opens at
-  once.
+  get a page ready in the background, fetched and drawn, as soon as the pointer rests on its
+  link or a finger lands on it, so it opens at once.
+- A photo further down a page never pops in over black: until it arrives its section shows a
+  blurred preview of it, made from a 32px copy written into the page, and then the photo fades
+  in over that. The hero and the page headings, fetched first, are drawn as soon as they arrive.
+  The previews are drawn only once their section is within a screen of view, so the first paint
+  never waits on them.
+- The menu starts to slide the moment it is tapped; making the page behind unreachable and
+  moving focus into it follow a frame later. The script reads nothing from the page's layout
+  while it starts, so it doesn't hold up the first taps on a phone.
 - The home pages describe the group to search engines (schema.org: name in both languages,
   logo, contact details, address, the companies).
 - A phone on its side (a screen under 500px tall) gets a slim header without the contact bar,
@@ -198,8 +208,8 @@ sizes and naming.
 - The home page: the hero has two buttons (Explore our sectors, Contact us; `actions` in
   `HOME`), Why Choose lists six areas with an icon each (`areas` in `WHY`), the sectors are
   numbered rows, and the partners sit in a grid of hairline cells.
-- Sections fade and slide in as they scroll into view. Everything is visible with JavaScript
-  off, and the motion is skipped for visitors who ask for reduced motion.
+- Sections fade and slide in as they scroll into view, in 0.7s (0.5s on a phone). Everything is
+  visible with JavaScript off, and the motion is skipped for visitors who ask for reduced motion.
 - Breakpoints at 1680px and 2200px (large screens), 1080px (hamburger menu and call button),
   900px (one column for Why Choose, About and the footer; fewer logos to a row), 800px (one
   column of sectors), 760px (two of partners) and 640px (phone layout: the sectors intro

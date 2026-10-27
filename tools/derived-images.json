@@ -245,6 +245,14 @@
     "width": 1672,
     "height": 941
   },
+  "photos/about-curved-facade.placeholder": {
+    "from": "photos/about-curved-facade.jpg",
+    "sha1": "d2699abae2c02d5df292279dd541063776051eb5",
+    "width": 32,
+    "height": 18,
+    "data": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAAAwBQCdASogABIAPu1cqU4ppKOiMBgMATAdiUAWpCgALFak5XKIrCTPuyzX/2IM4rsHAAD+9CkLx0NgtCm5bHJcyOI9YL7eJIvU/0lxNfFZCvByAXhR4TdD28dkNoHPAuMglvh99vBKBDmtH/se6IYdz9qZCI4pVfPHROPAq1MFH9oCXJd4xXdIyAu1B28AAAA=",
+    "focus": 0.5
+  },
   "photos/ceo-high-rise-window-960.avif": {
     "from": "photos/ceo-high-rise-window.jpg",
     "sha1": "bce200337bf6bb218c182b6d208c5bdc5f4aec00",
@@ -268,6 +276,14 @@
     "sha1": "bce200337bf6bb218c182b6d208c5bdc5f4aec00",
     "width": 1920,
     "height": 1080
+  },
+  "photos/ceo-high-rise-window.placeholder": {
+    "from": "photos/ceo-high-rise-window.jpg",
+    "sha1": "bce200337bf6bb218c182b6d208c5bdc5f4aec00",
+    "width": 32,
+    "height": 18,
+    "data": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAAAQAwCdASogABIAPu1oqk8ppiOiMBgIATAdiWkAAD+1RQAA/u8G31IHd69a5xoI3h4ZcWzyk4O/vG8//u/scqdUY8F4AAAA",
+    "focus": 0.5
   },
   "photos/footer-skyscrapers-bw-960.avif": {
     "from": "photos/footer-skyscrapers-bw.jpg",
@@ -293,6 +309,14 @@
     "width": 1672,
     "height": 941
   },
+  "photos/footer-skyscrapers-bw.placeholder": {
+    "from": "photos/footer-skyscrapers-bw.jpg",
+    "sha1": "04523ba17287325b763ac721ba5972ceed664271",
+    "width": 32,
+    "height": 18,
+    "data": "data:image/webp;base64,UklGRgABAABXRUJQVlA4IPQAAACQBQCdASogABIAPu1iqE2ppaOiMAgBMB2JYgCdOUDgkuW8bYDordrqJKWgmu/cqzSoJO8IAAD+fIw7kFKJFuaM4P/S/oJLurEcSSi70zEXjEFLW40RLSgZODhT/p0XYCBJW8z8oq0Ldmu7KMPblRaj0cQaUzlLxQa4ZWw9/96+MN73yRpNWmf42lFUPUFkZ28xbBN8xp7XR9Gdqx90eD1h0W57neMyp9/+XLYNLBPrNEHycIh4dje2K8uNWzZ0HQoSIaVwgjays66CN2LbeRle8kY8sxv3SwPX137BVq6LMqNPpBFUwbnOqcBBUUYRRUVNJsAA",
+    "focus": 0.8
+  },
   "photos/hero-glass-towers-960.avif": {
     "from": "photos/hero-glass-towers.jpg",
     "sha1": "db4db975e70dc4900bdfeb198db1258f00796000",
@@ -316,6 +340,14 @@
     "sha1": "db4db975e70dc4900bdfeb198db1258f00796000",
     "width": 1672,
     "height": 941
+  },
+  "photos/hero-glass-towers.placeholder": {
+    "from": "photos/hero-glass-towers.jpg",
+    "sha1": "db4db975e70dc4900bdfeb198db1258f00796000",
+    "width": 32,
+    "height": 18,
+    "data": "data:image/webp;base64,UklGRs4AAABXRUJQVlA4IMIAAABwBQCdASogABIAPu1iqE2ppaOiMAgBMB2JQBOmUGf7CMp3zOHzE2okPRJvtD/vgx8YLzFAAPYOk4Pb11WWVEzh+dHt84NOtMrnEnHNWZqVPY80IyWOPWAsl8Gvzz54v5Y2v1zXJiDCFWtgchQGznob8z2avt7EQ7y/nkc+IW4PZ5AnxYdBdDzKh/KMn0VXsd8fhydw33aW6Mh9LhCcVi5c/ELUachLeFaYKm3tDg1m3fZ2XnrfggXMKolfc/iI80AAAA==",
+    "focus": 0.5
   },
   "photos/sectors-glass-facade-960.avif": {
     "from": "photos/sectors-glass-facade.jpg",
@@ -341,6 +373,14 @@
     "width": 1672,
     "height": 941
   },
+  "photos/sectors-glass-facade.placeholder": {
+    "from": "photos/sectors-glass-facade.jpg",
+    "sha1": "88f03c48b467dca7052a67170bd378c88313f1db",
+    "width": 32,
+    "height": 18,
+    "data": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAAAQAwCdASogABIAPu1wsFIppiSjqAgBMB2JZwC90Ban4gAA/vByPjf416G8N1i1JFYX4jw3JbqJNmgxgAAAAA==",
+    "focus": 0.5
+  },
   "photos/why-choose-towers-960.avif": {
     "from": "photos/why-choose-towers.jpg",
     "sha1": "e97d2ebefba33be8ec5355b09e4fa0e70516219d",
@@ -364,5 +404,13 @@
     "sha1": "e97d2ebefba33be8ec5355b09e4fa0e70516219d",
     "width": 1672,
     "height": 941
+  },
+  "photos/why-choose-towers.placeholder": {
+    "from": "photos/why-choose-towers.jpg",
+    "sha1": "e97d2ebefba33be8ec5355b09e4fa0e70516219d",
+    "width": 32,
+    "height": 18,
+    "data": "data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAACQBACdASogABIAPu1iqU2ppaOiMAgBMB2JajuEQsecDYH1j5/wJZ1cYU76ihAA/u0hv2n8cm+0Sgi0BD2bduKSB8I3UkRvafKC4d/GURxmdJYyGdezn1ZG1IdrN4s/nNbjTMGq7XGQcl+o5TxVuHN2Cp2xrMZOI/7tbAwv3tDAzTJxHT6aHSr7t3LeVOghr9ZR3vTG5JYFrT7ixcKwEwVgcisY8D5yPnVPgw1d6AdGoKOdHeDDTQuaBhZ7P8l+OYLU5JfL2c6MjfoA48cbAAAA",
+    "focus": 0.22
   }
 }

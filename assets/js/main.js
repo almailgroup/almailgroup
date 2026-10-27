@@ -1,4 +1,4 @@
-/* Almail Group — site behaviour: sticky header, mobile menu, back to top, scroll reveal, quote slider */
+/* Almail Group — site behaviour: sticky header, mobile menu, back to top, scroll reveal, photo hints, quote slider */
 (function () {
   'use strict';
 
@@ -28,12 +28,18 @@
     if (!header) return;
     var drawer = doc.querySelector('.mobile-nav');
     var small = window.matchMedia ? window.matchMedia('(max-width: 1080px), (max-height: 500px)') : null;
-    var limit = header.offsetHeight + 120;
-    var lastY = window.scrollY;
+    // The header's height and the scroll position are read inside a frame,
+    // never while the script starts: reading either then makes the browser
+    // lay out the whole page early, in one long task that holds up the first
+    // taps. The height is read again after a resize.
+    var limit = null;
+    var lastY = null;
     var pending = false;
     function update() {
       pending = false;
+      if (limit === null) limit = header.offsetHeight + 120;
       var y = window.scrollY;
+      if (lastY === null) lastY = y;
       var stuck = y > limit;
       header.classList.toggle('is-stuck', stuck);
       var delta = y - lastY;
@@ -47,12 +53,18 @@
       }
       lastY = y;
     }
-    on(window, 'scroll', function () {
+    function schedule() {
       if (pending) return;
       pending = true;
       window.requestAnimationFrame(update);
-    }, { passive: true });
-    update();
+    }
+    on(window, 'scroll', schedule, { passive: true });
+    on(window, 'resize', function () {
+      if (header.classList.contains('is-stuck')) return;   // the compact bar is not the height to measure
+      limit = null;
+      schedule();
+    });
+    schedule();
   }
 
   /* ---------- mobile drawer ---------- */
@@ -66,21 +78,36 @@
     // keyboard nor a screen reader's swipe can wander out of the menu.
     var behind = all('.skip-link, .site-header, main, .site-footer, .to-top');
 
-    function setState(open) {
+    function setInert(open) {
+      behind.forEach(function (el) { if (open) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
+    }
+
+    // The menu starts to slide first, and the bookkeeping (the page behind
+    // made inert or not, focus moved) follows once that first frame is on
+    // screen, so a tap is answered at once. `refocus` sends focus back to
+    // the menu button after closing.
+    function afterPaint(fn) {
+      window.requestAnimationFrame(function () { setTimeout(fn, 0); });
+    }
+    function setState(open, refocus) {
       drawer.classList.toggle('is-open', open);
       backdrop.classList.toggle('is-open', open);
       burger.setAttribute('aria-expanded', open ? 'true' : 'false');
       doc.body.style.overflow = open ? 'hidden' : '';
-      behind.forEach(function (el) { if (open) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
-      if (open) { var f = drawer.querySelector('a, button'); if (f) f.focus(); }
+      afterPaint(function () {
+        if (drawer.classList.contains('is-open') !== open) return;   // changed again meanwhile
+        setInert(open);
+        var f = open ? drawer.querySelector('a, button') : refocus ? burger : null;
+        if (f) f.focus({ preventScroll: true });
+      });
     }
 
     on(burger, 'click', function () { setState(!drawer.classList.contains('is-open')); });
     on(backdrop, 'click', function () { setState(false); });
-    on(closeBtn, 'click', function () { setState(false); burger.focus(); });
+    on(closeBtn, 'click', function () { setState(false, true); });
     all('.mobile-nav a').forEach(function (a) { on(a, 'click', function () { setState(false); }); });
     on(doc, 'keydown', function (e) {
-      if (e.key === 'Escape' && drawer.classList.contains('is-open')) { setState(false); burger.focus(); }
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) setState(false, true);
     });
     // the drawer only exists below the desktop breakpoint in style.css
     on(window, 'resize', function () {
@@ -101,17 +128,18 @@
       pending = false;
       btn.classList.toggle('is-visible', window.scrollY > window.innerHeight * 1.5);
     }
-    on(window, 'scroll', function () {
+    function schedule() {
       if (pending) return;
       pending = true;
-      window.requestAnimationFrame(update);
-    }, { passive: true });
+      window.requestAnimationFrame(update);   // in a frame, as the header's (above)
+    }
+    on(window, 'scroll', schedule, { passive: true });
     on(btn, 'click', function () {
       window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
       var brand = doc.querySelector('.site-header .brand');
       if (brand) brand.focus({ preventScroll: true });
     });
-    update();
+    schedule();
   }
 
   /* ---------- reveal on scroll ---------- */
@@ -130,8 +158,30 @@
         setTimeout(function () { el.classList.add('is-in'); }, delay);
         io.unobserve(el);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
     items.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- photo hints ----------
+     A photo's blurred stand-in (style.css, "photos that load") is drawn
+     once its box is within a screen of view, which is after the first
+     paint: the page's first frame never waits on the stand-ins of photos
+     further down. The photo itself marks its box loaded (build.py). */
+  function photoHints() {
+    var boxes = all('.has-hint');
+    if (!boxes.length) return;
+    if (!('IntersectionObserver' in window)) {
+      boxes.forEach(function (el) { el.classList.add('is-near'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-near');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '100% 0px' });
+    boxes.forEach(function (el) { io.observe(el); });
   }
 
   /* ---------- quote slider ----------
@@ -174,10 +224,14 @@
   }
 
   function init() {
+    // iOS Safari shows :active (the tap feedback in style.css) only on a page
+    // that listens for touches.
+    on(doc, 'touchstart', function () {}, { passive: true });
     stickyHeader();
     mobileNav();
     toTop();
     reveal();
+    photoHints();
     quoteSlider();
   }
 

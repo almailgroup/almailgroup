@@ -166,6 +166,18 @@ text-decoration: none;
 .has-bg { position: relative; isolation: isolate; overflow: hidden; }
 .bg { position: absolute; inset: 0; z-index: -2; }
 .bg img { width: 100%; height: 100%; object-fit: cover; }
+.photo { isolation: isolate; }
+.has-hint.is-near::before {
+content: "";
+position: absolute;
+inset: -40px;
+z-index: -1;
+background: var(--hint) var(--focus) 50% / cover no-repeat;
+filter: blur(24px);
+}
+.has-hint.is-loaded::before { visibility: hidden; transition: visibility 0s .8s; }
+.js .photo-fade img { opacity: 0; transition: opacity .7s var(--ease); }
+.js .photo-fade.is-loaded img { opacity: 1; }
 .has-bg::before {
 content: "";
 position: absolute;
@@ -626,7 +638,8 @@ transition: background .3s var(--ease);
 }
 .quote-dot[aria-current="true"]::before { background: var(--white); }
 .site-footer { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); background: var(--black); }
-.footer-photo { position: relative; min-height: 100%; }
+.footer-photo { position: relative; min-height: 100%; overflow: hidden; }
+.footer-photo.has-hint::before { background-position: center; filter: grayscale(1) brightness(.78) blur(24px); }
 .footer-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.78); }
 .footer-panel { padding: clamp(56px, 7vw, 100px) clamp(28px, 5vw, 80px) clamp(32px, 4vw, 48px); }
 .footer-title { margin-bottom: clamp(36px, 5vw, 56px); font-size: clamp(34px, 4.4vw, 48px); }
@@ -866,6 +879,16 @@ a.chip:hover { border-color: var(--lavender); color: var(--lavender); }
 .side-note a:hover,
 .steps p a:hover { text-decoration: underline; text-underline-offset: 4px; }
 }
+.topbar-contact a:active,
+.lang-link:active,
+.footer-nav a:active { color: var(--white); }
+.topbar-social a:active,
+.social a:active,
+.company-link:active { color: var(--lavender); }
+.footer-grid a:active,
+.contact-card p a:active,
+.side-note a:active,
+.steps p a:active { text-decoration: underline; text-underline-offset: 4px; }
 @media (prefers-reduced-motion: no-preference) {
 @view-transition { navigation: auto; }
 }
@@ -896,8 +919,8 @@ background: linear-gradient(270deg, rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .58) 42
 }
 .js .reveal {
 opacity: 0;
-transform: translateY(26px);
-transition: opacity .9s var(--ease), transform .9s var(--ease);
+transform: translateY(20px);
+transition: opacity .7s var(--ease), transform .7s var(--ease);
 }
 .js .reveal.is-in { opacity: 1; transform: none; }
 @media (max-width: 1200px) {
@@ -1002,7 +1025,7 @@ body { font-size: 18px; }
 .footer-photo { height: 180px; }
 .footer-grid { gap: 32px; }
 .to-top { inset-inline-end: 12px; bottom: 12px; }
-.js .reveal { transform: translateY(16px); transition-duration: .6s; }
+.js .reveal { transform: translateY(14px); transition-duration: .5s; }
 }
 @media (max-width: 420px) {
 .footer-grid { grid-template-columns: 1fr; }
@@ -1038,13 +1061,13 @@ body { font-size: 18px; }
 .logo-grid--clients { --cols: 2; }
 }
 @media (pointer: coarse) {
-.topbar-contact a { padding-block: 10px; }
+.topbar-contact a { padding-block: 11px; }
 .lang-link { min-height: 44px; }
 .topbar-social { gap: 12px; }
 .topbar-social a { position: relative; }
 .topbar-social a::after { content: ""; position: absolute; inset: -6px; }
 .footer-contact a,
-.contact-card p a { display: inline-block; padding-block: 7px; }
+.contact-card p a { display: inline-block; padding-block: 8px; }
 a.chip { min-height: 44px; }
 .footer-nav a { min-height: 44px; min-width: 44px; justify-content: center; }
 }
@@ -1055,7 +1078,7 @@ html { scroll-behavior: auto; }
 }
 </style>
 <script>document.documentElement.classList.add('js')</script>
-<script type="speculationrules">{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]}</script>
+<script type="speculationrules">{"prerender": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}], "prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]}</script>
 </head>
 <body>
 <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
@@ -1128,7 +1151,7 @@ html { scroll-behavior: auto; }
 <main id="main">
 
 <section class="page-hero has-bg">
-  <div class="bg" aria-hidden="true"><picture><source media="(max-width: 640px) and (orientation: portrait)" type="image/avif" srcset="/assets/img/photos/hero-glass-towers-portrait.avif?v=7b2e46c33b"><source type="image/avif" srcset="/assets/img/photos/hero-glass-towers-960.avif?v=be827139dd 960w, /assets/img/photos/hero-glass-towers.avif?v=f19c75d0f5 1672w" sizes="100vw"><img src="/assets/img/photos/hero-glass-towers.jpg?v=db4db975e7" alt="" width="1672" height="941" srcset="/assets/img/photos/hero-glass-towers-960.jpg?v=9b527f7fe0 960w, /assets/img/photos/hero-glass-towers.jpg?v=db4db975e7 1672w" sizes="100vw" fetchpriority="high" decoding="async"></picture></div>
+  <div class="bg photo has-hint" style="--hint:url(data:image/webp;base64,UklGRs4AAABXRUJQVlA4IMIAAABwBQCdASogABIAPu1iqE2ppaOiMAgBMB2JQBOmUGf7CMp3zOHzE2okPRJvtD/vgx8YLzFAAPYOk4Pb11WWVEzh+dHt84NOtMrnEnHNWZqVPY80IyWOPWAsl8Gvzz54v5Y2v1zXJiDCFWtgchQGznob8z2avt7EQ7y/nkc+IW4PZ5AnxYdBdDzKh/KMn0VXsd8fhydw33aW6Mh9LhCcVi5c/ELUachLeFaYKm3tDg1m3fZ2XnrfggXMKolfc/iI80AAAA==);--focus:50%" aria-hidden="true"><picture><source media="(max-width: 640px) and (orientation: portrait)" type="image/avif" srcset="/assets/img/photos/hero-glass-towers-portrait.avif?v=7b2e46c33b"><source type="image/avif" srcset="/assets/img/photos/hero-glass-towers-960.avif?v=be827139dd 960w, /assets/img/photos/hero-glass-towers.avif?v=f19c75d0f5 1672w" sizes="100vw"><img src="/assets/img/photos/hero-glass-towers.jpg?v=db4db975e7" alt="" width="1672" height="941" srcset="/assets/img/photos/hero-glass-towers-960.jpg?v=9b527f7fe0 960w, /assets/img/photos/hero-glass-towers.jpg?v=db4db975e7 1672w" sizes="100vw" fetchpriority="high" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
   <div class="wrap">
     <h1>اتصل بنا</h1>
     <p class="page-lead">اتصل بنا أو راسلنا أو زُرنا. نستقبلكم من الأحد إلى الخميس، من 8 صباحاً حتى 5 مساءً.</p>
@@ -1144,19 +1167,19 @@ html { scroll-behavior: auto; }
         <p><a href="tel:+9651808606"><bdi dir="ltr">+965 - 1808606</bdi></a></p>
         <a class="btn btn-primary" href="tel:+9651808606">اتصل الآن</a>
       </article>
-      <article class="contact-card reveal" data-delay="70">
+      <article class="contact-card reveal" data-delay="50">
         <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></span>
         <h2>راسلنا</h2>
         <p><a href="mailto:info@almailgroup.com"><bdi dir="ltr">Info@Almailgroup.com</bdi></a></p>
         <a class="btn btn-ghost" href="mailto:info@almailgroup.com">أرسل رسالة</a>
       </article>
-      <article class="contact-card reveal" data-delay="140">
+      <article class="contact-card reveal" data-delay="100">
         <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
         <h2>زُرنا</h2>
         <address>برج مبنى الكويت، الدور 27،<br>شارع فهد السالم،<br>القبلة - الكويت.</address>
         <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=Kuwait+Building+Tower%2C+Fahad+Al+Salem+Street%2C+Qibla%2C+Kuwait" target="_blank" rel="noopener noreferrer">الاتجاهات</a>
       </article>
-      <article class="contact-card reveal" data-delay="210">
+      <article class="contact-card reveal" data-delay="150">
         <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
         <h2>ساعات العمل</h2>
         <ul class="hours"><li><span>الأحد - الخميس</span><span>8 صباحاً - 5 مساءً</span></li><li><span>الجمعة</span><span>مغلق</span></li><li><span>السبت</span><span>مغلق</span></li></ul>
@@ -1179,21 +1202,21 @@ html { scroll-behavior: auto; }
           <span class="online-url"><bdi>azsco.com</bdi><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10.5 13.5"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
         </a>
       </li>
-      <li class="reveal" data-delay="90">
+      <li class="reveal" data-delay="60">
         <a class="online-card" href="https://azsco.systems" target="_blank" rel="noopener noreferrer">
           <span class="online-logo"><picture><source type="image/webp" srcset="/assets/img/logos/logo-azsco-systems.webp?v=147b8efc41"><img src="/assets/img/logos/logo-azsco-systems.png?v=9a5d7dc999" alt="" width="503" height="192" loading="lazy" decoding="async"></picture></span>
           <span class="online-name">أنظمة أزسكو الأمنية</span>
           <span class="online-url"><bdi>azsco.systems</bdi><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10.5 13.5"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
         </a>
       </li>
-      <li class="reveal" data-delay="180">
+      <li class="reveal" data-delay="120">
         <a class="online-card" href="https://bizarri.com" target="_blank" rel="noopener noreferrer">
           <span class="online-logo"><picture><source type="image/webp" srcset="/assets/img/logos/logo-bizarri.webp?v=2903e10004"><img src="/assets/img/logos/logo-bizarri.png?v=b1b7ca46dc" alt="" width="520" height="211" loading="lazy" decoding="async"></picture></span>
           <span class="online-name">بيزاري</span>
           <span class="online-url"><bdi>bizarri.com</bdi><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10.5 13.5"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
         </a>
       </li>
-      <li class="reveal" data-delay="270">
+      <li class="reveal" data-delay="180">
         <a class="online-card" href="https://netlet.net" target="_blank" rel="noopener noreferrer">
           <span class="online-logo"><picture><source type="image/webp" srcset="/assets/img/logos/logo-netlet.webp?v=1a95689e97"><img src="/assets/img/logos/logo-netlet.png?v=c76b96c888" alt="" width="520" height="236" loading="lazy" decoding="async"></picture></span>
           <span class="online-name">نت‑لت</span>
@@ -1207,7 +1230,7 @@ html { scroll-behavior: auto; }
 </main>
 
 <footer class="site-footer">
-  <div class="footer-photo"><picture><source type="image/avif" srcset="/assets/img/photos/footer-skyscrapers-bw-960.avif?v=c5af413aeb 960w, /assets/img/photos/footer-skyscrapers-bw.avif?v=7cd6192219 1672w" sizes="(max-width: 900px) 100vw, 42vw"><img src="/assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172" alt="" width="1672" height="941" srcset="/assets/img/photos/footer-skyscrapers-bw-960.jpg?v=6e53873a52 960w, /assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172 1672w" sizes="(max-width: 900px) 100vw, 42vw" loading="lazy" decoding="async"></picture></div>
+  <div class="footer-photo photo photo-fade has-hint" style="--hint:url(data:image/webp;base64,UklGRgABAABXRUJQVlA4IPQAAACQBQCdASogABIAPu1iqE2ppaOiMAgBMB2JYgCdOUDgkuW8bYDordrqJKWgmu/cqzSoJO8IAAD+fIw7kFKJFuaM4P/S/oJLurEcSSi70zEXjEFLW40RLSgZODhT/p0XYCBJW8z8oq0Ldmu7KMPblRaj0cQaUzlLxQa4ZWw9/96+MN73yRpNWmf42lFUPUFkZ28xbBN8xp7XR9Gdqx90eD1h0W57neMyp9/+XLYNLBPrNEHycIh4dje2K8uNWzZ0HQoSIaVwgjays66CN2LbeRle8kY8sxv3SwPX137BVq6LMqNPpBFUwbnOqcBBUUYRRUVNJsAA);--focus:80%" aria-hidden="true"><picture><source type="image/avif" srcset="/assets/img/photos/footer-skyscrapers-bw-960.avif?v=c5af413aeb 960w, /assets/img/photos/footer-skyscrapers-bw.avif?v=7cd6192219 1672w" sizes="(max-width: 900px) 100vw, 42vw"><img src="/assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172" alt="" width="1672" height="941" srcset="/assets/img/photos/footer-skyscrapers-bw-960.jpg?v=6e53873a52 960w, /assets/img/photos/footer-skyscrapers-bw.jpg?v=04523ba172 1672w" sizes="(max-width: 900px) 100vw, 42vw" loading="lazy" decoding="async" onload="this.closest('.photo').classList.add('is-loaded')"></picture></div>
   <div class="footer-panel">
     <h2 class="footer-title">مجموعة الميل</h2>
     <div class="footer-grid">
@@ -1252,6 +1275,6 @@ html { scroll-behavior: auto; }
   </div>
   <button class="to-top" type="button" aria-label="العودة إلى الأعلى" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button>
 </footer>
-<script src="/assets/js/main.js?v=416173db49" defer></script>
+<script src="/assets/js/main.js?v=879d56e23f" defer></script>
 </body>
 </html>

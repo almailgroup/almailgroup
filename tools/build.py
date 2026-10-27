@@ -223,7 +223,7 @@ def portrait_version(rel):
     return copy if fresh(copy) else None
 
 
-def img(rel, alt, cls="", lazy=True, priority=False, sizes=None):
+def img(rel, alt, cls="", lazy=True, priority=False, sizes=None, onload=None):
     """An <img> with real width/height (no layout shift) and lazy loading by
     default. `rel` is relative to assets/img/. With `sizes`, a -960 copy of
     the file is offered to small screens when there is one."""
@@ -238,16 +238,18 @@ def img(rel, alt, cls="", lazy=True, priority=False, sizes=None):
     elif lazy:
         attrs.append('loading="lazy"')
     attrs.append('decoding="async"')
+    if onload:
+        attrs.append(f'onload="{onload}"')
     return "<img " + " ".join(attrs) + ">"
 
 
-def picture(rel, alt, cls="", lazy=True, priority=False, sizes=None, portrait=False):
+def picture(rel, alt, cls="", lazy=True, priority=False, sizes=None, portrait=False, onload=None):
     """img() inside a <picture> that offers the lighter copies first: for a
     photo (given `sizes`) AVIF, plus the portrait strip to an upright phone
     when `portrait` is set (photos that fill a tall box there); for a logo
     lossless WebP. A browser that takes neither format, or a copy that is
     missing or out of date, gets the original."""
-    tag = img(rel, alt, cls, lazy, priority, sizes)
+    tag = img(rel, alt, cls, lazy, priority, sizes, onload)
     sources = []
     if sizes:
         portrait = portrait and portrait_version(rel)
@@ -266,11 +268,44 @@ def picture(rel, alt, cls="", lazy=True, priority=False, sizes=None, portrait=Fa
     return "<picture>" + "".join(sources) + tag + "</picture>"
 
 
+def placeholder(rel):
+    """The photo 32px wide (tools/images.py) as (data: URL, where across the
+    photo a narrow screen looks), or None when it is missing or was made from
+    an older version of the photo."""
+    entry = DERIVED.get(os.path.splitext(rel)[0] + ".placeholder")
+    if not entry or _sha1(entry["from"]) != entry["sha1"]:
+        return None
+    return entry["data"], entry.get("focus", 0.5)
+
+
+# Set by the photo when it has loaded. An attribute rather than main.js, so a
+# photo that loads before the script runs, or a script that fails to load,
+# still shows its photo.
+PHOTO_LOADED = "this.closest('.photo').classList.add('is-loaded')"
+
+
+def photo_box(cls, rel, fade=True, **picture_args):
+    """A box holding one photo (class `cls`), which shows the photo's blurred
+    placeholder at once and the photo over it once it has loaded, faded in
+    unless `fade` is off (style.css, "photos that load")."""
+    classes = f"{cls} photo" + (" photo-fade" if fade else "")
+    style = ""
+    hint = placeholder(rel)
+    if hint:
+        data, focus = hint
+        classes += " has-hint"
+        style = f' style="--hint:url({data});--focus:{round(focus * 100)}%"'
+    return (f'<div class="{classes}"{style} aria-hidden="true">'
+            f'{picture(rel, "", onload=PHOTO_LOADED, **picture_args)}</div>')
+
+
 def backdrop(photo, priority=False, sizes="100vw"):
     """Full-bleed background photo. A real <img> rather than a CSS background,
-    so it lazy-loads below the fold and the hero can be fetched early."""
-    return (f'<div class="bg" aria-hidden="true">'
-            f'{picture("photos/" + photo, "", lazy=not priority, priority=priority, sizes=sizes, portrait=True)}</div>')
+    so it lazy-loads below the fold and the hero can be fetched early. The
+    hero and the page headings are fetched first and drawn as soon as they
+    arrive; the photos further down fade in."""
+    return photo_box("bg", "photos/" + photo, fade=not priority, lazy=not priority,
+                     priority=priority, sizes=sizes, portrait=True)
 
 
 # Images that are stand-ins until the real files are supplied, with the SHA-1
@@ -723,10 +758,13 @@ def inline_css():
     return _CSS
 
 
-# Chrome and Edge fetch a page of this site as soon as a mouse rests on a link
-# to it or a finger lands on one, so it opens at once; other browsers ignore it.
+# Chrome and Edge get a page of this site ready in the background, fetched and
+# drawn, as soon as a mouse rests on a link to it or a finger lands on one, so
+# it opens at once; a browser that can only fetch ahead fetches it, and other
+# browsers ignore it.
 SPECULATION = ('<script type="speculationrules">'
-               '{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]}'
+               '{"prerender": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}],'
+               ' "prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]}'
                '</script>\n')
 
 
@@ -932,7 +970,7 @@ def footer(lang, current):
     name = t(SITE_NAME, lang)
     return f'''
 <footer class="site-footer">
-  <div class="footer-photo">{picture("photos/footer-skyscrapers-bw.jpg", "", sizes="(max-width: 900px) 100vw, 42vw")}</div>
+  {photo_box("footer-photo", "photos/footer-skyscrapers-bw.jpg", sizes="(max-width: 900px) 100vw, 42vw")}
   <div class="footer-panel">
     <h2 class="footer-title">{e(name)}</h2>
     <div class="footer-grid">
@@ -983,7 +1021,7 @@ def page(lang, fname, title, desc, body, noindex=False, preload=""):
 
 def logo_list(items, cls, label):
     lis = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 5) * 70}">{picture(path, name)}</li>'
+        f'      <li class="reveal" data-delay="{(n % 5) * 50}">{picture(path, name)}</li>'
         for n, (name, path) in enumerate(items))
     return f'    <ul class="{cls}" aria-label="{e(label)}">\n{lis}\n    </ul>'
 
@@ -991,7 +1029,7 @@ def logo_list(items, cls, label):
 def company_tiles(lang, companies):
     """Company logos as tiles, each opening its card on Almail Group World."""
     lis = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 4) * 70}"><a href="{link(lang, "almail-group-world.html#" + c["id"])}">'
+        f'      <li class="reveal" data-delay="{(n % 4) * 50}"><a href="{link(lang, "almail-group-world.html#" + c["id"])}">'
         f'{picture(c["logo"], t(c["name"], lang))}</a></li>'
         for n, c in enumerate(companies))
     return f'    <ul class="sub-logos" aria-label="{e(t(UI["companies"], lang))}">\n{lis}\n    </ul>'
@@ -1026,7 +1064,7 @@ HERO_PHOTO = "hero-glass-towers.jpg"
 
 def build_home(lang):
     sectors = "\n".join(
-        f'      <li class="reveal" data-delay="{(n % 2) * 90}"><a class="sector-link" href="{link(lang, "our-sectors.html#" + slug(s[0]))}">'
+        f'      <li class="reveal" data-delay="{(n % 2) * 60}"><a class="sector-link" href="{link(lang, "our-sectors.html#" + slug(s[0]))}">'
         f'<span class="sector-num" aria-hidden="true">{n + 1:02d}</span><span class="sector-name">{e(t(s, lang))}</span>'
         f'<span class="sector-arrow">{I["arrow"]}</span></a></li>'
         for n, s in enumerate(SECTORS))
@@ -1242,7 +1280,7 @@ def build_sectors(lang):
         icon, text = SECTOR_INFO[s[0]]
         companies = [(t(c['name'], lang), link(lang, "almail-group-world.html#" + c['id']))
                      for c in COMPANIES if s[0] in c['sectors']]
-        cards.append(f"""      <article class="sector-card reveal" id="{slug(s[0])}" data-delay="{(n % 2) * 90}">
+        cards.append(f"""      <article class="sector-card reveal" id="{slug(s[0])}" data-delay="{(n % 2) * 60}">
         <div class="sector-card-top"><span class="icon-badge">{I[icon]}</span><span class="sector-num" aria-hidden="true">{n + 1:02d}</span></div>
         <h2>{e(t(s, lang))}</h2>
         <p class="sector-text">{e(t(text, lang))}</p>
@@ -1337,12 +1375,12 @@ def build_careers(lang):
         <p>{e(t(UI['step1_text'], lang))}</p>
         <ul class="chips">{fields}</ul>
       </li>
-      <li class="reveal" data-delay="90">
+      <li class="reveal" data-delay="60">
         <span class="step-num" aria-hidden="true">2</span>
         <h3>{e(t(UI['step2'], lang))}</h3>
         <p>{e(t(UI['step2_text'], lang))}</p>
       </li>
-      <li class="reveal" data-delay="180">
+      <li class="reveal" data-delay="120">
         <span class="step-num" aria-hidden="true">3</span>
         <h3>{e(t(UI['step3'], lang))}</h3>
         <p>{send_to}</p>
@@ -1369,7 +1407,7 @@ def build_contact(lang):
     address = "<br>".join(e(line) for line in t(ADDRESS, lang))
     hours = "".join(f"<li><span>{e(t(day, lang))}</span><span>{e(t(time, lang))}</span></li>" for day, time in HOURS)
     online = "\n".join(
-        f"""      <li class="reveal" data-delay="{n * 90}">
+        f"""      <li class="reveal" data-delay="{n * 60}">
         <a class="online-card" href="{c['url']}" target="_blank" rel="noopener noreferrer">
           <span class="online-logo">{picture(c['logo'], '')}</span>
           <span class="online-name">{e(t(c['name'], lang))}</span>
@@ -1386,19 +1424,19 @@ def build_contact(lang):
         <p><a href="tel:{PHONE_HREF}">{ltr(PHONE, lang)}</a></p>
         <a class="btn btn-primary" href="tel:{PHONE_HREF}">{e(t(UI['call_now'], lang))}</a>
       </article>
-      <article class="contact-card reveal" data-delay="70">
+      <article class="contact-card reveal" data-delay="50">
         <span class="icon-badge">{I['mail']}</span>
         <h2>{e(t(UI['email_us'], lang))}</h2>
         <p><a href="mailto:{EMAIL_HREF}">{ltr(EMAIL, lang)}</a></p>
         <a class="btn btn-ghost" href="mailto:{EMAIL_HREF}">{e(t(UI['send_email'], lang))}</a>
       </article>
-      <article class="contact-card reveal" data-delay="140">
+      <article class="contact-card reveal" data-delay="100">
         <span class="icon-badge">{I['pin']}</span>
         <h2>{e(t(UI['visit_us'], lang))}</h2>
         <address>{address}</address>
         <a class="btn btn-ghost" href="{MAPS_URL}" target="_blank" rel="noopener noreferrer">{e(t(UI['directions'], lang))}</a>
       </article>
-      <article class="contact-card reveal" data-delay="210">
+      <article class="contact-card reveal" data-delay="150">
         <span class="icon-badge">{I['clock']}</span>
         <h2>{e(t(UI['hours'], lang))}</h2>
         <ul class="hours">{hours}</ul>
