@@ -122,6 +122,9 @@ body {
 
 img { display: block; max-width: 100%; height: auto; }
 
+/* form fields at 16px exactly: below that an iPhone zooms in on the field */
+input, select, textarea { font-size: 16px; }
+
 /* <picture> only offers the lighter copies; the <img> inside lays out as if it stood alone */
 picture { display: contents; }
 
@@ -1367,15 +1370,14 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
 @media (max-width: 640px) {
   /* "Almail Group" on one line down to 320px; sections closer together, so a
      phone scrolls less between them */
-  :root { --h1: clamp(34px, 9.6vw, 44px); --section: 72px; }
-  body { font-size: 16px; }
+  :root { --section: 72px; }
   .header-inner { padding-block: 14px; }
   .brand-logo { height: 52px; }
   .site-header.is-stuck .header-inner { padding-block: 8px; }
   .site-header.is-stuck .brand-logo { height: 44px; }
   .hero { padding-block: 140px 96px; }
   .hero-title { margin-bottom: 20px; }
-  .hero-lead { font-size: 16px; line-height: 1.65; }
+  .hero-lead { line-height: 1.65; }
   .hero-actions { margin-top: 28px; }
   .why { padding-block: 64px; }
   .why-band { padding: 28px; }
@@ -1387,7 +1389,6 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .steps .btn,
   .item-card .btn { align-self: stretch; }
   .page-hero { min-height: 56vh; padding-block: 190px 56px; }
-  .page-lead { font-size: 17px; }
   .contact-cards { grid-template-columns: 1fr; }
   .company-logo { height: 140px; }
   .why .bg img { object-position: 22% center; }   /* a phone's narrow crop: keep the left tower in frame */
@@ -1429,7 +1430,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
    header and type sizes would fill half of it. The top bar goes (its number,
    language and links are in the menu), and the header and type come down. */
 @media (max-height: 500px) and (orientation: landscape) {
-  :root { --h1: clamp(30px, 5.4vw, 44px); --h2: clamp(26px, 4vw, 34px); --section: 64px; }
+  :root { --section: 64px; }
   .topbar { display: none; }
   .header-inner { padding-block: 8px; }
   .brand-logo { height: 44px; }
@@ -1437,15 +1438,54 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .site-header.is-stuck .header-inner { padding-block: 6px; }
   .hero { padding-block: 96px 56px; }
   .hero-title { margin-bottom: 18px; }
-  .hero-lead { font-size: 16px; }
   .hero-actions { margin-top: 24px; }
   .scroll-cue { display: none; }
   .page-hero { min-height: 0; padding-block: 110px 44px; }
-  .page-lead { font-size: 16px; }
   .why { padding-block: 56px; }
   .why-band { padding: 32px; }
   .clients-head { padding-block: 64px 36px; }
   .footer-photo { height: 200px; }
+}
+
+/* Type on a phone, upright or on its side: the sizes the owner set. */
+@media (max-width: 640px), (max-height: 500px) and (orientation: landscape) {
+  :root { --h1: 33.6px; --h2: 27.2px; }                 /* a page's title; every section heading */
+  body { font-size: 16px; line-height: 1.75; }
+  .hero-title { font-size: 33.5px; }
+  .footer-title,
+  .cta-band h2 { font-size: var(--h2); }
+  /* the paragraph under the hero and each page's title, and the home page's
+     section introductions */
+  .hero-lead,
+  .page-lead,
+  .about-text,
+  .sectors-head p { font-size: 16px; }
+  /* the larger paragraph opening a section on the inner pages */
+  .lead-text { font-size: 17.9px; }
+  /* cards: titles and text */
+  .why-band h3,
+  .company-body h3,
+  .sector-card h2,
+  .item-card h2,
+  .item-card h3,
+  .side-note h2,
+  .steps h3,
+  .contact-card h2,
+  .online-name { font-size: 18.6px; }
+  .why-band p,
+  .company-text,
+  .sector-text,
+  .item-card p,
+  .side-note p,
+  .empty-note,
+  .steps p,
+  .contact-card p,
+  .contact-card address,
+  .hours,
+  .online-url { font-size: 15.4px; }
+  /* the bar of page links and the copyright line at the foot of every page */
+  .footer-nav a,
+  .footer-legal { font-size: 11.8px; }
 }
 
 @media (max-width: 400px) {
@@ -1466,7 +1506,7 @@ a.chip:active { border-color: var(--lavender); color: var(--lavender); }
   .topbar-social a { position: relative; }
   .topbar-social a::after { content: ""; position: absolute; inset: -6px; }
   .footer-contact a,
-  .contact-card p a { display: inline-block; padding-block: 8px; }
+  .contact-card p a { display: inline-block; padding-block: 9px; }
   a.chip { min-height: 44px; }
   .footer-nav a { min-height: 44px; min-width: 44px; justify-content: center; }
 }

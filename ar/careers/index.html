@@ -128,6 +128,7 @@ font: 400 18px/1.7 var(--font-body);
 -moz-osx-font-smoothing: grayscale;
 }
 img { display: block; max-width: 100%; height: auto; }
+input, select, textarea { font-size: 16px; }
 picture { display: contents; }
 a, button { -webkit-tap-highlight-color: rgba(201, 184, 255, .2); }
 h1, h2, h3 {
@@ -1118,15 +1119,14 @@ body { font-size: 20px; }
 .logo-grid--partners { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
-:root { --h1: clamp(34px, 9.6vw, 44px); --section: 72px; }
-body { font-size: 16px; }
+:root { --section: 72px; }
 .header-inner { padding-block: 14px; }
 .brand-logo { height: 52px; }
 .site-header.is-stuck .header-inner { padding-block: 8px; }
 .site-header.is-stuck .brand-logo { height: 44px; }
 .hero { padding-block: 140px 96px; }
 .hero-title { margin-bottom: 20px; }
-.hero-lead { font-size: 16px; line-height: 1.65; }
+.hero-lead { line-height: 1.65; }
 .hero-actions { margin-top: 28px; }
 .why { padding-block: 64px; }
 .why-band { padding: 28px; }
@@ -1138,7 +1138,6 @@ body { font-size: 16px; }
 .steps .btn,
 .item-card .btn { align-self: stretch; }
 .page-hero { min-height: 56vh; padding-block: 190px 56px; }
-.page-lead { font-size: 17px; }
 .contact-cards { grid-template-columns: 1fr; }
 .company-logo { height: 140px; }
 .why .bg img { object-position: 22% center; }
@@ -1171,7 +1170,7 @@ body { font-size: 16px; }
 .sector-arrow { display: none; }
 }
 @media (max-height: 500px) and (orientation: landscape) {
-:root { --h1: clamp(30px, 5.4vw, 44px); --h2: clamp(26px, 4vw, 34px); --section: 64px; }
+:root { --section: 64px; }
 .topbar { display: none; }
 .header-inner { padding-block: 8px; }
 .brand-logo { height: 44px; }
@@ -1179,15 +1178,47 @@ body { font-size: 16px; }
 .site-header.is-stuck .header-inner { padding-block: 6px; }
 .hero { padding-block: 96px 56px; }
 .hero-title { margin-bottom: 18px; }
-.hero-lead { font-size: 16px; }
 .hero-actions { margin-top: 24px; }
 .scroll-cue { display: none; }
 .page-hero { min-height: 0; padding-block: 110px 44px; }
-.page-lead { font-size: 16px; }
 .why { padding-block: 56px; }
 .why-band { padding: 32px; }
 .clients-head { padding-block: 64px 36px; }
 .footer-photo { height: 200px; }
+}
+@media (max-width: 640px), (max-height: 500px) and (orientation: landscape) {
+:root { --h1: 33.6px; --h2: 27.2px; }
+body { font-size: 16px; line-height: 1.75; }
+.hero-title { font-size: 33.5px; }
+.footer-title,
+.cta-band h2 { font-size: var(--h2); }
+.hero-lead,
+.page-lead,
+.about-text,
+.sectors-head p { font-size: 16px; }
+.lead-text { font-size: 17.9px; }
+.why-band h3,
+.company-body h3,
+.sector-card h2,
+.item-card h2,
+.item-card h3,
+.side-note h2,
+.steps h3,
+.contact-card h2,
+.online-name { font-size: 18.6px; }
+.why-band p,
+.company-text,
+.sector-text,
+.item-card p,
+.side-note p,
+.empty-note,
+.steps p,
+.contact-card p,
+.contact-card address,
+.hours,
+.online-url { font-size: 15.4px; }
+.footer-nav a,
+.footer-legal { font-size: 11.8px; }
 }
 @media (max-width: 400px) {
 .topbar-social { display: none; }
@@ -1202,7 +1233,7 @@ body { font-size: 16px; }
 .topbar-social a { position: relative; }
 .topbar-social a::after { content: ""; position: absolute; inset: -6px; }
 .footer-contact a,
-.contact-card p a { display: inline-block; padding-block: 8px; }
+.contact-card p a { display: inline-block; padding-block: 9px; }
 a.chip { min-height: 44px; }
 .footer-nav a { min-height: 44px; min-width: 44px; justify-content: center; }
 }

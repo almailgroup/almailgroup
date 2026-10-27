@@ -162,8 +162,14 @@ sizes and naming.
 
 - Black and near-black surfaces, white type; full-bleed photographs under 50–72% black overlays.
 - Headings and navigation in Montserrat (H1 68px and H2 46px at weight 600, scaling down on
-  small screens; the navigation 16px bold); body copy in Inter at 18px (16px on a phone), and
-  the hero's paragraph at 20px (16px on a phone).
+  small screens; the navigation 16px bold); body copy in Inter at 18px, and the hero's
+  paragraph at 20px.
+- On a phone (upright, or on its side) the type is set to fixed sizes: body text 16px with a
+  line height of 1.75; the hero's and each page's paragraph and the home page's section
+  introductions 16px; an inner page's opening paragraph 17.9px; card text 15.4px and card
+  titles 18.6px; a page's title 33.6px (33.5px on the home page); section headings 27.2px;
+  the page links and copyright line at the foot 11.8px; form fields 16px. They are one block
+  at the end of the responsive rules in `style.css`.
 - A contact bar runs along the top of every page: the address (opening Google Maps), the
   phone, the email and the social links. Below 1200px the address shortens, and on a phone
   the bar keeps the phone number and the social links. Its address and map link are
