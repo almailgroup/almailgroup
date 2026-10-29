@@ -23,7 +23,7 @@ Every page is in English and Arabic: English at the addresses above, Arabic unde
 (`/ar/`, `/ar/contact/`, ...). See **Languages** below.
 
 On the home page each sector opens its card on Our Sectors, and each company logo opens its
-card on Almail Group World; the card arrived at is outlined in lavender. Every inner page ends
+card on Almail Group World; the card arrived at is outlined in white. Every inner page ends
 with a "Talk to us" band with call and email buttons.
 
 ## Structure
@@ -160,27 +160,27 @@ sizes and naming.
 
 ## Design
 
-- Black and near-black surfaces, white type; full-bleed photographs under 50–72% black overlays.
-- Headings and navigation in Montserrat (H1 68px and H2 46px at weight 600, scaling down on
-  small screens; the navigation 16px bold); body copy in Inter at 18px, and the hero's
-  paragraph at 20px.
-- On a phone (upright, or on its side) the type is set to fixed sizes: body text 16px with a
-  line height of 1.75; the hero's and each page's paragraph and the home page's section
-  introductions 16px; an inner page's opening paragraph 17.9px; card text 15.4px and card
-  titles 18.6px; a page's title 33.6px (33.5px on the home page); section headings 27.2px;
-  the page links and copyright line at the foot 11.8px; form fields 16px. They are one block
-  at the end of the responsive rules in `style.css`.
+- Black and white only: black and near-black surfaces, white type, and no second colour. An
+  accent is white where it sits on black and black where it sits on white (the Why Choose
+  panel's icons, a white button under the pointer). Full-bleed photographs sit under 50–72%
+  black overlays.
+- Headings and navigation in Montserrat at weight 600, body copy in Inter, at the same fixed
+  sizes on every screen: body text 16px with a line height of 1.75; the hero's and each page's
+  paragraph and the home page's section introductions 16px; an inner page's opening paragraph
+  17.9px; card text 15.4px and card titles 18.6px; a page's title 33.6px (33.5px on the home
+  page); section headings 27.2px; the page links and copyright line at the foot 11.8px; form
+  fields 16px; the navigation 16px bold.
 - A contact bar runs along the top of every page: the address (opening Google Maps), the
   phone, the email and the social links. Below 1200px the address shortens, and on a phone
   the bar keeps the phone number and the social links. Its address and map link are
   `ADDRESS_LINE`, `ADDRESS_SHORT` and `MAPS_URL` in `tools/build.py`.
-- The current page's navigation link is lavender (`#C9B8FF`); every other link is white.
+- The current page's navigation link is underlined, in the header, the menu and the footer.
 - On phones and tablets the header has a menu button, and the menu ends with a call button,
   the email, the address (opening Google Maps), the opening hours and the
   social links. While the menu is open the page behind it can't be reached by keyboard or
   screen reader.
 - Hover effects only exist where there is a mouse or trackpad; on a touch screen a tap flashes
-  lavender and buttons press in, and nothing stays lit after going Back. Every link and button
+  white and buttons press in, and nothing stays lit after going Back. Every link and button
   is at least 44px to tap.
 - Once the header has scrolled out of sight it comes back as a compact dark bar fixed to the
   top, without the contact bar, and goes back to normal near the top of the page. On phones
@@ -221,7 +221,7 @@ sizes and naming.
   their rows slide in, and the footer's columns follow its name. Tied to the scroll itself, in
   browsers that run it off the main thread (Chrome, Edge, Safari 26 and later): the section
   photos drift slower than the page, the hero's words float away as it scrolls off, the footer
-  photo settles into place, and a thin lavender line along the top of the screen shows how far
+  photo settles into place, and a thin white line along the top of the screen shows how far
   down the page is. Everything is visible with JavaScript off, a link reached with the keyboard
   shows at once, and all of it is skipped for visitors who ask for reduced motion. On an Arabic
   page the rows and lines come in from the right.
